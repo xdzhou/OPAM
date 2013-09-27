@@ -6,9 +6,8 @@ public class Main {
 
 	public static void main(String[] args){
 
-		System.out.println(Chiffrement.encrypt("whoami?", "OPAM"));	  
+		System.out.println(Chiffrement.encrypt("whoami?", "OPAM"));	   
 		
 	}
-	
 	
 }

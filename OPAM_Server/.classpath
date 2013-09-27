@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/httpcomponents-client-4.2.2/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/httpcomponents-client-4.2.2/lib/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/httpcomponents-client-4.2.2/lib/httpcore-4.2.2.jar" sourcepath="D:/Documents and Settings/xiandonz/.m2/repository/org/apache/httpcomponents/httpcore/4.2.2/httpcore-4.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/httpcomponents-client-4.2.2/lib/httpmime-4.2.2.jar"/>
+	<classpathentry kind="lib" path="D:/workspace/socketFreeHttpClient/bin/GAEHttpClient.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/jdom-2.0.4/jdom-2.0.4.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/v2"/>
+	<classpathentry kind="lib" path="D:/Program Files/Eclipse/Lib_ext/json/json-simple-1.1.1.jar"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>
