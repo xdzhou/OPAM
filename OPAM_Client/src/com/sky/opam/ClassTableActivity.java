@@ -158,7 +158,7 @@ public class ClassTableActivity extends FragmentActivity {
 		menu = findViewById(R.id.menu);
 		menuParams = (LinearLayout.LayoutParams) menu.getLayoutParams();
 		menuPadding = screenWidth / 2;
-		// 将menu的宽度设置为屏幕宽度减去menuPadding
+		// 将menu的宽度设置为屏幕宽度减去menuPadding test
 		menuParams.width = screenWidth - menuPadding;
 		// 左边缘的值赋值为menu宽度的负数
 		leftEdge = -menuParams.width;
