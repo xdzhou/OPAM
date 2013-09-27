@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 	private static final String BDNAME = "opamInfo.db";
 	private SQLiteDatabase db;
 
@@ -16,53 +16,71 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		//db.execSQL("create table config (id int,lastlogin varchar(10), showinfo int);");
-		db.execSQL("create table user (login varchar(10) primary key," +
-										"password varchar(64), " +
-										"name varchar(50), " +
-										"defaultuser int," +
-										"thisweek int);");
-		db.execSQL("create table cours (login varchar(10)," +
-										"name varchar(50)," +
-										"type varchar(20)," +
-										"position varchar(10)," +
-										"debut varchar(10)," +
-										"fin varchar(10)," +
-										"auteur varchar(50)," +
-										"formateur varchar(50)," +
-										"apprenant text," +
-										"groupe varchar(30)," +
-										"salle varchar(50),foreign key(login) references user(login));");
+		// db.execSQL("create table config (id int,lastlogin varchar(10), showinfo int);");
+		db.execSQL("create table if not exists user (login varchar(10) primary key,"
+				+ "password varchar(64), "
+				+ "name varchar(50), "
+				+ "defaultuser int,"
+				+ "thisweek int,"
+				+ "sync int, "
+				+ "weeksync int);");
+		db.execSQL("create table if not exists cours (login varchar(10),"
+				+ "name varchar(50),"
+				+ "type varchar(20),"
+				+ "position varchar(10),"
+				+ "debut varchar(10),"
+				+ "fin varchar(10),"
+				+ "auteur varchar(50),"
+				+ "formateur varchar(50),"
+				+ "apprenant text,"
+				+ "groupe varchar(30),"
+				+ "salle varchar(50),foreign key(login) references user(login));");
+		db.execSQL("create table if not exists syncevent (login varchar(10),"
+				+ "eventid long);");
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-		//db.execSQL("DROP TABLE IF EXISTS diary"); 
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		if (oldVersion == 1 && newVersion == 2) {
+			db.execSQL("ALTER TABLE user ADD COLUMN sync int;"); // 0:no 1:yes
+			db.execSQL("ALTER TABLE user ADD COLUMN weeksync int;"); // 0:no
+																		// 1:yes
+			db.execSQL("update user set sync = 1");
+		}
+		onCreate(db);
 	}
-	
-    public Cursor queryUser() {  
-        SQLiteDatabase db = getWritableDatabase();  
-        Cursor c = db.query("user", null, null, null, null, null, null);  
-        return c;  
-    }  
-    public Cursor queryCours() {  
-        SQLiteDatabase db = getWritableDatabase();  
-        Cursor c = db.query("cours", null, null, null, null, null, null);  
-        return c;  
-    }
-    public void delUser(int id) {  
-        if (db == null)  
-            db = getWritableDatabase();  
-        db.delete("user", "login=?", new String[] { String.valueOf(id) });  
-    }  
-    public void delCours(int id) {  
-        if (db == null)  
-            db = getWritableDatabase();  
-        db.delete("cours", "id=?", new String[] { String.valueOf(id) });  
-    }
-    public void close() {  
-        if (db != null)  
-            db.close();  
-    }  
+
+	public void addConfigTable() {
+
+	}
+
+	public Cursor queryUser() {
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.query("user", null, null, null, null, null, null);
+		return c;
+	}
+
+	public Cursor queryCours() {
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.query("cours", null, null, null, null, null, null);
+		return c;
+	}
+
+	public void delUser(int id) {
+		if (db == null)
+			db = getWritableDatabase();
+		db.delete("user", "login=?", new String[] { String.valueOf(id) });
+	}
+
+	public void delCours(int id) {
+		if (db == null)
+			db = getWritableDatabase();
+		db.delete("cours", "id=?", new String[] { String.valueOf(id) });
+	}
+
+	public void close() {
+		if (db != null)
+			db.close();
+	}
 
 }

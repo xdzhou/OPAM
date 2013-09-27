@@ -14,7 +14,7 @@
         android:text="Static Info"
         android:gravity="center"
         android:textColor="@color/red"
-        android:textSize="16sp" />
+        android:textSize="20dp" />
     
     <View 
         android:layout_width="fill_parent" 

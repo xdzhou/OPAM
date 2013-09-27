@@ -28,54 +28,58 @@ public class SimsimiAPI {
 	HttpGet httpGet;
 	HttpResponse response;
 	HttpEntity entity;
-	
-	public SimsimiAPI(){
+
+	public SimsimiAPI() {
 		client = new DefaultHttpClient();
 		// set cookie store
 		cookieStore = new BasicCookieStore();
 		localContext = new BasicHttpContext();
 		localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-		//other set
-		client.getParams().setParameter(HttpProtocolParams.HTTP_CONTENT_CHARSET, "UTF-8");	
+		// other set
+		client.getParams().setParameter(
+				HttpProtocolParams.HTTP_CONTENT_CHARSET, "UTF-8");
 	}
-	
-	public void Start(){
+
+	public void Start() {
 		httpGet = new HttpGet("http://www.simsimi.com/talk.htm");
 		setHeader();
 		try {
-			response = client.execute(httpGet,localContext);
+			response = client.execute(httpGet, localContext);
 			httpGet.abort();
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
-	public void stop(){
+
+	public void stop() {
 		client.getConnectionManager().shutdown();
 	}
-	
-	public String getSimsimiRsp(String msg, String ln){		
+
+	public String getSimsimiRsp(String msg, String ln) {
 		try {
 			msg = URLEncoder.encode(msg, "utf-8");
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}
-		System.out.println("http://www.simsimi.com/func/req?msg="+msg+"&lc="+ln);
-		httpGet = new HttpGet("http://www.simsimi.com/func/req?msg="+msg+"&lc="+ln);
+		System.out.println("http://www.simsimi.com/func/req?msg=" + msg
+				+ "&lc=" + ln);
+		httpGet = new HttpGet("http://www.simsimi.com/func/req?msg=" + msg
+				+ "&lc=" + ln);
 		setHeader();
 		try {
-			response = client.execute(httpGet,localContext);
+			response = client.execute(httpGet, localContext);
 			entity = response.getEntity();
 			int status = response.getStatusLine().getStatusCode();
-			if(status==200){
+			if (status == 200) {
 				JSONObject json = new JSONObject(EntityUtils.toString(entity));
 				String s = json.getString("response");
 				return s;
-			}else {
+			} else {
 				return "Not 200, failed";
-			}	
-			//httpGet.abort();
+			}
+			// httpGet.abort();
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -84,13 +88,14 @@ public class SimsimiAPI {
 			e.printStackTrace();
 		} catch (JSONException e) {
 			return "I have no response!";
-		} 		
-		return "sorry, There is a error!!!";	
+		}
+		return "sorry, There is a error!!!";
 	}
-	
-	private void setHeader(){
+
+	private void setHeader() {
 		httpGet.setHeader("Referer", "http://www.simsimi.com/talk.htm");
-		httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:20.0) Gecko/20100101 Firefox/20.0");
+		httpGet.setHeader("User-Agent",
+				"Mozilla/5.0 (Windows NT 5.1; rv:20.0) Gecko/20100101 Firefox/20.0");
 	}
 
 }

@@ -8,16 +8,16 @@ public class DataCompo {
 	private int id;
 	private int numweek;
 	private String username;
-	
-	public DataCompo(){
-		
+
+	public DataCompo() {
+
 	}
-	
-	public DataCompo(List<Cours> cours, int id, int numweek,String username){
-		this.cours=cours;
-		this.id=id;
-		this.numweek=numweek;
-		this.username=username;
+
+	public DataCompo(List<Cours> cours, int id, int numweek, String username) {
+		this.cours = cours;
+		this.id = id;
+		this.numweek = numweek;
+		this.username = username;
 	}
 
 	public List<Cours> getCours() {
@@ -51,7 +51,5 @@ public class DataCompo {
 	public void setNumweek(int numweek) {
 		this.numweek = numweek;
 	}
-	
-	
 
 }

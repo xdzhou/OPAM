@@ -1,10 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/com/sky/opam/AgendaActivity.java=UTF-8
-encoding//src/com/sky/opam/AgendaNextWeekActivity.java=UTF-8
-encoding//src/com/sky/opam/ChatActivity.java=UTF-8
-encoding//src/com/sky/opam/DynamicClassActivity.java=UTF-8
+encoding//src/com/sky/opam/ClassTableActivity.java=UTF-8
 encoding//src/com/sky/opam/LoginActivity.java=UTF-8
-encoding//src/com/sky/opam/MainActivity.java=UTF-8
-encoding//src/com/sky/opam/OnlineActivity.java=UTF-8
 encoding//src/com/sky/opam/outil/PullXMLReader.java=UTF-8
 encoding//src/com/sky/opam/outil/SimsimiAPI.java=UTF-8

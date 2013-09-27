@@ -1,24 +1,26 @@
 package com.sky.opam.model;
 
 public class User {
-	private String login="";
-	private String passwoed="";
-	private String usename="";
+	private String login = "";
+	private String passwoed = "";
+	private String usename = "";
 	private int thisweek;
-	//if 1, this user is the default user
-	private int defaultUser=0;
-	
-	public User(){
+	// if 1, this user is the default user
+	private int defaultUser = 0;
+
+	public User() {
 		super();
 	}
-	
-	public User(String login,String passwoed, String username){
+
+	public User(String login, String passwoed, String username) {
 		super();
 		this.login = login;
 		this.passwoed = passwoed;
 		this.usename = username;
 	}
-	public User(String login,String passwoed,String username,int defaultUser,int thisweek){
+
+	public User(String login, String passwoed, String username,
+			int defaultUser, int thisweek) {
 		super();
 		this.login = login;
 		this.passwoed = passwoed;
@@ -73,7 +75,5 @@ public class User {
 				+ usename + ", thisweek=" + thisweek + ", defaultUser="
 				+ defaultUser + "]";
 	}
-	
 
-	
 }

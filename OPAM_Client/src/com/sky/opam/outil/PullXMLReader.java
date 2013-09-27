@@ -11,7 +11,7 @@ import com.sky.opam.model.Cours;
 import com.sky.opam.model.DataCompo;
 
 public class PullXMLReader {
-	public static DataCompo readXML(InputStream inStream){
+	public static DataCompo readXML(InputStream inStream) {
 		XmlPullParser parser = Xml.newPullParser();
 		int id = -1;
 		int numweek = -1;
@@ -19,61 +19,63 @@ public class PullXMLReader {
 		try {
 			parser.setInput(inStream, "UTF-8");
 			int eventType = parser.getEventType();
-			Cours c = null;			
+			Cours c = null;
 			List<Cours> cours = null;
-			//SimpleDateFormat sdf=new  SimpleDateFormat("yyyyMMdd HH:mm");
-			
-			while(eventType!=XmlPullParser.END_DOCUMENT){
+			// SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd HH:mm");
+
+			while (eventType != XmlPullParser.END_DOCUMENT) {
 				switch (eventType) {
 				case XmlPullParser.START_DOCUMENT:
 					cours = new ArrayList<Cours>();
 					break;
 				case XmlPullParser.START_TAG:
 					String name = parser.getName();
-					if(name.equalsIgnoreCase("list")){
+					if (name.equalsIgnoreCase("list")) {
 						id = Integer.parseInt(parser.getAttributeValue(0));
 						numweek = Integer.parseInt(parser.getAttributeValue(1));
 						username = parser.getAttributeValue(2);
-						System.out.println("username: "+username);
-					}else if(name.equalsIgnoreCase("cour")){
+						System.out.println("username: " + username);
+					} else if (name.equalsIgnoreCase("cour")) {
 						c = new Cours();
-					}else if (c!=null) {
-						if(name.equalsIgnoreCase("name")){
+					} else if (c != null) {
+						if (name.equalsIgnoreCase("name")) {
 							c.name = parser.nextText();
-						}else if (name.equalsIgnoreCase("type")) {
+						} else if (name.equalsIgnoreCase("type")) {
 							c.type = parser.nextText();
-						}else if (name.equalsIgnoreCase("debut")) {
+						} else if (name.equalsIgnoreCase("debut")) {
 							String s = parser.nextText();
-							if(!s.equals("debut")){
+							if (!s.equals("debut")) {
 								c.debut = s.substring(9, s.length());
-							}	
-						}else if (name.equalsIgnoreCase("position")) {
+							}
+						} else if (name.equalsIgnoreCase("position")) {
 							c.position = parser.nextText();
-						}else if (name.equalsIgnoreCase("auteur")) {
+						} else if (name.equalsIgnoreCase("auteur")) {
 							c.auteur = parser.nextText();
-						}else if (name.equalsIgnoreCase("formateur")) {
+						} else if (name.equalsIgnoreCase("formateur")) {
 							c.formateur = parser.nextText();
-						}else if (name.equalsIgnoreCase("fin")) {
+						} else if (name.equalsIgnoreCase("fin")) {
 							String s = parser.nextText();
-							if(!s.equals("fin")){
+							if (!s.equals("fin")) {
 								c.fin = s.substring(9, s.length());
 							}
-						}else if (name.equalsIgnoreCase("apprenant")) {
+						} else if (name.equalsIgnoreCase("apprenant")) {
 							c.apprenants = parser.nextText();
-						}else if (name.equalsIgnoreCase("group")) {
+						} else if (name.equalsIgnoreCase("group")) {
 							c.groupe = parser.nextText();
-						}else {
+						} else {
 							c.salle = parser.nextText();
 						}
 					}
 					break;
 				case XmlPullParser.END_TAG:
-					if(parser.getName().equalsIgnoreCase("cour") && c!=null){
-						if(!c.name.equals("")){
-							if(c.salle.equals("")){c.salle="no room special";}
+					if (parser.getName().equalsIgnoreCase("cour") && c != null) {
+						if (!c.name.equals("")) {
+							if (c.salle.equals("")) {
+								c.salle = "no room special";
+							}
 							cours.add(c);
 						}
-						c=null;
+						c = null;
 					}
 					break;
 				default:
@@ -82,7 +84,7 @@ public class PullXMLReader {
 				eventType = parser.next();
 			}
 			inStream.close();
-			return new DataCompo(cours, id, numweek,username);
+			return new DataCompo(cours, id, numweek, username);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
