@@ -20,7 +20,7 @@ public class AgendaOPAMServlet extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		resp.setHeader("Content-type","text/html;charset=UTF-8");
 		
-		resp.getWriter().println("1.3");
+		resp.getWriter().println("version 2.1");
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{

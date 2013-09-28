@@ -73,6 +73,7 @@ public class NewEssai {
  			userName=getUserName();
  			getTWCoursPara();
  			getNWCoursPara();
+ 			
  			for(Cours c : cours){
  			//c=cours.get(0);//
  				getCoursDetail(c);
@@ -347,24 +348,27 @@ public class NewEssai {
 	}
 	
 	private void chargerCours(Cours c) throws FailException{	
-		System.out.println(rspHtml);
+		//System.out.println(rspHtml);
 		
 		String page = rspHtml.replaceAll("<[^>]+>", "_");
 		page = sansAccent(page);
 		page = page.replace(" ", " ");
 		page = page.replaceAll("_[ _:]+_", "_");	
 		
+		//System.out.println(page);
+		
 		Pattern pattern;
 		if(page.contains("Formateur")){
-			pattern = Pattern.compile("_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Formateur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
+			pattern = Pattern.compile("_([^_]+)_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Formateur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
 		}else {
-			pattern = Pattern.compile("_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
+			pattern = Pattern.compile("_([^_]+)_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
 		}		
 		Matcher matcher = pattern.matcher(page);
 		if(matcher.find()){
 			int offset=0;
-			if(matcher.groupCount()==10){offset=1;}
-			c.type=matcher.group(1);
+			if(matcher.groupCount()==11){offset=1;}
+			
+			c.type=matcher.group(2);
 			c.type=c.type.replace("\\", "");
 			if(c.type.contains("Examen")){
 				 if(page.contains("Controle Final 2")){
@@ -374,23 +378,30 @@ public class NewEssai {
 				}
 			 }
 			if(c.type.contains("Point de Rencontre")) c.type="Point de Rencontre";
-			c.debut=c.dateSrc+" "+matcher.group(4);
-			c.fin=c.dateSrc+" "+matcher.group(5);
+			c.debut=c.dateSrc+" "+matcher.group(5);
+			c.fin=c.dateSrc+" "+matcher.group(6);
 			c.position=getPosition(c.debut);
-			c.auteur=matcher.group(6);
+			c.auteur=matcher.group(7);
 			//c.auteur="";
-			c.formateur = (offset==1) ? "" :matcher.group(7);
+			c.formateur = (offset==1) ? "" :matcher.group(8);
 
 			//c.formateur="";
-			c.name=matcher.group(9-offset);
+			c.name=matcher.group(10-offset);
 			c.name=c.name.replace("\\", "");
-			c.group=matcher.group(10-offset);
+			c.group=matcher.group(11-offset);
 			if(c.group.equals("Gp-EI2-G")){
 				c.apprenants = "all the students";
 			}else {
-				c.apprenants=matcher.group(8-offset);
+				c.apprenants=matcher.group(9-offset);
 			}
-			c.salle=matcher.group(11-offset);
+			c.salle=matcher.group(12-offset);
+			if(c.salle.equals("") ){				
+				c.salle = matcher.group(1);
+				Pattern pt = Pattern.compile("salle ([^_]+)",Pattern.CASE_INSENSITIVE); //不区分大小写
+				Matcher match_salle = pt.matcher(c.salle);
+				
+				if(match_salle.find()) c.salle = match_salle.group(1);
+			}
 			if(c.salle.endsWith("_")){
 				c.salle=c.salle.substring(0, c.salle.length()-1);
 			}
