@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/Users/loic/workspace/GIT/OPAM-INT/OPAM_Server/war/WEB-INF/lib/httpmime-4.2.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/loic/workspace/GIT/OPAM-INT/OPAM_Server/war/WEB-INF/lib/jdom-2.0.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/loic/workspace/GIT/OPAM-INT/OPAM_Server/war/WEB-INF/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
