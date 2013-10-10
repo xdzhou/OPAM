@@ -235,7 +235,7 @@ public class ClassTableActivity extends FragmentActivity {
 				indiWeek = 0;
 			else
 				indiWeek = 1;
-			System.out.println(indiWeek);
+		//System.out.println(indiWeek);
 			if (!ClassList.get(i).debut.equals("")) {
 				try {
 					debut = formatter.parse(ClassList.get(i).debut);
@@ -274,12 +274,9 @@ public class ClassTableActivity extends FragmentActivity {
 	private void iniPopMenu() {
 		if (popMenu == null) {
 			System.out.println("got it 1");
-			View popupWindow_view = getLayoutInflater().inflate(R.layout.pop,
-					null, false);
-			TableLayout tableLayout = (TableLayout) popupWindow_view
-					.findViewById(R.id.poptl);
-			TextView pop_title = (TextView) popupWindow_view
-					.findViewById(R.id.pop_title);
+			View popupWindow_view = getLayoutInflater().inflate(R.layout.pop,null, false);
+			TableLayout tableLayout = (TableLayout) popupWindow_view.findViewById(R.id.poptl);
+			TextView pop_title = (TextView) popupWindow_view.findViewById(R.id.pop_title);
 			pop_title.setText("Course Info");
 			Iterator<String> itor = classTypeMap.keySet().iterator();
 

@@ -108,18 +108,20 @@ public class ClassFragment extends Fragment {
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
-		win.setContentView(R.layout.cours_detail);
+		win.setContentView(R.layout.cours_detail_2);
 
 		TextView name = (TextView) win.findViewById(R.id.className);
 		TextView type = (TextView) win.findViewById(R.id.classType);
 		TextView time = (TextView) win.findViewById(R.id.classTime);
 		TextView group = (TextView) win.findViewById(R.id.classGroup);
 		TextView room = (TextView) win.findViewById(R.id.classRoom);
+		TextView teacher = (TextView) win.findViewById(R.id.classTeacher);
 		name.setText(c.name);
-		type.setText("Type:   " + c.type);
-		time.setText("Time:   " + c.debut + "--" + c.fin);
-		group.setText("Group:   " + c.groupe);
-		room.setText("Room:   " + c.salle);
+		type.setText(c.type);
+		time.setText(c.debut + "--" + c.fin);
+		group.setText(c.groupe);
+		room.setText(c.salle);
+		teacher.setText(c.formateur);
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new OnClickListener() {
