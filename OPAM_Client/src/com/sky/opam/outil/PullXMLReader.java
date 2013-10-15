@@ -70,9 +70,10 @@ public class PullXMLReader {
 				case XmlPullParser.END_TAG:
 					if (parser.getName().equalsIgnoreCase("cour") && c != null) {
 						if (!c.name.equals("")) {
-							if (c.salle.equals("")) {
-								c.salle = "no room special";
-							}
+							//don't need to do this
+//							if (c.salle.equals("")) {
+//								c.salle = "no room special";
+//							}
 							cours.add(c);
 						}
 						c = null;

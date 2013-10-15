@@ -8,6 +8,7 @@ import com.sky.opam.outil.DBworker;
 import com.sky.opam.widget.ClassView;
 import com.sky.opam.widget.MyViewclickListener;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
@@ -23,6 +24,8 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 @SuppressLint("ValidFragment")
@@ -110,18 +113,25 @@ public class ClassFragment extends Fragment {
 		Window win = dlg.getWindow();
 		win.setContentView(R.layout.cours_detail_2);
 
-		TextView name = (TextView) win.findViewById(R.id.className);
-		TextView type = (TextView) win.findViewById(R.id.classType);
-		TextView time = (TextView) win.findViewById(R.id.classTime);
-		TextView group = (TextView) win.findViewById(R.id.classGroup);
-		TextView room = (TextView) win.findViewById(R.id.classRoom);
-		TextView teacher = (TextView) win.findViewById(R.id.classTeacher);
-		name.setText(c.name);
-		type.setText(c.type);
-		time.setText(c.debut + "--" + c.fin);
-		group.setText(c.groupe);
-		room.setText(c.salle);
-		teacher.setText(c.formateur);
+		((TextView) win.findViewById(R.id.className)).setText(c.name);
+		((TextView) win.findViewById(R.id.classType)).setText(c.type);
+		((TextView) win.findViewById(R.id.classTime)).setText(c.debut + "--" + c.fin);
+		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe);
+		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle);
+		String[] teachers;
+		if(c.formateur!=null || !c.formateur.equals("")) {
+			teachers = c.formateur.split("_");
+			((TextView) win.findViewById(R.id.classTeacher)).setText(teachers[0]);
+			TableLayout tl = (TableLayout) win.findViewById(R.id.classInfoTable);
+			int numTea = teachers.length-1;
+			for(int i=0; i<numTea; i++){
+				TableRow row = new TableRow(getActivity());
+				TextView tx = new TextView(getActivity());
+				tx.setText(teachers[i+1]);
+				row.addView(tx);
+				tl.addView(row, 1);
+			}
+		}
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new OnClickListener() {

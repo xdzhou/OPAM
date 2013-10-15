@@ -92,7 +92,7 @@
 			<TextView
 			    android:id="@+id/classRoom"
 			    android:layout_width="wrap_content"
-	      		android:text="A004 SC32pl"
+	      		android:text="??"
 	      		android:textColor="#000000" />
     	</TableRow>
     	
@@ -106,7 +106,7 @@
 			<TextView
 			    android:id="@+id/classTeacher"
 			    android:layout_width="wrap_content"
-	      		android:text="Denis Conan"
+	      		android:text="??"
 	      		android:textColor="#000000" />
     	</TableRow>
 		</TableLayout> 
