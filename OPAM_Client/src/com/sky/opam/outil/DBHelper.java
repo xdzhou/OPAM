@@ -1,12 +1,13 @@
 package com.sky.opam.outil;
 
+import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 	private static final String BDNAME = "opamInfo.db";
 	private SQLiteDatabase db;
 
@@ -35,17 +36,20 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ "apprenant text,"
 				+ "groupe varchar(30),"
 				+ "salle varchar(50),foreign key(login) references user(login));");
-		db.execSQL("create table if not exists syncevent (login varchar(10),"
+		db.execSQL("create table if not exists syncevent (login varchar(10), "
+				+ "numweek int,"
 				+ "eventid long);");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (oldVersion == 1 && newVersion == 2) {
+		if (oldVersion == 1) {
 			db.execSQL("ALTER TABLE user ADD COLUMN sync int;"); // 0:no 1:yes
-			db.execSQL("ALTER TABLE user ADD COLUMN weeksync int;"); // 0:no
-																		// 1:yes
+			db.execSQL("ALTER TABLE user ADD COLUMN weeksync int;"); // 0:no 1:yes
 			db.execSQL("update user set sync = 1");
+		}
+		if(oldVersion ==2){
+			db.execSQL("ALTER TABLE syncevent ADD COLUMN numweek int;"); // 0:no 1:yes
 		}
 		onCreate(db);
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import com.sky.opam.model.Cours;
 import com.sky.opam.model.User;
 
+import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -219,9 +220,7 @@ public class DBworker {
 
 	public boolean syncCalendar(Context context, String login) {
 		db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(
-				"select thisweek,weeksync from user where login='" + login
-						+ "';", null);
+		Cursor cursor = db.rawQuery("select thisweek,weeksync from user where login='" + login+ "';", null);
 		List<Cours> cours = null;
 		int newSync = 0, thisweek = 0, sync = 0;
 		if (cursor.getCount() > 0) {
@@ -234,6 +233,7 @@ public class DBworker {
 		// System.out.println("thisweek:"+thisweek+"  sync:"+sync);
 		if (thisweek != 0) {
 			if (sync == thisweek - 1) {
+				untachEventID(login, sync);
 				cours = findClass(login, thisweek + 1);
 				newSync = thisweek;
 			} else if (sync >= thisweek) {
@@ -269,23 +269,31 @@ public class DBworker {
 		db.close();
 	}
 
-	public void delAllEventID(Context context, String login) {
-		db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(
-				"select eventid from syncevent where login='" + login + "';",
-				null);
-		GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
-		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-			long eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
-			calendarAPI.delEvent(eventid);
-		}
-		cursor.close();
-		db.close();
+	public void delAllEventID(Context context, String login) {		
+		//if(ifdelCalEvent){
+			db = helper.getReadableDatabase();
+			Cursor cursor = db.rawQuery(
+					"select eventid from syncevent where login='" + login + "';",
+					null);
+			GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
+			for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+				long eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
+				calendarAPI.delEvent(eventid);
+			}
+			cursor.close();
+			db.close();
+		//}
 
 		db = helper.getWritableDatabase();
 		db.execSQL("delete from syncevent where login ='" + login + "';");
-		db.execSQL("update user set weeksync =? where login = ?", new Object[] {
-				0, login });
+		db.execSQL("update user set weeksync =? where login = ?", new Object[] {0, login });
+		db.close();
+	}
+	
+	public void untachEventID(String login, int numweek) {			
+		db = helper.getWritableDatabase();
+		db.execSQL("delete from syncevent where numweek ="+numweek+" AND login ='" + login + "';");
+		//db.execSQL("update user set weeksync =? where login = ?", new Object[] {0, login });
 		db.close();
 
 	}
