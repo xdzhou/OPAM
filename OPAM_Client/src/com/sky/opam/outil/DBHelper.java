@@ -1,6 +1,5 @@
 package com.sky.opam.outil;
 
-import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

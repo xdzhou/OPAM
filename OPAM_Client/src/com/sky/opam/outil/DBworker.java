@@ -6,7 +6,6 @@ import java.util.List;
 import com.sky.opam.model.Cours;
 import com.sky.opam.model.User;
 
-import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
