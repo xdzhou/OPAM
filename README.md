@@ -30,4 +30,3 @@ a web application providing a student’s class schedule abstracted from [Teleco
 [8]: https://lh5.ggpht.com/i84Fb3HCD4DbF-p7z2Li2Ud41IZSqa_EoIw6DCj0nNQWpDp_cN1l2SuTXwtArpbOD1w=h900-rw
 [9]: https://lh5.ggpht.com/BXfXt8pffzDKFXUr_-2cT83ZcNYvc5eJVPDoHKUpIMsaU28B4PQ4cLkSdFljJwv23A=h900-rw
 [10]: https://lh3.ggpht.com/5am3zdnjFSWhtIzLgbAwm27lY5x8P48LJlq8XcSnfVOyLBBONNhVTlKnglqO3_XoDw=h900-rw
-[5]: https://github.com/franciscojunior
