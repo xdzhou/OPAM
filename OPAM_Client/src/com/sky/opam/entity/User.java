@@ -1,4 +1,4 @@
-package com.sky.opam.model;
+package com.sky.opam.entity;
 
 public class User {
 	private String login = "";

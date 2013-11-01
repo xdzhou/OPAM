@@ -3,7 +3,7 @@ package com.sky.opam.adapter;
 import java.util.List;
 
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
+import com.sky.opam.entity.Cours;
 import com.sky.opam.outil.DBworker;
 import com.sky.opam.widget.ClassView;
 import com.sky.opam.widget.MyViewclickListener;
@@ -91,7 +91,7 @@ public class ClassFragment extends Fragment {
 			myview.setIstoday(true);
 		}
 		DBworker worker = new DBworker(getActivity().getApplicationContext());
-		final List<Cours> cours = worker.trouverCours(login, flag);
+		final List<Cours> cours = worker.findClass(login, flag);
 		myview.setCours(cours);
 		myview.setClickListener(new MyViewclickListener() {
 			@Override

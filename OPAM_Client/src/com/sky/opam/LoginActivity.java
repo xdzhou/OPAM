@@ -19,9 +19,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
-import com.sky.opam.model.DataCompo;
-import com.sky.opam.model.User;
+import com.sky.opam.entity.Cours;
+import com.sky.opam.entity.DataCompo;
+import com.sky.opam.entity.User;
 import com.sky.opam.outil.Chiffrement;
 import com.sky.opam.outil.DBworker;
 import com.sky.opam.outil.PullXMLReader;
@@ -113,8 +113,7 @@ public class LoginActivity extends Activity {
 						downloadCharge();
 					} else {
 						worker.updateDefaultUser(u.getLogin());
-						String mdp = Chiffrement.decrypt(u.getPasswoed(),
-								"OPAM");
+						String mdp = Chiffrement.decrypt(u.getPasswoed(),"OPAM");
 						if (!mdp.equals(password)) {
 							showInfo("Password incorrect.");
 						} else {
@@ -325,15 +324,13 @@ public class LoginActivity extends Activity {
 						msgData = dataCompo.getCours().get(0).type;
 					} else {
 						if (u == null) {
-							u = new User(login, Chiffrement.encrypt(password,
-									"OPAM"), dataCompo.getUsername());
+							u = new User(login, Chiffrement.encrypt(password,"OPAM"), dataCompo.getUsername());
 							worker.addUser(u);
 						}
 						u.setThisweek(dataCompo.getNumweek());
 						worker.updateUser(u);
 						worker.updateDefaultUser(login);
-						worker.delAllCours(login);
-						worker.delAllEventID(LoginActivity.this, login);
+						worker.delAllCours(login,LoginActivity.this); //must after u.setThisweek
 						//
 						List<Cours> cours = dataCompo.getCours();
 						for (Cours c : cours) {

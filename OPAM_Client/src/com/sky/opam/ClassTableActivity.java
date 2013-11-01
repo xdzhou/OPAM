@@ -38,7 +38,7 @@ import android.widget.Toast;
 import android.widget.FrameLayout.LayoutParams;
 
 import com.sky.opam.adapter.FragementClassAdapter;
-import com.sky.opam.model.Cours;
+import com.sky.opam.entity.Cours;
 import com.sky.opam.outil.DBworker;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -178,8 +178,7 @@ public class ClassTableActivity extends FragmentActivity {
 
 		CheckBox cbox = (CheckBox) findViewById(R.id.flag_sync_calendar);
 		boolean sync_flag = worker.isCalendarSynced(login);
-		if (sync_flag)
-			new SyncCalendarTask().execute();
+		if (sync_flag)new SyncCalendarTask().execute();
 		cbox.setChecked(sync_flag);
 		cbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
@@ -420,18 +419,15 @@ public class ClassTableActivity extends FragmentActivity {
 		}
 	}
 
-	class SyncCalendarTask extends AsyncTask<Integer, Integer, Boolean> {
+	class SyncCalendarTask extends AsyncTask<Integer, Integer, Integer> {
 		@Override
-		protected Boolean doInBackground(Integer... params) {
+		protected Integer doInBackground(Integer... params) {
 			return worker.syncCalendar(ClassTableActivity.this, login);
 		}
 
 		@Override
-		protected void onPostExecute(Boolean synced) {
-			String info;
-			if (synced) info = "Calender Synchronized !";
-			else info = "can't sync google calender !";
-			Toast.makeText(getApplicationContext(),info, Toast.LENGTH_SHORT).show();
+		protected void onPostExecute(Integer nbClassSynced) {
+			Toast.makeText(getApplicationContext(),"sync "+nbClassSynced+" course to Google Calendar", Toast.LENGTH_SHORT).show();
 		}
 	}
 
