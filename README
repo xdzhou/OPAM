@@ -1,7 +1,0 @@
-Project OPAM:
-
-PS:
-git status
-git rm --cached classes/*.class
-git branch testing
-git checkout testing
