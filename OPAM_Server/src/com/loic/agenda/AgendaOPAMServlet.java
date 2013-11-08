@@ -1,17 +1,14 @@
 package com.loic.agenda;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.servlet.http.*;
 
 import com.loic.agenda.model.Cours;
 import com.loic.agenda.outil.Chiffrement;
-import com.loic.agenda.outil.NewEssai;
-import com.loic.agenda.outil.FailException;
+import com.loic.agenda.outil.NetAnt;
 import com.loic.agenda.outil.Java2xml;
-import com.loic.agenda.outil.Essai;
 
 @SuppressWarnings("serial")
 public class AgendaOPAMServlet extends HttpServlet {
@@ -20,7 +17,7 @@ public class AgendaOPAMServlet extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		resp.setHeader("Content-type","text/html;charset=UTF-8");
 		
-		resp.getWriter().println("1.3");
+		resp.getWriter().println("version 2.2");
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{
@@ -34,7 +31,7 @@ public class AgendaOPAMServlet extends HttpServlet {
 	    	
 	    	//long startTime=System.currentTimeMillis();
 	    	
-	    	NewEssai es = new NewEssai();
+	    	NetAnt es = new NetAnt();
 		    List<Cours> cours = es.start(id, mdp);
 		    String userName = es.userName;
 		    Java2xml b = new Java2xml(cours, userName);

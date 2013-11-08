@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 	private static final String BDNAME = "opamInfo.db";
 	private SQLiteDatabase db;
 
@@ -18,12 +18,11 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		// db.execSQL("create table config (id int,lastlogin varchar(10), showinfo int);");
 		db.execSQL("create table if not exists user (login varchar(10) primary key,"
-				+ "password varchar(64), "
+				+ "password varchar(64),"
 				+ "name varchar(50), "
-				+ "defaultuser int,"
-				+ "thisweek int,"
-				+ "sync int, "
-				+ "weeksync int);");
+				+ "defaultuser int," //boolean , if it's a default user
+				+ "thisweek int," //num of this week
+				+ "sync int);"); //boolean, if sync google calendar
 		db.execSQL("create table if not exists cours (login varchar(10),"
 				+ "name varchar(50),"
 				+ "type varchar(20),"
@@ -34,18 +33,26 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ "formateur varchar(50),"
 				+ "apprenant text,"
 				+ "groupe varchar(30),"
-				+ "salle varchar(50),foreign key(login) references user(login));");
-		db.execSQL("create table if not exists syncevent (login varchar(10),"
-				+ "eventid long);");
+				+ "salle varchar(50), "
+				+ "eventid long,"
+				+ "foreign key(login) references user(login));");
+//		db.execSQL("create table if not exists syncevent (login varchar(10), "
+//				+ "numweek int,"
+//				+ "eventid long);");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (oldVersion == 1 && newVersion == 2) {
+		if (oldVersion == 1) {
 			db.execSQL("ALTER TABLE user ADD COLUMN sync int;"); // 0:no 1:yes
-			db.execSQL("ALTER TABLE user ADD COLUMN weeksync int;"); // 0:no
-																		// 1:yes
+			//db.execSQL("ALTER TABLE user ADD COLUMN weeksync int;");
 			db.execSQL("update user set sync = 1");
+			db.execSQL("ALTER TABLE user ADD COLUMN eventid int;"); //add attribut eventid of table:user
+		}
+		if(oldVersion ==2){
+			db.execSQL("ALTER TABLE user DROP COLUMN weeksync;"); //delete attribut weeksync of table:user
+			db.execSQL("ALTER TABLE user ADD COLUMN eventid int;"); //add attribut eventid of table:user
+			db.execSQL("DROP TABLE syncevent;"); // delete table syncevent
 		}
 		onCreate(db);
 	}

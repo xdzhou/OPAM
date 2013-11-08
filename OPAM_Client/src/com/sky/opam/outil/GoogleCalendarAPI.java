@@ -3,7 +3,7 @@ package com.sky.opam.outil;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.entity.Cours;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

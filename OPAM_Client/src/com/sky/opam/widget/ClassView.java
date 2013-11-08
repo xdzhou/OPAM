@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.entity.Cours;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
