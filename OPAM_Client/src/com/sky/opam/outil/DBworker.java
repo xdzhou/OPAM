@@ -3,8 +3,8 @@ package com.sky.opam.outil;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sky.opam.model.Cours;
-import com.sky.opam.model.User;
+import com.sky.opam.entity.Cours;
+import com.sky.opam.entity.User;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -20,19 +20,13 @@ public class DBworker {
 
 	public void addUser(User user) {
 		db = helper.getWritableDatabase();
-		db.execSQL(
-				"insert into user (login,password,name,sync) values (?,?,?,?)",
-				new Object[] { user.getLogin(), user.getPasswoed(),
-						user.getUsename(), 1 });
+		db.execSQL("insert into user (login,password,name,sync) values (?,?,?,?)",new Object[] { user.getLogin(), user.getPasswoed(),user.getUsename(), 1 });
 		db.close();
 	}
 
 	public User defaultUser() {
 		db = helper.getReadableDatabase();
-		Cursor cursor = db
-				.rawQuery(
-						"select login,password,thisweek,name from user where defaultuser=1",
-						null);
+		Cursor cursor = db.rawQuery("select login,password,thisweek,name from user where defaultuser=1",null);
 		User user = new User();
 		cursor.moveToFirst();
 		if (!cursor.isAfterLast()) {
@@ -48,17 +42,16 @@ public class DBworker {
 
 	public void addCours(Cours c) {
 		db = helper.getWritableDatabase();
-		db.execSQL("insert into cours values (?,?,?,?,?,?,?,?,?,?,?)",
+		db.execSQL("insert into cours values (?,?,?,?,?,?,?,?,?,?,?,?)",
 				new Object[] { c.login, c.name, c.type, c.position, c.debut,
 						c.fin, c.auteur, c.formateur, c.apprenants, c.groupe,
-						c.salle });
+						c.salle,c.eventid });
 		db.close();
 	}
 
 	public void updateUser(User user) {
 		db = helper.getWritableDatabase();
-		db.execSQL(
-				"update user set password = ?,defaultuser =?, thisweek=? where login = ?",
+		db.execSQL("update user set password = ?,defaultuser =?, thisweek=? where login = ?",
 				new Object[] { user.getPasswoed(), user.getDefaultUser(),
 						user.getThisweek(), user.getLogin() });
 		db.close();
@@ -69,8 +62,25 @@ public class DBworker {
 		db.execSQL("delete from cours ;");
 		db.close();
 	}
-
-	public void delAllCours(String login) {
+	
+	//del all coures and it's calender (this week and next week)
+	public void delAllCours(String login, Context context) {
+		int thisweek = 0;
+		db = helper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("select thisweek from user where login='" + login+ "';", null);	
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			thisweek = cursor.getInt(cursor.getColumnIndex("thisweek"));
+		}
+		cursor.close();
+		db.close();
+		GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
+		for(Cours c : findClass(login)){
+			int numWeekofClass = Integer.parseInt(c.position.split("_")[0]);
+			if(numWeekofClass == thisweek || numWeekofClass == thisweek+1){
+				if(c.eventid!=0) calendarAPI.delEvent(c.eventid);
+			}
+		}		
 		db = helper.getWritableDatabase();
 		db.execSQL("delete from cours where login ='" + login + "';");
 		db.close();
@@ -105,22 +115,11 @@ public class DBworker {
 		}
 	}
 
-	public Cursor findClass(String login, String flag) {
+	public List<Cours> findClass(String login, String flag) {
 		db = helper.getReadableDatabase();
 		Cursor cursor = db.rawQuery(
-				"select name,type,debut,fin,groupe,salle from cours where login='"
-						+ login + "' AND position='" + flag + "';", null);
-		db.close();
-		return cursor;
-	}
-
-	public List<Cours> trouverCours(String login, String flag) {
-		db = helper.getReadableDatabase();
-		Cursor cursor = db
-				.rawQuery(
-						"select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
-								+ login + "' AND position='" + flag + "';",
-						null);
+						"select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position,eventid from cours where login='"
+						+ login + "' AND position='" + flag + "';",null);
 		List<Cours> cours = new ArrayList<Cours>();
 		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
 			Cours c = new Cours();
@@ -134,6 +133,7 @@ public class DBworker {
 			c.auteur = cursor.getString(7);
 			c.apprenants = cursor.getString(8);
 			c.position = cursor.getString(9);
+			c.eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
 			cours.add(c);
 		}
 		cursor.close();
@@ -143,19 +143,18 @@ public class DBworker {
 
 	public List<Cours> findClass(String login, int numweek) {
 		List<Cours> cours = new ArrayList<Cours>();
-		cours.addAll(trouverCours(login, numweek + "_1"));
-		cours.addAll(trouverCours(login, numweek + "_2"));
-		cours.addAll(trouverCours(login, numweek + "_3"));
-		cours.addAll(trouverCours(login, numweek + "_4"));
-		cours.addAll(trouverCours(login, numweek + "_5"));
+		cours.addAll(findClass(login, numweek + "_1"));
+		cours.addAll(findClass(login, numweek + "_2"));
+		cours.addAll(findClass(login, numweek + "_3"));
+		cours.addAll(findClass(login, numweek + "_4"));
+		cours.addAll(findClass(login, numweek + "_5"));
 		return cours;
 	}
 
 	public List<Cours> findClass(String login) {
 		db = helper.getReadableDatabase();
-		Cursor cursor = db
-				.rawQuery(
-						"select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
+		Cursor cursor = db.rawQuery(
+						"select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position,eventid from cours where login='"
 								+ login + "';", null);
 		List<Cours> cours = new ArrayList<Cours>();
 		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -170,6 +169,7 @@ public class DBworker {
 			c.auteur = cursor.getString(7);
 			c.apprenants = cursor.getString(8);
 			c.position = cursor.getString(9);
+			c.eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
 			cours.add(c);
 		}
 		cursor.close();
@@ -198,8 +198,7 @@ public class DBworker {
 	public boolean isCalendarSynced(String login) {
 		boolean b = false;
 		db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("select sync from user where login='"
-				+ login + "';", null);
+		Cursor cursor = db.rawQuery("select sync from user where login='"+ login + "';", null);
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			b = cursor.getInt(cursor.getColumnIndex("sync")) == 1;
@@ -217,77 +216,25 @@ public class DBworker {
 		db.close();
 	}
 
-	public boolean syncCalendar(Context context, String login) {
-		db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(
-				"select thisweek,weeksync from user where login='" + login
-						+ "';", null);
-		List<Cours> cours = null;
-		int newSync = 0, thisweek = 0, sync = 0;
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			thisweek = cursor.getInt(cursor.getColumnIndex("thisweek"));
-			sync = cursor.getInt(cursor.getColumnIndex("weeksync"));
-		}
-		cursor.close();
-		db.close();
-		// System.out.println("thisweek:"+thisweek+"  sync:"+sync);
-		if (thisweek != 0) {
-			if (sync == thisweek - 1) {
-				cours = findClass(login, thisweek + 1);
-				newSync = thisweek;
-			} else if (sync >= thisweek) {
-				newSync = sync;
-			} else {
-				cours = findClass(login);
-				newSync = thisweek;
-			}
-		}
-		// List<Cours> cours = findClass(login);
-		if (cours != null) {
-			db = helper.getWritableDatabase();
-			db.execSQL("update user set weeksync = ? where login = ?",
-					new Object[] { newSync, login });
-			db.close();
-
-			GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
-			for (Cours c : cours) {
-				long eventid = calendarAPI.addCourse2Calendar(c);
-				if(eventid==0) return false;
-				addEventID(login, eventid);
-			}
-			return true;
-		}
-		return false;
-
-	}
-
-	public void addEventID(String login, long eventid) {
-		db = helper.getWritableDatabase();
-		db.execSQL("insert into syncevent (login,eventid) values (?,?)",
-				new Object[] { login, eventid });
-		db.close();
-	}
-
-	public void delAllEventID(Context context, String login) {
-		db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(
-				"select eventid from syncevent where login='" + login + "';",
-				null);
+	public int syncCalendar(Context context, String login) {
+		int nbClassSync = 0;
 		GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
-		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-			long eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
-			calendarAPI.delEvent(eventid);
+		for(Cours c : findClass(login)){
+			if(c.eventid==0){
+				nbClassSync++;
+				long eventid = calendarAPI.addCourse2Calendar(c);
+				c.eventid = eventid;
+				updateClass(c, login);
+			}
 		}
-		cursor.close();
-		db.close();
-
+		return nbClassSync;
+	}
+	
+	private void updateClass(Cours c, String login){
 		db = helper.getWritableDatabase();
-		db.execSQL("delete from syncevent where login ='" + login + "';");
-		db.execSQL("update user set weeksync =? where login = ?", new Object[] {
-				0, login });
+		db.execSQL("update cours set eventid = ? where debut = ? AND login = ?",
+				new Object[] { c.eventid, c.debut,login });
 		db.close();
-
 	}
 
 }

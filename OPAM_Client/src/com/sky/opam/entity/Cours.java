@@ -1,4 +1,4 @@
-package com.sky.opam.model;
+package com.sky.opam.entity;
 
 public class Cours {
 	public String login = "";
@@ -12,6 +12,7 @@ public class Cours {
 	public String apprenants = "";
 	public String groupe = "";
 	public String salle = "";
+	public long eventid = 0;
 
 	public Cours() {
 	}

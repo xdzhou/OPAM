@@ -3,11 +3,12 @@ package com.sky.opam.adapter;
 import java.util.List;
 
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
+import com.sky.opam.entity.Cours;
 import com.sky.opam.outil.DBworker;
 import com.sky.opam.widget.ClassView;
 import com.sky.opam.widget.MyViewclickListener;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
@@ -23,6 +24,8 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 @SuppressLint("ValidFragment")
@@ -88,7 +91,7 @@ public class ClassFragment extends Fragment {
 			myview.setIstoday(true);
 		}
 		DBworker worker = new DBworker(getActivity().getApplicationContext());
-		final List<Cours> cours = worker.trouverCours(login, flag);
+		final List<Cours> cours = worker.findClass(login, flag);
 		myview.setCours(cours);
 		myview.setClickListener(new MyViewclickListener() {
 			@Override
@@ -108,18 +111,27 @@ public class ClassFragment extends Fragment {
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
-		win.setContentView(R.layout.cours_detail);
+		win.setContentView(R.layout.cours_detail_2);
 
-		TextView name = (TextView) win.findViewById(R.id.className);
-		TextView type = (TextView) win.findViewById(R.id.classType);
-		TextView time = (TextView) win.findViewById(R.id.classTime);
-		TextView group = (TextView) win.findViewById(R.id.classGroup);
-		TextView room = (TextView) win.findViewById(R.id.classRoom);
-		name.setText(c.name);
-		type.setText("Type:   " + c.type);
-		time.setText("Time:   " + c.debut + "--" + c.fin);
-		group.setText("Group:   " + c.groupe);
-		room.setText("Room:   " + c.salle);
+		((TextView) win.findViewById(R.id.className)).setText(c.name);
+		((TextView) win.findViewById(R.id.classType)).setText(c.type);
+		((TextView) win.findViewById(R.id.classTime)).setText(c.debut + "--" + c.fin);
+		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe);
+		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle);
+		String[] teachers;
+		if(c.formateur!=null || !c.formateur.equals("")) {
+			teachers = c.formateur.split("_");
+			((TextView) win.findViewById(R.id.classTeacher)).setText(teachers[0]);
+			TableLayout tl = (TableLayout) win.findViewById(R.id.classInfoTable);
+			int numTea = teachers.length-1;
+			for(int i=0; i<numTea; i++){
+				TableRow row = new TableRow(getActivity());
+				TextView tx = new TextView(getActivity());
+				tx.setText(teachers[i+1]);
+				row.addView(tx);
+				tl.addView(row, 1);
+			}
+		}
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new OnClickListener() {

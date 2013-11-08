@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
+
 import android.util.Xml;
 
-import com.sky.opam.model.Cours;
-import com.sky.opam.model.DataCompo;
+import com.sky.opam.entity.Cours;
+import com.sky.opam.entity.DataCompo;
 
 public class PullXMLReader {
 	public static DataCompo readXML(InputStream inStream) {
@@ -70,9 +71,10 @@ public class PullXMLReader {
 				case XmlPullParser.END_TAG:
 					if (parser.getName().equalsIgnoreCase("cour") && c != null) {
 						if (!c.name.equals("")) {
-							if (c.salle.equals("")) {
-								c.salle = "no room special";
-							}
+							//don't need to do this
+//							if (c.salle.equals("")) {
+//								c.salle = "no room special";
+//							}
 							cours.add(c);
 						}
 						c = null;

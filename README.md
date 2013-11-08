@@ -1,6 +1,7 @@
 OPAM(OpenPortal Agenda Mobile)
 ==============================
 
+<<<<<<< HEAD
 **OPAM_Server**:
 ----------------
 
@@ -18,6 +19,19 @@ This app use the library [Android ViewPagerIndicator][5]
 
 
 ![OPAM1][6] ![OPAM2][7] ![OPAM3][8] ![OPAM4][9] ![OPAM5][10]
+=======
+OPAM_Client:
+an android application who contact OPAM_Server for course schedule of student from [Telecom Sudparis][1] or [Telecom Ecole de Management][2]
+
+Try out this application [on Google Play][3].
+
+This app use the library [Android ViewPagerIndicator][5]
+
+![OPAM1][6] ![OPAM2][7] ![OPAM3][8] ![OPAM4][9] ![OPAM5][10]
+
+OPAM_Server:
+a web application providing a student’s class schedule abstracted from [Telecom Sudparis][1]'s platform based on [Google App Engine][4]
+>>>>>>> refs/heads/opam_client
 
 
 [1]: http://www.telecom-sudparis.eu/
