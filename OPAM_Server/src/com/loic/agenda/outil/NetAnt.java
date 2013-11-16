@@ -28,7 +28,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.loic.agenda.model.Cours;
@@ -389,29 +388,23 @@ public class NetAnt {
 			c.name=matcher.group(10-offset);
 			c.name=c.name.replace("\\", "");
 			c.group=matcher.group(11-offset);
-			if(c.group.equals("Gp-EI1-G")){
+			if(c.group.contains("Gp-EI1-G")){
 				c.apprenants = "all the students of 1st year";
-			}else if (c.group.equals("Gp-EI2-G")) {
+			}else if (c.group.contains("Gp-EI2-G")) {
 				c.apprenants = "all the students of 2nd year";
-			}else if (c.group.equals("Gp-EI3-G")) {
+			}else if (c.group.contains("Gp-EI3-G")) {
 				c.apprenants = "all the students of 3rd year";
 			}else {
 				c.apprenants=matcher.group(9-offset);
 			}
 			c.salle=matcher.group(12-offset);
-			if(c.salle.equals("") ){				
-				c.salle = matcher.group(1);
-				Pattern pt = Pattern.compile("salle ([^_]+)",Pattern.CASE_INSENSITIVE); //不区分大小写
-				Matcher match_salle = pt.matcher(c.salle);
-				
-				if(match_salle.find()) c.salle = match_salle.group(1);
-				else c.salle = "";
+			if( c.salle.equals("") ){				
+				c.salle = getSalleFromTitle( matcher.group(1) );
 			}
 			if(c.salle.endsWith("_")){
 				c.salle=c.salle.substring(0, c.salle.length()-1);
 			}
-		}
-		
+		}	
 	}
 	
 	private String getPosition(String sdata) throws FailException{
@@ -443,6 +436,22 @@ public class NetAnt {
         String strTemp = Normalizer.normalize(s, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(strTemp).replaceAll("");
-  }
+    }
+	
+	private String getSalleFromTitle(String msg){
+		String[] rooms = msg.split("-");
+		String lastMsg = rooms[rooms.length-1]; //获取salle可能存在的地方的string
+		
+		Pattern pt = Pattern.compile("salle ([^_]+)",Pattern.CASE_INSENSITIVE); //不区分大小写//可能存在关键字salle
+		Matcher match_salle = pt.matcher(lastMsg);
+		
+		if(match_salle.find()) return match_salle.group(1);
+		else {
+			pt = Pattern.compile("en ([^_]+)",Pattern.CASE_INSENSITIVE); //不区分大小写//可能存在关键字en
+			match_salle = pt.matcher(lastMsg);
+			if(match_salle.find()) return match_salle.group(1);
+		}
+		return "";
+	}
 
 }
