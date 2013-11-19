@@ -26,8 +26,8 @@ This app use the library [Android ViewPagerIndicator][5]
 [3]: https://play.google.com/store/apps/details?id=com.sky.opam
 [4]: https://cloud.google.com/products/app-engine
 [5]: https://github.com/JakeWharton/Android-ViewPagerIndicator
-[6]: https://lh4.ggpht.com/jKhPuzwXOiXfsYQJPayYEYpEFkAu7UkgI1JsGWj4fVeTZTDZpMamQzoHSTRVopS_CKEb=h900-rw
-[7]: https://lh5.ggpht.com/4DXV0z6ctVdklyovx6ZX-F6bvlxtPMu62breRn9c-lRWrA0zzif1Eg1Wn0iRJIHr6Cs=h900-rw
-[8]: https://lh5.ggpht.com/i84Fb3HCD4DbF-p7z2Li2Ud41IZSqa_EoIw6DCj0nNQWpDp_cN1l2SuTXwtArpbOD1w=h900-rw
-[9]: https://lh5.ggpht.com/BXfXt8pffzDKFXUr_-2cT83ZcNYvc5eJVPDoHKUpIMsaU28B4PQ4cLkSdFljJwv23A=h900-rw
-[10]: https://lh3.ggpht.com/5am3zdnjFSWhtIzLgbAwm27lY5x8P48LJlq8XcSnfVOyLBBONNhVTlKnglqO3_XoDw=h900-rw
+[6]: https://lh4.ggpht.com/jKhPuzwXOiXfsYQJPayYEYpEFkAu7UkgI1JsGWj4fVeTZTDZpMamQzoHSTRVopS_CKEb=h900
+[7]: https://lh5.ggpht.com/4DXV0z6ctVdklyovx6ZX-F6bvlxtPMu62breRn9c-lRWrA0zzif1Eg1Wn0iRJIHr6Cs=h900
+[8]: https://lh5.ggpht.com/i84Fb3HCD4DbF-p7z2Li2Ud41IZSqa_EoIw6DCj0nNQWpDp_cN1l2SuTXwtArpbOD1w=h900
+[9]: https://lh5.ggpht.com/BXfXt8pffzDKFXUr_-2cT83ZcNYvc5eJVPDoHKUpIMsaU28B4PQ4cLkSdFljJwv23A=h900
+[10]: https://lh3.ggpht.com/5am3zdnjFSWhtIzLgbAwm27lY5x8P48LJlq8XcSnfVOyLBBONNhVTlKnglqO3_XoDw=h900
