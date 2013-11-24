@@ -387,6 +387,8 @@ public class NetAnt {
 			//c.formateur="";
 			c.name=matcher.group(10-offset);
 			c.name=c.name.replace("\\", "");
+			//Caractères spéciaux HTML
+			c.name=c.name.replace("&amp;", "et");  
 			c.group=matcher.group(11-offset);
 			if(c.group.contains("Gp-EI1-G")){
 				c.apprenants = "all the students of 1st year";
@@ -403,6 +405,13 @@ public class NetAnt {
 			}
 			if(c.salle.endsWith("_")){
 				c.salle=c.salle.substring(0, c.salle.length()-1);
+			}
+			//可能group有好几组，此情况下，除第一个group外，其他都在salle里
+			String[] groupsalle = c.salle.split("_");
+			int len = groupsalle.length;
+			if(len != 1){
+				c.salle = groupsalle[len-1];
+				for(int i=0; i<len-1; i++) c.group+=("_"+groupsalle[i]);
 			}
 		}	
 	}
