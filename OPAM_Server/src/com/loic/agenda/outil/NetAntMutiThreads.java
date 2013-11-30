@@ -106,7 +106,7 @@ public class NetAntMutiThreads {
  			
  			Thread[] threads = new Thread[cours.size()];
  			for(int i=0; i<threads.length; i++){
-	 			threads[i] = new Thread(new GetClassDetailThread(c, host, client));
+	 			threads[i] = new Thread(new GetClassDetailThread(cours.get(i), host, client));
 	 			threads[i].start();
  			}
  			for(int i = 0; i < threads.length; i++){
