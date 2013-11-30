@@ -98,6 +98,7 @@ public class NetAntMutiThreads {
 			} 		
  			getAgendaHtml();	
  			redirection();
+ 			System.out.println(rspHtml);
  			userName = getUserName();
  			getTWCoursPara();
  			getNWCoursPara();
@@ -296,7 +297,7 @@ public class NetAntMutiThreads {
 		if(matcher.find()){
 			return matcher.group(1)+" "+matcher.group(2);
 		}else {
-			throw new FailException("user name not found:");
+			throw new FailException("Sorry, INT server NOT work for the moment, please try later.");
 		}
 		
 	}

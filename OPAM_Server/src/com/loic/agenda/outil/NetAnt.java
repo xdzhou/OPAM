@@ -261,7 +261,7 @@ public class NetAnt {
 		if(matcher.find()){
 			return matcher.group(1)+" "+matcher.group(2);
 		}else {
-			throw new FailException("user name not found:");
+			throw new FailException("Sorry, INT server NOT work for the moment, please try later.");
 		}
 		
 	}
