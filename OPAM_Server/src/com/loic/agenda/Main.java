@@ -16,7 +16,7 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException{
 		//System.out.println(Chiffrement.encrypt("whoami?", "OPAM"));
 		
-		NetAntMutiThreads es = new NetAntMutiThreads();
+		NetAnt es = new NetAnt();
 	    List<Cours> cours = es.start("zhou_xia", "whoami?");
 	    String userName = es.userName;
 	    Java2xml b = new Java2xml(cours, userName);

@@ -28,6 +28,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.loic.agenda.model.Cours;
@@ -349,18 +350,18 @@ public class NetAnt {
 	private void chargerCours(Cours c) throws FailException{	
 		//System.out.println(rspHtml);
 		
-		String page = rspHtml.replaceAll("<[^>]+>", "_");
+		String page = rspHtml.replaceAll("<[^>]+>", "__");
 		page = sansAccent(page);
 		page = page.replace(" ", " ");
-		page = page.replaceAll("_[ _:]+_", "_");	
+		page = page.replaceAll("_[ _:]+_", "__");	
 		
 		//System.out.println(page);
 		
 		Pattern pattern;
 		if(page.contains("Formateur")){
-			pattern = Pattern.compile("_([^_]+)_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Formateur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
+			pattern = Pattern.compile("__([^_]+)__Type__ ([^_]+)__Etat__([^_]+)__Date\\(s\\)__([^_]+)__Debut__ : ([^_]+)__Fin__ : ([^_]+)__Auteur__(.+)__Formateur__(.+)__Apprenants__(.+)__Projets__([^_]+)__Groupes de personnes__([^_]+)__(.*)'\\);__");
 		}else {
-			pattern = Pattern.compile("_([^_]+)_Type_ ([^_]+)_Etat_([^_]+)_Date\\(s\\)_([^_]+)_Debut_ : ([^_]+)_Fin_ : ([^_]+)_Auteur_(.+)_Apprenants_(.+)_Projets_([^_]+)_Groupes de personnes_([^_]+)_(.*)'\\);_");
+			pattern = Pattern.compile("__([^_]+)__Type__ ([^_]+)__Etat__([^_]+)__Date\\(s\\)__([^_]+)__Debut__ : ([^_]+)__Fin__ : ([^_]+)__Auteur__(.+)__Apprenants__(.+)__Projets__([^_]+)__Groupes de personnes__([^_]+)__(.*)'\\);__");
 		}		
 		Matcher matcher = pattern.matcher(page);
 		if(matcher.find()){
@@ -399,19 +400,24 @@ public class NetAnt {
 			}else {
 				c.apprenants=matcher.group(9-offset);
 			}
-			c.salle=matcher.group(12-offset);
-			if( c.salle.equals("") ){				
+			
+			c.salle = matcher.group(12-offset);			
+			if(c.salle.equals("")){
 				c.salle = getSalleFromTitle( matcher.group(1) );
+			}else{
+				//可能group有好几组，此情况下，除第一个group外，其他都在salle里
+				String[] groupsalle = c.salle.split("__");
+				int len = groupsalle.length;
+				if(groupsalle[len-1].startsWith("Gp")){
+					for(int i=0; i<len; i++) c.group+=("__"+groupsalle[i]);
+					c.salle = getSalleFromTitle( matcher.group(1) );
+				}else {
+					for(int i=0; i<len-1; i++) c.group+=("__"+groupsalle[i]);
+					c.salle = groupsalle[len-1];
+				}
 			}
-			if(c.salle.endsWith("_")){
-				c.salle=c.salle.substring(0, c.salle.length()-1);
-			}
-			//可能group有好几组，此情况下，除第一个group外，其他都在salle里
-			String[] groupsalle = c.salle.split("_");
-			int len = groupsalle.length;
-			if(len != 1){
-				c.salle = groupsalle[len-1];
-				for(int i=0; i<len-1; i++) c.group+=("_"+groupsalle[i]);
+			if(c.salle.endsWith("__")){
+				c.salle=c.salle.substring(0, c.salle.length()-2);
 			}
 		}	
 	}
