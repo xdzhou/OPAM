@@ -10,6 +10,7 @@ import com.sky.opam.entity.User;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 public class DBworker {
         private DBHelper helper;
@@ -247,16 +248,18 @@ public class DBworker {
                 // List<Cours> cours = findClass(login);
                 if (cours != null) {
                         db = helper.getWritableDatabase();
-                        db.execSQL("update user set weeksync = ? where login = ?",
-                                        new Object[] { newSync, login });
+                        db.execSQL("update user set weeksync = ? where login = ?",new Object[] { newSync, login });
                         db.close();
 
-                        GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
-                        for (Cours c : cours) {
-                                long eventid = calendarAPI.addCourse2Calendar(c);
-                                if(eventid==0) return SyncStatus.errorSync;
-                                addEventID(login, eventid);
-                        }
+                        GoogleCalendarAPI calendarAPI;
+
+						calendarAPI = new GoogleCalendarAPI(context);
+						for (Cours c : cours) {
+                            long eventid = calendarAPI.addCourse2Calendar(c);
+                            if(eventid==0) return SyncStatus.errorSync;
+                            addEventID(login, eventid);
+						}
+                        
                         return SyncStatus.allSync;
                 }
                 return SyncStatus.errorSync;
@@ -275,11 +278,15 @@ public class DBworker {
                 Cursor cursor = db.rawQuery(
                                 "select eventid from syncevent where login='" + login + "';",
                                 null);
-                GoogleCalendarAPI calendarAPI = new GoogleCalendarAPI(context);
-                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                        long eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
-                        calendarAPI.delEvent(eventid);
-                }
+                GoogleCalendarAPI calendarAPI;
+
+				calendarAPI = new GoogleCalendarAPI(context);
+				for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    long eventid = cursor.getLong(cursor.getColumnIndex("eventid"));
+                    calendarAPI.delEvent(eventid);
+				}
+
+                
                 cursor.close();
                 db.close();
 
