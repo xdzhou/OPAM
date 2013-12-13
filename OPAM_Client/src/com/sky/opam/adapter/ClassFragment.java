@@ -91,7 +91,7 @@ public class ClassFragment extends Fragment {
 			myview.setIstoday(true);
 		}
 		DBworker worker = new DBworker(getActivity().getApplicationContext());
-		final List<Cours> cours = worker.findClass(login, flag);
+		final List<Cours> cours = worker.trouverCours(login, flag);
 		myview.setCours(cours);
 		myview.setClickListener(new MyViewclickListener() {
 			@Override
@@ -116,22 +116,10 @@ public class ClassFragment extends Fragment {
 		((TextView) win.findViewById(R.id.className)).setText(c.name);
 		((TextView) win.findViewById(R.id.classType)).setText(c.type);
 		((TextView) win.findViewById(R.id.classTime)).setText(c.debut + "--" + c.fin);
-		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe);
-		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle);
-		String[] teachers;
-		if(c.formateur!=null || !c.formateur.equals("")) {
-			teachers = c.formateur.split("_");
-			((TextView) win.findViewById(R.id.classTeacher)).setText(teachers[0]);
-			TableLayout tl = (TableLayout) win.findViewById(R.id.classInfoTable);
-			int numTea = teachers.length-1;
-			for(int i=0; i<numTea; i++){
-				TableRow row = new TableRow(getActivity());
-				TextView tx = new TextView(getActivity());
-				tx.setText(teachers[i+1]);
-				row.addView(tx);
-				tl.addView(row, 1);
-			}
-		}
+		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe.replace("__", "\n"));
+		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle.replace("__", "\n"));
+		if(c.formateur!=null || !c.formateur.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.formateur.replace("__", "\n"));
+		
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new OnClickListener() {
@@ -140,5 +128,9 @@ public class ClassFragment extends Fragment {
 				dlg.cancel();
 			}
 		});
+	}
+	
+	private void multiValue(){
+		
 	}
 }

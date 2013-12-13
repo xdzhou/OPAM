@@ -12,7 +12,6 @@ public class Cours {
 	public String apprenants = "";
 	public String groupe = "";
 	public String salle = "";
-	public long eventid = 0;
 
 	public Cours() {
 	}

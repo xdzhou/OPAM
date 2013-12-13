@@ -12,8 +12,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.CalendarContract.Calendars;
+import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Reminders;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class GoogleCalendarAPI {
 	private static String calanderURL = "";
 	private static String calanderEventURL = "";
@@ -21,6 +25,7 @@ public class GoogleCalendarAPI {
 	private String calId = "";
 	private Context context;
 	private String userName = "";
+	private Boolean highSDK = false;
 
 	static {
 		if (Integer.parseInt(Build.VERSION.SDK) >= 8) {
@@ -36,9 +41,12 @@ public class GoogleCalendarAPI {
 	}
 
 	public GoogleCalendarAPI(Context context) {
+		if (Integer.parseInt(Build.VERSION.SDK) >= 14) highSDK = true;
 		this.context = context;
-		Cursor userCursor = context.getContentResolver().query(
-				Uri.parse(calanderURL), null, null, null, null);
+
+		Cursor userCursor;
+		if(highSDK) userCursor = context.getContentResolver().query(Calendars.CONTENT_URI, null, null, null, null);
+		else userCursor = context.getContentResolver().query(Uri.parse(calanderURL), null, null, null, null);
 		for (userCursor.moveToFirst(); !userCursor.isAfterLast(); userCursor
 				.moveToNext()) {
 			userName = userCursor.getString(userCursor.getColumnIndex("name"));
@@ -97,27 +105,32 @@ public class GoogleCalendarAPI {
 		calendar = null;
 		event.put("hasAlarm", 1);
 
-		Uri newEvent = context.getContentResolver().insert(Uri.parse(calanderEventURL), event);
+		Uri newEvent;
+		if(highSDK) newEvent = context.getContentResolver().insert(Events.CONTENT_URI, event);
+		else newEvent = context.getContentResolver().insert(Uri.parse(calanderEventURL), event);
 		
 		long id = Long.parseLong(newEvent.getLastPathSegment());
 		ContentValues values = new ContentValues();
 		values.put("event_id", id);
 		values.put("minutes", 15);
 		values.put("method", 1); // Alert(1), Email(2), SMS(3)
-		context.getContentResolver().insert(Uri.parse(calanderRemiderURL),
-				values);
+
+		if(highSDK) context.getContentResolver().insert(Reminders.CONTENT_URI,values);
+		else context.getContentResolver().insert(Uri.parse(calanderRemiderURL),values);
 
 		values = new ContentValues();
 		values.put("event_id", id);
 		values.put("minutes", 10);
 		values.put("method", 3); // Alert(1), Email(2), SMS(3)
-		context.getContentResolver().insert(Uri.parse(calanderRemiderURL),values);
+		if(highSDK) context.getContentResolver().insert(Reminders.CONTENT_URI,values);
+		else context.getContentResolver().insert(Uri.parse(calanderRemiderURL),values);
 
 		return id;
 	}
 
 	public void delEvent(long eventid) {
-		Uri eventUri = ContentUris.withAppendedId(Uri.parse(calanderEventURL),eventid);
+		//Uri eventUri = ContentUris.withAppendedId(Uri.parse(calanderEventURL),eventid);
+		Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI,eventid);
 		context.getContentResolver().delete(eventUri, null, null);
 	}
 
