@@ -347,9 +347,7 @@ public class NetAnt {
 		
 	}
 	
-	private void chargerCours(Cours c) throws FailException{	
-		//System.out.println(rspHtml);
-		
+	private void chargerCours(Cours c) throws FailException{			
 		String page = rspHtml.replaceAll("<[^>]+>", "__");
 		page = sansAccent(page);
 		page = page.replace(" ", " ");
