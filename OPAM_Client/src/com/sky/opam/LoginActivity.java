@@ -166,7 +166,7 @@ public class LoginActivity extends Activity {
                 password = tfMDP.getText().toString();
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPost = new HttpPost(
-                                "http://intagenda.appspot.com/agendaopam");
+                                "http://openopam-loic.rhcloud.com/agendaopam");
                 List<NameValuePair> data = new ArrayList<NameValuePair>();
                 data.add(new BasicNameValuePair("username", tfID.getText().toString()));
                 data.add(new BasicNameValuePair("password", Chiffrement.encrypt(
