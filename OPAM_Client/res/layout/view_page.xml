@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/menu"
         android:background="#006699"        
-        android:layout_width="250dp"
+        android:layout_width="20dp"
         android:layout_height="fill_parent" >        
         <ListView
             android:id="@+id/menu_list"
@@ -24,7 +24,7 @@
     	    android:layout_alignParentBottom="true"
     	    android:layout_centerHorizontal="true"
     	    android:layout_marginBottom="10dp"
-    	    android:text="Google Calendar Sync"/>
+    	    android:text="@string/google_calendar"/>
     </RelativeLayout>  
     
 	<LinearLayout

@@ -2,4 +2,9 @@
 <resources>
     <string name="title">Welcome to OPAM</string>
     <string name="app_name">OPAM</string>
+    <string name="login_hint">Login</string>
+    <string name="password_hint">Password</string>
+    <string name="ok">OK</string>
+    <string name="class_name">ASR - middlewar pour app repartie</string>
+    <string name="google_calendar">Google Calendar Sync</string>
 </resources>
