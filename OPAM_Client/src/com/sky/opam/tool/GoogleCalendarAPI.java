@@ -1,9 +1,9 @@
-package com.sky.opam.outil;
+package com.sky.opam.tool;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import com.sky.opam.entity.Cours;
+import com.sky.opam.model.Cours;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

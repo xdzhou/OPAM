@@ -37,10 +37,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout.LayoutParams;
 
-import com.sky.opam.adapter.FragementClassAdapter;
-import com.sky.opam.entity.Config.SyncStatus;
-import com.sky.opam.entity.Cours;
-import com.sky.opam.outil.DBworker;
+import com.sky.opam.fragment.FragementClassAdapter;
+import com.sky.opam.model.Cours;
+import com.sky.opam.model.Config.SyncStatus;
+import com.sky.opam.tool.DBworker;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class ClassTableActivity extends FragmentActivity {

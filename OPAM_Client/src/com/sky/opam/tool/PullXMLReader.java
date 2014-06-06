@@ -1,4 +1,4 @@
-package com.sky.opam.outil;
+package com.sky.opam.tool;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import org.xmlpull.v1.XmlPullParser;
 
 import android.util.Xml;
 
-import com.sky.opam.entity.Cours;
-import com.sky.opam.entity.DataCompo;
+import com.sky.opam.model.Cours;
+import com.sky.opam.model.DataCompo;
 
 public class PullXMLReader {
 	public static DataCompo readXML(InputStream inStream) {

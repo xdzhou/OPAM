@@ -1,4 +1,4 @@
-package com.sky.opam.entity;
+package com.sky.opam.model;
 
 import java.util.ArrayList;
 import java.util.List;

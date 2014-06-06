@@ -1,11 +1,11 @@
-package com.sky.opam.outil;
+package com.sky.opam.tool;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sky.opam.entity.Config.SyncStatus;
-import com.sky.opam.entity.Cours;
-import com.sky.opam.entity.User;
+import com.sky.opam.model.Cours;
+import com.sky.opam.model.User;
+import com.sky.opam.model.Config.SyncStatus;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -25,27 +25,24 @@ public class DBworker {
                 db.execSQL(
                                 "insert into user (login,password,name,sync) values (?,?,?,?)",
                                 new Object[] { user.getLogin(), user.getPasswoed(),
-                                                user.getUsename(), 1 });
+                                                user.getUsename(), 0 });
                 db.close();
         }
 
         public User defaultUser() {
-                db = helper.getReadableDatabase();
-                Cursor cursor = db
-                                .rawQuery(
-                                                "select login,password,thisweek,name from user where defaultuser=1",
-                                                null);
-                User user = new User();
-                cursor.moveToFirst();
-                if (!cursor.isAfterLast()) {
-                        user.setLogin(cursor.getString(0));
-                        user.setPasswoed(cursor.getString(1));
-                        user.setThisweek(cursor.getInt(2));
-                        user.setUsename(cursor.getString(3));
-                }
-                cursor.close();
-                db.close();
-                return user;
+            db = helper.getReadableDatabase();
+            Cursor cursor = db.rawQuery("select login,password,thisweek,name from user where defaultuser=1",null);
+            User user = new User();
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                user.setLogin(cursor.getString(0));
+                user.setPasswoed(cursor.getString(1));
+                user.setThisweek(cursor.getInt(2));
+                user.setUsename(cursor.getString(3));
+            }
+            cursor.close();
+            db.close();
+            return user;
         }
 
         public void addCours(Cours c) {

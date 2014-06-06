@@ -1,10 +1,10 @@
-package com.sky.opam.adapter;
+package com.sky.opam.fragment;
 
 import java.util.List;
 
 import com.sky.opam.R;
-import com.sky.opam.entity.Cours;
-import com.sky.opam.outil.DBworker;
+import com.sky.opam.model.Cours;
+import com.sky.opam.tool.DBworker;
 import com.sky.opam.widget.ClassView;
 import com.sky.opam.widget.MyViewclickListener;
 
@@ -40,8 +40,7 @@ public class ClassFragment extends Fragment {
 	private boolean isToday;
 	private boolean isTW;
 
-	public static ClassFragment newInstance(String login, String flag,
-			boolean isToday, boolean isTW) {
+	public static ClassFragment newInstance(String login, String flag, boolean isToday, boolean isTW) {
 		ClassFragment fragment = new ClassFragment();
 		fragment.login = login;
 		fragment.flag = flag;
@@ -76,8 +75,7 @@ public class ClassFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (container == null)
 			return null;
 		ScrollView scroller = new ScrollView(getActivity());
