@@ -69,7 +69,7 @@ public class ClassTableActivity extends FragmentActivity {
         protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
-                setContentView(R.layout.view_page);
+                setContentView(R.layout.agenda_tab);
 
                 iniContent();
                 initValues();
@@ -85,7 +85,7 @@ public class ClassTableActivity extends FragmentActivity {
                 tv.setText(username);
                 tv = (TextView) findViewById(R.id.top_numweek);
                 tv.setText(getTopNumWeek(numweek));
-                indi_week_btn = (ImageView) findViewById(R.id.top_btn_flag);
+                indi_week_btn = (ImageView) findViewById(R.id.top_title);
                 indi_week_btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

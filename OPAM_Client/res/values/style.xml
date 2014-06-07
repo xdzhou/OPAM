@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CodeFont" parent="@android:style/TextAppearance.Medium">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">#00FF00</item>
-        <item name="android:typeface">monospace</item>
-    </style>
-    
     <style name="MyDialog" parent="@android:Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item> 
@@ -15,111 +8,17 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
     
-    <style name="normalText" parent="@android:style/TextAppearance"> 
-		<item name="android:textColor">#444</item> 
-		<item name="android:textSize">14sp</item> 
-	</style>
-	
-    <style name="main_tab_bottom">
-        <item name="android:textSize">5dip</item>
-        <item name="android:textColor">#ffffffff</item>
-        <item name="android:ellipsize">marquee</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:background">@drawable/logo</item>
-        <item name="android:paddingTop">2dip</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:button">@null</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:drawablePadding">2dip</item>
-        <item name="android:layout_weight">1.0</item>
-    </style>
-    
     <style name="AnimationFade">   
 		<!--   PopupWindow左右弹出的效果-->   
 		<item name="android:windowEnterAnimation">@anim/in_lefttoright</item>   
 		<item name="android:windowExitAnimation">@anim/out_righttoleft</item>   
 	</style>
-	
-    <style name="AppTheme" parent="android:Theme.Light" />
- 	<style name="chat_text_date_style">
-	    <item name="android:padding">2dp</item>    
-		<item name="android:textColor">#ffffff</item>   
-		<item name="android:textSize">12sp</item>      
-		<item name="android:background">#bfbfbf</item> 
-	</style>
-  
-	     
-	<style name="chat_content_date_style">
-	    <item name="android:minHeight">50dp</item>
-	    <item name="android:gravity">left|center</item>    
-		<item name="android:textColor">#000000</item>   
-		<item name="android:textSize">15sp</item>      
-		<item name="android:lineSpacingExtra">2dp</item>   
-		<item name="android:clickable">true</item>   
-		<item name="android:focusable">true</item>   
-		<item name="android:background">#bfbfbf</item> 
-	</style>	 
-	
-	<style name="chat_text_name_style">  
-		<item name="android:textColor">#818181</item>   
-		<item name="android:textSize">15sp</item>      
-		<item name="android:gravity">center</item> 
-	</style>
-	
-	<style name="StyledIndicators" parent="@android:style/Theme.Light">
-        <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
-        <item name="vpiLinePageIndicatorStyle">@style/CustomLinePageIndicator</item>
-        <item name="vpiTitlePageIndicatorStyle">@style/CustomTitlePageIndicator</item>
-        <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
-        <item name="vpiUnderlinePageIndicatorStyle">@style/CustomUnderlinePageIndicator</item>
+    
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
     </style>
 
-    <style name="CustomTitlePageIndicator">
-        <item name="android:background">#18FF0000</item>
-        <item name="footerColor">#FFAA2222</item>
-        <item name="footerLineHeight">1dp</item>
-        <item name="footerIndicatorHeight">3dp</item>
-        <item name="footerIndicatorStyle">underline</item>
-        <item name="android:textColor">#AA000000</item>
-        <item name="selectedColor">#FF000000</item>
-        <item name="selectedBold">true</item>
-    </style>
-
-    <style name="CustomLinePageIndicator">
-        <item name="strokeWidth">4dp</item>
-        <item name="lineWidth">30dp</item>
-        <item name="unselectedColor">#FF888888</item>
-        <item name="selectedColor">#FF880000</item>
-    </style>
-
-    <style name="CustomCirclePageIndicator">
-        <item name="fillColor">#FF888888</item>
-        <item name="strokeColor">#FF000000</item>
-        <item name="strokeWidth">2dp</item>
-        <item name="radius">10dp</item>
-        <item name="centered">true</item>
-    </style>
-
-    <style name="CustomTabPageIndicator" parent="Widget.TabPageIndicator">
-        <item name="android:textAppearance">@style/CustomTabPageIndicator.Text</item>
-        <item name="android:textColor">#FF555555</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
-        <item name="android:fadingEdge">horizontal</item>
-        <item name="android:fadingEdgeLength">8dp</item>
-    </style>
-
-    <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
-        <item name="android:typeface">monospace</item>
-    </style>
-
-    <style name="CustomUnderlinePageIndicator">
-        <item name="selectedColor">#FFCC0000</item>
-        <item name="android:background">#FFCCCCCC</item>
-        <item name="fadeLength">1000</item>
-        <item name="fadeDelay">1000</item>
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">>
     </style>
     
 </resources>

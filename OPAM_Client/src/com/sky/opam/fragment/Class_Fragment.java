@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 @SuppressLint("ValidFragment")
 //fragment who show the class view
-public class ClassFragment extends Fragment {
+public class Class_Fragment extends Fragment {
 	private static final String KEY_LOGIN = "ClassFragment:login";
 	private static final String KEY_FLAG = "ClassFragment:flag";
 	private static final String KEY_ISTODAY = "ClassFragment:istoday";
@@ -40,8 +40,8 @@ public class ClassFragment extends Fragment {
 	private boolean isToday;
 	private boolean isTW;
 
-	public static ClassFragment newInstance(String login, String flag, boolean isToday, boolean isTW) {
-		ClassFragment fragment = new ClassFragment();
+	public static Class_Fragment newInstance(String login, String flag, boolean isToday, boolean isTW) {
+		Class_Fragment fragment = new Class_Fragment();
 		fragment.login = login;
 		fragment.flag = flag;
 		fragment.isToday = isToday;

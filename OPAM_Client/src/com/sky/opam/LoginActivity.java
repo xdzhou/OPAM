@@ -1,46 +1,21 @@
 package com.sky.opam;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
-import com.sky.opam.model.DataCompo;
 import com.sky.opam.model.User;
 import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.PullXMLReader;
 import com.sky.opam.tool.Tool;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -52,7 +27,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 public class LoginActivity extends Activity {
         private AutoCompleteTextView tfID = null;
@@ -139,12 +113,12 @@ public class LoginActivity extends Activity {
         // reponse au le update request
         @Override
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-                if (requestCode == 0 && resultCode == 22) {
-                        finishActivity(requestCode);
-                        downloadCharge();
-                } else if (resultCode == 1) {
-                        finish();
-                }
+            if (requestCode == 0 && resultCode == 22) {
+                finishActivity(requestCode);
+                downloadCharge();
+            } else if (resultCode == 1) {
+                finish();
+            }
         }
 
         // download the course
@@ -167,25 +141,25 @@ public class LoginActivity extends Activity {
         }
 
         DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                        case Dialog.BUTTON_NEGATIVE:
-                                AgendaShow();
-                                break;
-                        case Dialog.BUTTON_NEUTRAL:
-                                Tool.showInfo(context,"unknow choise...");
-                                break;
-                        case Dialog.BUTTON_POSITIVE:
-                                downloadCharge();
-                                break;
-                        }
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                case Dialog.BUTTON_NEGATIVE:
+                    AgendaShow();
+                    break;
+                case Dialog.BUTTON_NEUTRAL:
+                    Tool.showInfo(context,"unknow choise...");
+                    break;
+                case Dialog.BUTTON_POSITIVE:
+                    downloadCharge();
+                    break;
                 }
+            }
         };
 
         private void AgendaShow() {
             Intent intent = new Intent();
-            intent.setClass(LoginActivity.this, ClassTableActivity.class);
+            intent.setClass(LoginActivity.this, AgendaTabActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString("login", login);
             bundle.putString("numweek", "" + u.getThisweek());
@@ -214,7 +188,7 @@ public class LoginActivity extends Activity {
 			@Override
 			public void handleMessage(Message msg) {
 				super.handleMessage(msg);
-				if(msg.what == 10){
+				if(msg.what == R.integer.OK){
 					u = worker.findUser(login);
 					AgendaShow();
 				}else {

@@ -17,7 +17,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.sky.opam.LoginActivity;
 import com.sky.opam.R;
 import com.sky.opam.model.Cours;
 import com.sky.opam.model.DataCompo;
@@ -116,7 +115,7 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
                 pdialog = null;
             }
             if (result == null) {
-                handler.sendEmptyMessage(10);
+                handler.sendEmptyMessage(R.integer.OK);
             } else {
             	Message msg = new Message();
             	Bundle b = new Bundle();// 存放数据
