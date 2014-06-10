@@ -1,4 +1,4 @@
-package com.sky.opam.widget;
+package com.sky.opam.view;
 
 import android.view.MotionEvent;
 import android.view.View;

@@ -34,14 +34,10 @@ public class Cours {
 	}
 
 	public String getCalendarDescription() {
-		String s;
-		if (!formateur.equals(""))
-			s = "Teacher : " + formateur + " ";
-		else
-			s = "";
-		s += "\nStudent : ";
-		s += apprenants;
-		return s;
+		StringBuilder s = new StringBuilder();
+		if (!formateur.equals("")) s.append("Teacher : ").append(formateur).append(" ");
+		s.append("\nStudent : ").append(apprenants);
+		return s.toString();
 	}
 
 }

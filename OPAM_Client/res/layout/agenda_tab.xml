@@ -15,22 +15,21 @@
 	        android:id="@+id/pager"
 	        android:layout_width="fill_parent"
 	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:background="#702da2" />
+	        android:layout_weight="1" />
 	
 	    <com.viewpagerindicator.TitlePageIndicator
 	        android:id="@+id/indicator"
-	        android:padding="10dip"
-	        android:layout_height="wrap_content"
 	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:background="#18FF0000"
-	        android:textColor="#cc9900"
+	        android:padding="10dip"
+	        android:textColor="#7a5c00"
 	        app:footerColor="#FFAA2222"
-	        app:footerLineHeight="1dp"
 	        app:footerIndicatorHeight="3dp"
 	        app:footerIndicatorStyle="underline"
-	        app:selectedColor="#ffccff"
-	        app:selectedBold="true"/>
+	        app:footerLineHeight="1dp"
+	        app:selectedBold="true"
+	        app:selectedColor="#000000" />
 	
 	</LinearLayout>
 </LinearLayout>

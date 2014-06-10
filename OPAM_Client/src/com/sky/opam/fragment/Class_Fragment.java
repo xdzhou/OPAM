@@ -5,10 +5,9 @@ import java.util.List;
 import com.sky.opam.R;
 import com.sky.opam.model.Cours;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.widget.ClassView;
-import com.sky.opam.widget.MyViewclickListener;
+import com.sky.opam.view.ClassView;
+import com.sky.opam.view.MyViewclickListener;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
@@ -76,11 +75,9 @@ public class Class_Fragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (container == null)
-			return null;
+		if (container == null) return null;
 		ScrollView scroller = new ScrollView(getActivity());
-		if (!isTW)
-			scroller.setBackgroundColor(Color.argb(255, 153, 102, 0));
+		//if (!isTW) scroller.setBackgroundColor(Color.argb(255, 153, 102, 0));
 		ClassView myview = new ClassView(getActivity());
 		WindowManager manager = getActivity().getWindowManager();
 		Display display = manager.getDefaultDisplay();
@@ -109,7 +106,7 @@ public class Class_Fragment extends Fragment {
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
-		win.setContentView(R.layout.cours_detail_2);
+		win.setContentView(R.layout.cours_detail_pop);
 
 		((TextView) win.findViewById(R.id.className)).setText(c.name);
 		((TextView) win.findViewById(R.id.classType)).setText(c.type);

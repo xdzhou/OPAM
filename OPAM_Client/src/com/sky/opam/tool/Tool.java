@@ -4,11 +4,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.sky.opam.R.integer;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 public class Tool {
@@ -49,5 +55,17 @@ public class Tool {
         SimpleDateFormat sdf = new SimpleDateFormat();
         sdf.applyPattern("w");
         return Integer.parseInt(sdf.format(c.getTime()));
-}
+	}
+	
+	public static int dip2px(Context context, int dipValue) {
+		float scale = context.getResources().getDisplayMetrics().density;
+		return (int) (dipValue * scale + 0.5f);
+	}
+	
+	public static int getScreenWidth(Activity activity){
+		WindowManager manager = activity.getWindowManager();
+		Display display = manager.getDefaultDisplay();
+		return display.getWidth();
+	}
+	
 }

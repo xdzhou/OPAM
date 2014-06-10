@@ -1,4 +1,4 @@
-package com.sky.opam.widget;
+package com.sky.opam.view;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,8 +24,7 @@ import android.view.View;
 import android.view.GestureDetector;
 
 @SuppressLint("SimpleDateFormat")
-public class ClassView extends View implements
-		GestureDetector.OnGestureListener {
+public class ClassView extends View implements GestureDetector.OnGestureListener {
 	private float scale; // screen density
 	private float delta;
 	private float timeW;
@@ -79,7 +78,7 @@ public class ClassView extends View implements
 		linePaint.setColor(Color.BLUE);
 		linePaint.setStrokeWidth(dip2px(2));
 		// show the at left
-		timePaint.setColor(Color.WHITE);
+		timePaint.setColor(Color.BLACK);
 		timePaint.setTextSize(4 * r);
 		delta = getTextHeight(timePaint) / 2 - r;
 		timeW = timePaint.measureText("08:00 ");
@@ -90,13 +89,13 @@ public class ClassView extends View implements
 		NamePaint.setTypeface(Typeface.DEFAULT_BOLD);
 		// show other info of class
 		TextPaint.setTextAlign(Paint.Align.CENTER);
-		TextPaint.setColor(Color.WHITE);
+		TextPaint.setColor(Color.BLACK);
 		TextPaint.setTextSize(dip2px(12));
 		// show the line selected of class
 		smallPaint.setColor(Color.RED);
 		smallPaint.setStrokeWidth(dip2px(3));
 		// show the line catche the class
-		classPaint.setColor(Color.argb(200, 230, 237, 18));
+		classPaint.setColor(Color.argb(200, 245, 152, 142));
 		classPaint.setStyle(Style.STROKE);
 		PathEffect effects = new DashPathEffect(new float[] { 5, 5, 5, 5 }, 1);
 		classPaint.setPathEffect(effects);
