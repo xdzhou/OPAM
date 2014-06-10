@@ -2,6 +2,9 @@ package com.sky.opam.fragment;
 
 import com.sky.opam.R;
 import com.sky.opam.task.DownloadImageTask;
+import com.sky.opam.tool.DBworker;
+import com.sky.opam.tool.MyApp;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,16 +23,16 @@ public class Menu_Fragment extends ListFragment{
 	private String user_name;
 	
 	public Menu_Fragment() {
-	}
-	
-	public Menu_Fragment(String login, String user_name) {
-		this.login = login;
-		this.user_name = user_name;
+		
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		MyApp myApp = (MyApp)getActivity().getApplication();
+		login = myApp.getLogin();
+		user_name = new DBworker(getActivity()).findUser(myApp.getLogin()).getUsename();
+		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
 		adapter.add(new MenuItemContent("go to today", android.R.drawable.ic_menu_compass));

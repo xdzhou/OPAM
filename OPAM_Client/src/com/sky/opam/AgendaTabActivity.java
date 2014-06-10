@@ -128,7 +128,7 @@ public class AgendaTabActivity extends ActionBarActivity {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	private View getMenuView(int menu_fragment){
 		View view = LayoutInflater.from(this).inflate(menu_fragment, null);
-		Menu_Fragment fragment = new Menu_Fragment(login, worker.findUser(login).getUsename());
+		Menu_Fragment fragment = new Menu_Fragment();
 		FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.menu_fragment,fragment);
 		ft.commit();

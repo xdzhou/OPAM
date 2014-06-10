@@ -19,12 +19,13 @@ public class FragementClassAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public Fragment getItem(int position) {
-		if (position < 5)
-			return Class_Fragment.newInstance(login, numweek + "_"
-					+ (position + 1), (position + 1) == getDayWeek(), true);
-		else
-			return Class_Fragment.newInstance(login, (numweek + 1) + "_"
-					+ (position + 1 - 5), false, false);
+//		if (position < 5)
+//			return Class_Fragment.newInstance(login, numweek + "_"
+//					+ (position + 1), (position + 1) == getDayWeek(), true);
+//		else
+//			return Class_Fragment.newInstance(login, (numweek + 1) + "_"
+//					+ (position + 1 - 5), false, false);
+		return null;
 
 	}
 

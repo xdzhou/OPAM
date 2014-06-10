@@ -3,6 +3,7 @@ package com.sky.opam.tool;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sky.opam.R.integer;
 import com.sky.opam.model.Cours;
 import com.sky.opam.model.User;
 import com.sky.opam.model.Config.SyncStatus;
@@ -104,22 +105,21 @@ public class DBworker {
                 }
         }
 
-        public Cursor findClass(String login, String flag) {
+//        public Cursor findClass(String login, String flag) {
+//                db = helper.getReadableDatabase();
+//                Cursor cursor = db.rawQuery(
+//                                "select name,type,debut,fin,groupe,salle from cours where login='"
+//                                                + login + "' AND position='" + flag + "';", null);
+//                db.close();
+//                return cursor;
+//        }
+
+        public List<Cours> findClassInfo(String login, String flag) {
                 db = helper.getReadableDatabase();
                 Cursor cursor = db.rawQuery(
-                                "select name,type,debut,fin,groupe,salle from cours where login='"
-                                                + login + "' AND position='" + flag + "';", null);
-                db.close();
-                return cursor;
-        }
-
-        public List<Cours> trouverCours(String login, String flag) {
-                db = helper.getReadableDatabase();
-                Cursor cursor = db
-                                .rawQuery(
-                                                "select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
-                                                                + login + "' AND position='" + flag + "';",
-                                                null);
+	                "select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
+	                                + login + "' AND position='" + flag + "';",
+	                null);
                 List<Cours> cours = new ArrayList<Cours>();
                 for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                         Cours c = new Cours();
@@ -139,41 +139,44 @@ public class DBworker {
                 db.close();
                 return cours;
         }
+        
+        public List<Cours> findClassInfo(String login, int numWeek, int dayOfWeek) {
+        	return findClassInfo(login, numWeek+"_"+dayOfWeek);
+        }
 
-        public List<Cours> findClass(String login, int numweek) {
+        public List<Cours> findClassInfo(String login, int numweek) {
                 List<Cours> cours = new ArrayList<Cours>();
-                cours.addAll(trouverCours(login, numweek + "_1"));
-                cours.addAll(trouverCours(login, numweek + "_2"));
-                cours.addAll(trouverCours(login, numweek + "_3"));
-                cours.addAll(trouverCours(login, numweek + "_4"));
-                cours.addAll(trouverCours(login, numweek + "_5"));
+                cours.addAll(findClassInfo(login, numweek, 1));
+                cours.addAll(findClassInfo(login, numweek, 2));
+                cours.addAll(findClassInfo(login, numweek, 3));
+                cours.addAll(findClassInfo(login, numweek, 4));
+                cours.addAll(findClassInfo(login, numweek, 5));
                 return cours;
         }
 
         public List<Cours> findClass(String login) {
-                db = helper.getReadableDatabase();
-                Cursor cursor = db
-                                .rawQuery(
-                                                "select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
-                                                                + login + "';", null);
-                List<Cours> cours = new ArrayList<Cours>();
-                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                        Cours c = new Cours();
-                        c.name = cursor.getString(0);
-                        c.type = cursor.getString(1);
-                        c.debut = cursor.getString(2);
-                        c.fin = cursor.getString(3);
-                        c.groupe = cursor.getString(4);
-                        c.salle = cursor.getString(5);
-                        c.formateur = cursor.getString(6);
-                        c.auteur = cursor.getString(7);
-                        c.apprenants = cursor.getString(8);
-                        c.position = cursor.getString(9);
-                        cours.add(c);
-                }
-                cursor.close();
-                db.close();
-                return cours;
+            db = helper.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                "select name,type,debut,fin,groupe,salle,formateur,auteur,apprenant,position from cours where login='"
+                                + login + "';", null);
+            List<Cours> cours = new ArrayList<Cours>();
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    Cours c = new Cours();
+                    c.name = cursor.getString(0);
+                    c.type = cursor.getString(1);
+                    c.debut = cursor.getString(2);
+                    c.fin = cursor.getString(3);
+                    c.groupe = cursor.getString(4);
+                    c.salle = cursor.getString(5);
+                    c.formateur = cursor.getString(6);
+                    c.auteur = cursor.getString(7);
+                    c.apprenants = cursor.getString(8);
+                    c.position = cursor.getString(9);
+                    cours.add(c);
+            }
+            cursor.close();
+            db.close();
+            return cours;
         }
 
         public long nbUser() {
@@ -233,7 +236,7 @@ public class DBworker {
                 // System.out.println("thisweek:"+thisweek+"  sync:"+sync);
                 if (thisweek != 0) {
                         if (sync == thisweek - 1) {
-                                cours = findClass(login, thisweek + 1);
+                                cours = findClassInfo(login, thisweek + 1);
                                 newSync = thisweek;
                         } else if (sync >= thisweek) {
                         	return SyncStatus.alreadySync;

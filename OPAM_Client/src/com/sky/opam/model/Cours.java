@@ -1,6 +1,10 @@
 package com.sky.opam.model;
 
-public class Cours {
+import java.io.Serializable;
+
+public class Cours implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	public String login = "";
 	public String name = "";
 	public String type = "";
@@ -18,11 +22,9 @@ public class Cours {
 
 	@Override
 	public String toString() {
-		return "Cours [login=" + login + ", name=" + name + ", type=" + type
+		return "Cours [" + "name=" + name + ", type=" + type
 				+ ", position=" + position + ", debut=" + debut + ", fin="
-				+ fin + ", auteur=" + auteur + ", formateur=" + formateur
-				+ ", apprenants=" + apprenants + ", groupe=" + groupe
-				+ ", salle=" + salle + "]";
+				+ fin +"]";
 	}
 
 	public String getCalendarTitle() {

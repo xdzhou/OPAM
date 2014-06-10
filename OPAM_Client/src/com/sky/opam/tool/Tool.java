@@ -57,6 +57,16 @@ public class Tool {
         return Integer.parseInt(sdf.format(c.getTime()));
 	}
 	
+	public static int getDayOfWeek() {
+		Calendar c = Calendar.getInstance();
+		int xq = c.get(Calendar.DAY_OF_WEEK);
+		if (xq == 1) {
+			return 7;
+		} else {
+			return xq - 1;
+		}
+	}
+	
 	public static int dip2px(Context context, int dipValue) {
 		float scale = context.getResources().getDisplayMetrics().density;
 		return (int) (dipValue * scale + 0.5f);
