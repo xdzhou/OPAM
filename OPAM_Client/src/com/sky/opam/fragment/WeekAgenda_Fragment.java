@@ -1,22 +1,26 @@
 package com.sky.opam.fragment;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import com.sky.opam.AgendaTabActivity;
+import com.sky.opam.ClassInfoEditActivity;
 import com.sky.opam.DayViewActivity;
-import com.sky.opam.LoginActivity;
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
+import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 import com.sky.opam.view.ClassInfoClickListener;
 import com.sky.opam.view.DayTabClassView;
+import com.sky.opam.view.DayViewLongPressListener;
 import com.sky.opam.view.TimeLineView;
 
-import android.R.color;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -42,8 +46,9 @@ public class WeekAgenda_Fragment extends Fragment{
 	private float day_view_width ;
 	private int title_hight ;
 	private MyApp myApp;
-	private final String[] tab_title = {"Mon","Tue","Wen","Thi","Fri"};
-	private HashMap<Integer, List<Cours>> dateMap = new HashMap<Integer, List<Cours>>();
+	private DBworker worker;
+	private String[] tab_title = {"MO ","TU ","WE ","TH ","FR "};
+	private HashMap<Integer, List<ClassInfo>> dateMap = new HashMap<Integer, List<ClassInfo>>();
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -54,10 +59,15 @@ public class WeekAgenda_Fragment extends Fragment{
 		endTime = b.getInt("endTime");
 		numWeek = b.getInt("numWeek");
 		time_distance = b.getFloat("time_distance");
+		worker = new DBworker(getActivity());
 		
 		myApp = (MyApp)getActivity().getApplication();
 		Resources res = getActivity().getResources();
 		title_hight = Tool.dip2px(getActivity(),res.getInteger(R.integer.title_hight));
+		
+		for(int i=0; i<tab_title.length; i++){
+			tab_title[i] += Tool.getDateViaNumWeek(numWeek, i+Calendar.MONDAY).substring(3, 5);
+		}
 	}
 	
 	@Override
@@ -100,8 +110,9 @@ public class WeekAgenda_Fragment extends Fragment{
         	dView.setTimeDistance(time_distance);
         	dView.setStartTime(startTime);
         	dView.setEndTime(endTime);
+        	dView.setMyLongPressListener(dayViewLongPressListener);
         	dView.setClickListener(classInfoClickListener);
-        	dView.addClass(dateMap.get(i+1));
+        	dView.addClass(dateMap.get(i+Calendar.MONDAY));
         	if(myApp.getCurrentWeekNum()==numWeek && Tool.getDayOfWeek()==i+1) dView.setBackgroundColor(Color.LTGRAY);
         	innerLayout.addView(dView);
 		}
@@ -120,9 +131,20 @@ public class WeekAgenda_Fragment extends Fragment{
 		outState.putFloat("time_distance", time_distance);
 	}
 	
+	DayViewLongPressListener dayViewLongPressListener = new DayViewLongPressListener() {		
+		@Override
+		public void onLongPressEvent(DayTabClassView v, ClassInfo c, String vocationStartTime,String vocationEndTime) {
+			if(c == null){
+				createVocationDialog(v, vocationStartTime, vocationEndTime);
+			}else {
+				createEventDialog(v, c);
+			}
+		}
+	};
+	
 	ClassInfoClickListener classInfoClickListener = new ClassInfoClickListener() {		
 		@Override
-		public void onTouchEvent(View v, MotionEvent e, Cours c) {
+		public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
 			showClassInfo(c);
 		}
 	};
@@ -156,7 +178,7 @@ public class WeekAgenda_Fragment extends Fragment{
 		}
 	};
 	
-	private void showClassInfo(Cours c) {
+	private void showClassInfo(ClassInfo c) {
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
@@ -178,9 +200,58 @@ public class WeekAgenda_Fragment extends Fragment{
 		});
 	}
 	
-	public void setData(int position, List<Cours> data){
-		if(position>=1 && position<=5){
+	public void setData(int position, List<ClassInfo> data){
+		if(position>=Calendar.MONDAY && position<=Calendar.FRIDAY){
 			dateMap.put(position, data);
 		}
 	}
+	/*
+	 * 
+	 */
+	private void createVocationDialog(final DayTabClassView v, String vocationStartTime, String vocationEndTime){
+		String[] mItems = {"Add Event"};
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Free Time: "+vocationStartTime+" - "+vocationEndTime);
+		builder.setOnCancelListener(new OnCancelListener() {			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				v.cancelSelectDraw();
+			}
+		});
+		builder.setItems(mItems, new DialogInterface.OnClickListener() {			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		builder.create().show();
+	}
+	
+	private void createEventDialog(final DayTabClassView v, final ClassInfo c){
+		String[] mItems = {"Edit Event", "Remove Event"};
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Class Time: "+c.debut+" - "+c.fin);
+		builder.setOnCancelListener(new OnCancelListener() {			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				v.cancelSelectDraw();
+			}
+		});
+		builder.setItems(mItems, new DialogInterface.OnClickListener() {			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if(which==0){
+					Intent intent = new Intent();
+			        intent.setClass(getActivity(), ClassInfoEditActivity.class);     
+			        getActivity().startActivityForResult(intent, MyApp.rsqCode);
+				}else{
+					worker.delClassInfo(myApp.getLogin(), c.position, c.debut);
+					v.removeClass(c);
+				}			
+			}
+		});
+		builder.create().show();
+	}
+
 }

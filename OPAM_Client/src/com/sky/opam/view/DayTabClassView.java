@@ -3,10 +3,11 @@ package com.sky.opam.view;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.Tool;
 
 import android.content.Context;
@@ -14,6 +15,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -27,13 +30,20 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	private int endTime ;
 	private float view_width ;
 	private float time_distance ;
-	private List<Cours> class_list = new ArrayList<Cours>();
+	private List<ClassInfo> class_list = new ArrayList<ClassInfo>();
 	private Paint outLinePaint = new Paint();
+	private Paint selectePaint = new Paint();
 	private Paint backgroundPaint = new Paint();
+	//select region
 	private TextPaint textPaint = new TextPaint();
+	private float startSelectP;
+	private float endSelectP;
+	private boolean isRegionSelected = false;
+	
 	private float d;
 	private GestureDetector mGestureDetector;
 	private ClassInfoClickListener myClcLis;
+	private DayViewLongPressListener myLongPressListener;
 
 	public DayTabClassView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -70,6 +80,9 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		mGestureDetector = new GestureDetector(getContext(), this);
 		outLinePaint.setColor(Color.BLUE);
 		outLinePaint.setStrokeWidth(Tool.dip2px(context, 1));
+		selectePaint.setColor(Color.argb(100, 0xff, 0, 0));
+		selectePaint.setStrokeWidth(Tool.dip2px(context, 3));
+		//selectePaint.setStyle(Style.STROKE);
 		backgroundPaint.setColor(Color.GRAY);
 		backgroundPaint.setStyle(Paint.Style.FILL_AND_STROKE);//设置填满
 		textPaint.setColor(Color.WHITE);
@@ -90,9 +103,11 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 			canvas.drawLine(0, i*time_distance, view_width, i*time_distance, outLinePaint);
 		}
 		//draw class info
-		for(Cours c : class_list){
+		for(ClassInfo c : class_list){
 			drawClassInfo(canvas, c);
 		}
+		//draw selected region
+		if(isRegionSelected) canvas.drawRect(0, startSelectP, view_width, endSelectP, selectePaint);
 	}
 	
 	@Override
@@ -100,7 +115,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		setMeasuredDimension((int)(view_width), (int)((endTime-startTime)*time_distance));
 	}
 	
-	private void drawClassInfo(Canvas canvas, Cours c) {
+	private void drawClassInfo(Canvas canvas, ClassInfo c) {
 		float startP = getTimeDistance(c.debut);
 		float endP = getTimeDistance(c.fin);
 		canvas.drawRect(d, startP+d, view_width-d, endP-d, backgroundPaint);
@@ -132,14 +147,24 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		return (time_distance * sed / 3600);
 	}
 	
-	public void addClass(Cours c){
+	public void addClass(ClassInfo c){
 		class_list.add(c);
+		Collections.sort(class_list);
+		invalidate();
 	}
 	
-	public void addClass(List<Cours> list){
+	public void addClass(List<ClassInfo> list){
 		if(list!=null && list.size()>0){
 			class_list.addAll(list);
+			Collections.sort(class_list);
+			invalidate();
 		}
+	}
+	
+	public void removeClass(ClassInfo c){
+		class_list.remove(c);
+		Collections.sort(class_list);
+		invalidate();
 	}
 	
 	private float getTextHeight(TextPaint p) {
@@ -167,7 +192,73 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	}
 
 	@Override
-	public void onLongPress(MotionEvent e) {
+	public void onLongPress(MotionEvent e) {	
+		//enableSelectDraw(0,(endTime-startTime)*time_distance);
+		if(myLongPressListener != null){
+			String vocationStartTime, vocationEndTime;
+			if(class_list.size()==0) {
+				enableSelectDraw(0,(endTime-startTime)*time_distance);
+				myLongPressListener.onLongPressEvent(this,
+					null, 
+					(startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00"),
+					(endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00"));
+			}
+			
+			for(int i=0; i<class_list.size(); i++){
+				ClassInfo c = class_list.get(i);
+				float startP = getTimeDistance(c.debut);
+				float endP = getTimeDistance(c.fin);
+				if(e.getY() < startP){
+					float previousP;
+					if(i-1 == -1) {
+						previousP = 0f;
+						vocationStartTime = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
+					}else {
+						vocationStartTime = class_list.get(i-1).fin;
+						previousP = getTimeDistance(vocationStartTime);
+					}
+					if(previousP < e.getY()){
+						enableSelectDraw(previousP, startP);
+						myLongPressListener.onLongPressEvent(this, null, vocationStartTime, c.debut);
+						break;
+					}
+				}else if (startP < e.getY() && e.getY() < endP) {
+					enableSelectDraw(startP, endP);
+					myLongPressListener.onLongPressEvent(this, c, null, null);
+					break;
+				}else {
+					float nestP;
+					if(i == class_list.size()-1) {
+						vocationEndTime = (endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00");
+						nestP = getTimeDistance(vocationEndTime);			
+					}else {
+						vocationEndTime = class_list.get(i+1).debut;
+						nestP = getTimeDistance(vocationEndTime);				
+					}
+					if(nestP > e.getY()){
+						enableSelectDraw(endP, nestP);
+						myLongPressListener.onLongPressEvent(this, null, c.fin, vocationEndTime);
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	private void enableSelectDraw(float p1, float p2){
+		isRegionSelected = true;
+		startSelectP = p1;
+		endSelectP = p2;
+		postInvalidate();
+	}
+	
+	public void cancelSelectDraw(){
+		isRegionSelected = false;
+		postInvalidate();
+	}
+
+	public void setMyLongPressListener(DayViewLongPressListener myLongPressListener) {
+		this.myLongPressListener = myLongPressListener;
 	}
 
 	@Override
@@ -178,7 +269,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		if(myClcLis!=null){
-			for (Cours c: class_list) {
+			for (ClassInfo c: class_list) {
 				float startP = getTimeDistance(c.debut);
 				float endP = getTimeDistance(c.fin);
 				if (startP < e.getY() && e.getY() < endP) {
@@ -193,4 +284,6 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	public void setClickListener(ClassInfoClickListener clickListener) {
 		this.myClcLis = clickListener;
 	}
+	
+	
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataCompo {
-	private List<Cours> cours = new ArrayList<Cours>();
+	private List<ClassInfo> cours = new ArrayList<ClassInfo>();
 	private int id;
 	private int numweek;
 	private String username;
@@ -13,18 +13,18 @@ public class DataCompo {
 
 	}
 
-	public DataCompo(List<Cours> cours, int id, int numweek, String username) {
+	public DataCompo(List<ClassInfo> cours, int id, int numweek, String username) {
 		this.cours = cours;
 		this.id = id;
 		this.numweek = numweek;
 		this.username = username;
 	}
 
-	public List<Cours> getCours() {
+	public List<ClassInfo> getCours() {
 		return cours;
 	}
 
-	public void setCours(List<Cours> cours) {
+	public void setCours(List<ClassInfo> cours) {
 		this.cours = cours;
 	}
 

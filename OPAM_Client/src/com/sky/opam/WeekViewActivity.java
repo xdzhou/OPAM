@@ -1,6 +1,7 @@
 package com.sky.opam;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -11,12 +12,14 @@ import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,8 +43,9 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+		System.out.println("WeekViewActivity created");
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.test);
+        setContentView(R.layout.seul_fragment);
 
         myApp = (MyApp)getApplication();
         numWeek = (Integer) getIntent().getExtras().get("numWeek");       
@@ -70,11 +74,14 @@ public class WeekViewActivity extends ActionBarActivity{
 	private void setActionBar(){
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1,getData());
+        SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_layout,getData());
         actionBar.setListNavigationCallbacks(spinnerAdapter, new  ActionBar.OnNavigationListener() {			
 			@Override
 			public boolean onNavigationItemSelected(int position, long itemId) {
+				profile_menu.showContent();
 				setWeekAgenda(numWeek+position);
 				return true;
 			}
@@ -83,10 +90,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	private List<String> getData(){      
         List<String> data = new ArrayList<String>();
-        data.add(numWeek+"th week");
-        data.add((numWeek+1)+"th week");
-        data.add((numWeek+2)+"th week");
-        data.add((numWeek+3)+"th week");        
+        data.add(Tool.getDateViaNumWeek(numWeek, Calendar.MONDAY)+" - "+Tool.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
+        data.add(Tool.getDateViaNumWeek(numWeek+1, Calendar.MONDAY)+" - "+Tool.getDateViaNumWeek(numWeek+1, Calendar.FRIDAY));        
         return data;
     }
 	
@@ -100,12 +105,24 @@ public class WeekViewActivity extends ActionBarActivity{
 		b.putFloat("time_distance", time_distance);
 		fragment.setArguments(b);
 		
-		for(int i=1; i<=5; i++) fragment.setData(i, worker.findClassInfo(myApp.getLogin(), weekN, i));
+		for(int i=0; i<5; i++) fragment.setData(i+Calendar.MONDAY, worker.findClassInfo(myApp.getLogin(), weekN, i+1));
         
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.agenda_fragement,fragment);
 		ft.commit();
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		System.out.println("WeekView "+requestCode+" "+ resultCode);
+        if (resultCode == myApp.Refresh) {
+        	finish();
+        	startActivityForResult(getIntent(), MyApp.rsqCode);
+        } else if (resultCode == myApp.Exit) {
+        	setResult(MyApp.Exit);
+            finish();
+        }
+    }
 	
 	@Override  
     public boolean onCreateOptionsMenu(Menu menu) { 
@@ -137,4 +154,23 @@ public class WeekViewActivity extends ActionBarActivity{
 		ft.commit();
 		return view;
 	}
+	
+	long exitTime = 0;
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                if ((System.currentTimeMillis() - exitTime) > 2000) {
+                	Tool.showInfo(this, "one more time to exit");
+                    exitTime = System.currentTimeMillis();
+                } else {
+                    setResult(MyApp.Exit);
+                    finish();
+                }
+            }
+            return true;
+	    } else {
+        	return super.onKeyDown(keyCode, event);
+	    }
+    }
 }

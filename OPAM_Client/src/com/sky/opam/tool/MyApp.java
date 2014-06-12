@@ -1,10 +1,16 @@
 package com.sky.opam.tool;
 
+import com.sky.opam.R.integer;
+
 import android.app.Application;
 
 public class MyApp extends Application{
 	private String login;
 	private int currentWeekNum;
+	public static final int rsqCode = 11;
+	public static final int Exit = 0xde;
+	public static final int Update = 0xaa;
+	public static final int Refresh = 22;
 	
 	public String getLogin() {
 		return login;

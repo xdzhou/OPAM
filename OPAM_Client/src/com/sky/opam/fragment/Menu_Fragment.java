@@ -1,12 +1,19 @@
 package com.sky.opam.fragment;
 
+import com.sky.opam.AccountActivity;
+import com.sky.opam.DayViewActivity;
+import com.sky.opam.LoginActivity;
 import com.sky.opam.R;
+import com.sky.opam.WeekViewActivity;
+import com.sky.opam.R.integer;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
+import com.sky.opam.tool.Tool;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -35,11 +42,12 @@ public class Menu_Fragment extends ListFragment{
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
-		adapter.add(new MenuItemContent("go to today", android.R.drawable.ic_menu_compass));
-		adapter.add(new MenuItemContent("course info", android.R.drawable.ic_menu_view));
-		adapter.add(new MenuItemContent("update", android.R.drawable.ic_menu_rotate));
-		adapter.add(new MenuItemContent("account", android.R.drawable.ic_menu_myplaces));
-		adapter.add(new MenuItemContent("exit", android.R.drawable.ic_menu_close_clear_cancel));
+		adapter.add(new MenuItemContent("Today's Class", android.R.drawable.ic_menu_compass));
+		adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
+		adapter.add(new MenuItemContent("Update", android.R.drawable.ic_menu_rotate));
+		adapter.add(new MenuItemContent("Account", android.R.drawable.ic_menu_myplaces));
+		//adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_lock_power_off));
+		adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_menu_close_clear_cancel));
 		setListAdapter(adapter);
 	}
 	
@@ -75,9 +83,26 @@ public class Menu_Fragment extends ListFragment{
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		if(position == 0){
-			//MainTabActivity contest = (MainTabActivity) getActivity();
-			//contest.close_profile();
+		if(position == 1){
+			Intent intent = new Intent();
+	        intent.setClass(getActivity(), DayViewActivity.class);
+	        Bundle bundle = new Bundle();
+	        bundle.putInt("numWeek", Tool.getNumWeek());
+	        bundle.putInt("dayOfWeek", Tool.getDayOfWeek());
+	        intent.putExtras(bundle);      
+	        startActivityForResult(intent, MyApp.rsqCode);
+		}else if (position == 2) {
+			
+		}else if (position == 3) {
+			getActivity().setResult(MyApp.Update);
+			getActivity().finish();
+		}else if (position == 4) {
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), AccountActivity.class);
+			getActivity().startActivityForResult(intent, MyApp.rsqCode);
+		}else if (position == 5){
+			getActivity().setResult(MyApp.Exit);
+			getActivity().finish();
 		}
 	}
 }

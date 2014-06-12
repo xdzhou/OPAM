@@ -8,7 +8,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import android.util.Xml;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.DataCompo;
 
 public class PullXMLReader {
@@ -20,14 +20,14 @@ public class PullXMLReader {
 		try {
 			parser.setInput(inStream, "UTF-8");
 			int eventType = parser.getEventType();
-			Cours c = null;
-			List<Cours> cours = null;
+			ClassInfo c = null;
+			List<ClassInfo> cours = null;
 			// SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd HH:mm");
 
 			while (eventType != XmlPullParser.END_DOCUMENT) {
 				switch (eventType) {
 				case XmlPullParser.START_DOCUMENT:
-					cours = new ArrayList<Cours>();
+					cours = new ArrayList<ClassInfo>();
 					break;
 				case XmlPullParser.START_TAG:
 					String name = parser.getName();
@@ -37,7 +37,7 @@ public class PullXMLReader {
 						username = parser.getAttributeValue(2);
 						System.out.println("username: " + username);
 					} else if (name.equalsIgnoreCase("cour")) {
-						c = new Cours();
+						c = new ClassInfo();
 					} else if (c != null) {
 						if (name.equalsIgnoreCase("name")) {
 							c.name = parser.nextText();

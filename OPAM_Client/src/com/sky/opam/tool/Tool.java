@@ -57,6 +57,25 @@ public class Tool {
         return Integer.parseInt(sdf.format(c.getTime()));
 	}
 	
+	public static String getDateViaNumWeek(int numweek, int dayOfWeek) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.WEEK_OF_YEAR, numweek);
+		cal.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+		cal.set(Calendar.WEEK_OF_YEAR, numweek);
+		int num = cal.get(Calendar.MONTH) + 1;
+
+		String date = (num < 10) ? "0" + num : "" + num;
+		date += "/";
+		num = cal.get(Calendar.DAY_OF_MONTH);
+		date += (num < 10) ? "0" + num : "" + num;
+		return date;
+	}
+	
+	public static int getYear() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR);
+	}
+	
 	public static int getDayOfWeek() {
 		Calendar c = Calendar.getInstance();
 		int xq = c.get(Calendar.DAY_OF_WEEK);

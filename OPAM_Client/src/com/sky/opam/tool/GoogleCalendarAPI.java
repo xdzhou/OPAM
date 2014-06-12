@@ -3,7 +3,7 @@ package com.sky.opam.tool;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
@@ -55,7 +55,7 @@ public class GoogleCalendarAPI {
 	}
 
 	@SuppressLint("SimpleDateFormat")
-	public long addCourse2Calendar(Cours c) {
+	public long addCourse2Calendar(ClassInfo c) {
 		if(calId.equals("") || userName.equals("")) return 0;
 		
 		ContentValues event = new ContentValues();

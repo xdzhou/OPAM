@@ -18,7 +18,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.sky.opam.R;
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.DataCompo;
 import com.sky.opam.model.User;
 import com.sky.opam.tool.Chiffrement;
@@ -47,19 +47,19 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
         pdialog = new ProgressDialog(context, 0);
         pdialog.setCancelable(true);
         pdialog.setButton("cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int i) {
-                        dialog.cancel();
-                }
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
         });
         pdialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                public void onCancel(DialogInterface dialog) {
-                        dialog.dismiss();
-                        dialog = null;
-                        cancel(true);
-                }
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+                dialog = null;
+                cancel(true);
+            }
         });
-        pdialog.setIcon(R.drawable.download_icon);
-        pdialog.setTitle("downloading the data");
+        pdialog.setIcon(android.R.drawable.ic_popup_sync);
+        pdialog.setTitle("Downloading");
         pdialog.setMessage("Please wait while loading the list of class...");
 	}
 	
@@ -92,10 +92,10 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 	        	u.setThisweek(dataCompo.getNumweek());
                 worker.updateUser(u);
                 worker.updateDefaultUser(login);
-                worker.delAllCours(login);
-                worker.delAllEventID(context, login);
-                List<Cours> cours = dataCompo.getCours();
-                for (Cours c : cours) {
+                worker.delClassInfo(login);
+                //worker.delAllEventID(context, login);
+                List<ClassInfo> cours = dataCompo.getCours();
+                for (ClassInfo c : cours) {
                         c.login = login;
                         worker.addCours(c);
                 }
@@ -133,17 +133,17 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
         data.add(new BasicNameValuePair("username", login));
         data.add(new BasicNameValuePair("password", Chiffrement.encrypt(password, "OPAM")));
         try {
-                httpPost.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
-                HttpResponse response = client.execute(httpPost);
-                int status = response.getStatusLine().getStatusCode();
-                if (status == 200) {
-                    HttpEntity entity = response.getEntity();
-                    agendaXML = EntityUtils.toString(entity);
-                    httpPost.abort();
-                    return agendaXML;
-                } else {
-                	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
-                }
+            httpPost.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
+            HttpResponse response = client.execute(httpPost);
+            int status = response.getStatusLine().getStatusCode();
+            if (status == 200) {
+                HttpEntity entity = response.getEntity();
+                agendaXML = EntityUtils.toString(entity);
+                httpPost.abort();
+                return agendaXML;
+            } else {
+            	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
+            }
         } catch (UnsupportedEncodingException e) {
         	throw new FailException(e.getMessage());
 		} catch (ClientProtocolException e) {

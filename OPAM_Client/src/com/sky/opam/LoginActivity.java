@@ -1,6 +1,5 @@
 package com.sky.opam;
 
-
 import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.task.AgendaDownloadTask;
@@ -42,6 +41,7 @@ public class LoginActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	System.out.println("LoginActivity created");
             super.onCreate(savedInstanceState);
             requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.login_activity);
@@ -60,7 +60,7 @@ public class LoginActivity extends Activity {
             tfMDP = (EditText) findViewById(R.id.txtMDP);
             tfMDP.getBackground().setAlpha(150);
 
-            User fUser = worker.defaultUser();
+            User fUser = worker.getDefaultUser();
             if (!fUser.getLogin().equals("")) {
                 u = fUser;
                 login = fUser.getLogin();
@@ -118,10 +118,11 @@ public class LoginActivity extends Activity {
     // reponse au le update request
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0 && resultCode == 22) {
+    	System.out.println("Login "+requestCode+" "+ resultCode);
+        if (resultCode == myApp.Update) {
             finishActivity(requestCode);
             downloadCharge();
-        } else if (resultCode == 1) {
+        } else if (resultCode == myApp.Exit || resultCode == 0) {
             finish();
         }
     }
@@ -129,6 +130,8 @@ public class LoginActivity extends Activity {
     // download the course
     private void downloadCharge() {
         if (Tool.isNetworkAvailable(context)) {
+        	login = tfID.getText().toString();
+            password = tfMDP.getText().toString();
             AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, worker, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
         } else {
@@ -168,7 +171,7 @@ public class LoginActivity extends Activity {
         Bundle bundle = new Bundle();
         bundle.putInt("numWeek", numWeek);
         intent.putExtras(bundle);
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, MyApp.rsqCode);
     }
 
     long exitTime = 0;
@@ -193,6 +196,7 @@ public class LoginActivity extends Activity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			if(msg.what == R.integer.OK){
+				//Tool.showInfo(context, "Data updated !");
 				u = worker.findUser(login);
 				WeekAgendaShow(u.getThisweek());
 			}else {

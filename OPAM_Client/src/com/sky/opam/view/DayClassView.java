@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -33,7 +33,7 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	private int l = 45; // longeur of every 2 circles
 	private String FinDuMonde = "20121221";
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
-	private List<Cours> cours = new ArrayList<Cours>();
+	private List<ClassInfo> cours = new ArrayList<ClassInfo>();
 	private List<float[]> flag = new ArrayList<float[]>();
 	private int SW;
 	private ClassInfoClickListener myClcLis;
@@ -104,7 +104,7 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		this.myClcLis = clickListener;
 	}
 
-	public void setCours(List<Cours> cours) {
+	public void setCours(List<ClassInfo> cours) {
 		this.cours = cours;
 	}
 
@@ -128,7 +128,7 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 					+ r + i * l, linePaint);
 		}
 
-		for (Cours c : cours) {
+		for (ClassInfo c : cours) {
 			drawCours(canvas, c);
 		}
 		if (cours.size() == 0) {
@@ -169,7 +169,7 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		return (fm.descent - fm.ascent);
 	}
 
-	private void drawCours(Canvas canvas, Cours c) {
+	private void drawCours(Canvas canvas, ClassInfo c) {
 		if (c.type.contains("Examen")) {
 			NamePaint.setColor(Color.argb(255, 248, 220, 24));
 		} else {

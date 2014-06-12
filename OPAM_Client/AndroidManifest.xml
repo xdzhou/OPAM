@@ -29,10 +29,15 @@
         	android:label="@string/app_name">
         </activity>
         
-        <activity android:name="com.sky.opam.AgendaTabActivity"
+        <activity android:name="com.sky.opam.AccountActivity"
             android:screenOrientation="portrait"
         	android:label="@string/app_name">
-        </activity>      
+        </activity>
+        
+        <activity android:name="com.sky.opam.ClassInfoEditActivity"
+            android:screenOrientation="portrait"
+        	android:label="@string/app_name">
+        </activity>     
     </application>
     
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" ></uses-permission>

@@ -1,7 +1,10 @@
 package com.sky.opam;
 
+import java.util.Calendar;
+
+import com.sky.opam.R.integer;
 import com.sky.opam.fragment.WeekAgenda_Fragment;
-import com.sky.opam.model.Cours;
+import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
@@ -12,19 +15,26 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class DayViewActivity extends FragmentActivity{
+public class DayViewActivity extends ActionBarActivity{
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         int numWeek = (Integer) getIntent().getExtras().get("numWeek");
         int dayOfWeek = (Integer) getIntent().getExtras().get("dayOfWeek");
@@ -37,14 +47,25 @@ public class DayViewActivity extends FragmentActivity{
 		dayClassView.setCours(worker.findClassInfo(login, numWeek, dayOfWeek));
 		dayClassView.setClickListener(new ClassInfoClickListener() {
 			@Override
-			public void onTouchEvent(View v, MotionEvent e, Cours c) {
+			public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
 				showClassInfo(c);
 			}
 		});
-		setContentView(dayClassView);
+		
+		LinearLayout linearLayout = new LinearLayout(this);
+		linearLayout.setOrientation(LinearLayout.VERTICAL);
+		TextView tView = new TextView(this);
+		tView.setGravity(Gravity.CENTER);
+		tView.setTextSize(Tool.dip2px(this, 8));
+		int padding = Tool.dip2px(this, 5);
+		tView.setPadding(padding, padding, padding, padding);
+		tView.setText("Class of "+Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek-1+Calendar.MONDAY));
+		linearLayout.addView(tView);
+		linearLayout.addView(dayClassView);
+		setContentView(linearLayout);
 	}
 	
-	private void showClassInfo(Cours c) {
+	private void showClassInfo(ClassInfo c) {
 		final Dialog dlg = new Dialog(this, R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
