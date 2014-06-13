@@ -6,43 +6,52 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ClassInfo implements Serializable, Comparable<ClassInfo>{
-
 	private static final long serialVersionUID = 1L;
+	
+	public long id;
 	public String login;
 	public String name;
-	public String type;
-	public String position;
-	public String debut;
-	public String fin;
+	public ClassType classType;
+	public int weekOfYear;
+	public int dayOfWeek;
+	public String startTime;
+	public String endTime;
 	public String auteur;
-	public String formateur;
-	public String apprenants;
+	public String teacher;
+	public String students;
 	public String groupe;
-	public String salle;
+	public Room room;
+	public ClassColor color;
+	public boolean isSync = false;
 
 	public ClassInfo() {
-		login=name=type=position=auteur=formateur=apprenants=groupe="";
+		login=name=auteur=teacher=students=groupe="";
 	}
+
+	
 
 	@Override
 	public String toString() {
-		return "Cours [" + "name=" + name + ", type=" + type
-				+ ", position=" + position + ", debut=" + debut + ", fin="
-				+ fin +"]";
+		return "ClassInfo [id=" + id + ", login=" + login + ", name=" + name
+				+ ", weekOfYear=" + weekOfYear + ", dayOfWeek=" + dayOfWeek
+				+ ", startTime=" + startTime + ", endTime=" + endTime
+				+ ", isSync=" + isSync + "]";
 	}
+
+
 
 	public String getCalendarTitle() {
 		if (name.contains("Point de Rencontre"))
 			return name;
 		else {
-			return type + " - " + name;
+			return classType.name + " - " + name;
 		}
 	}
 
 	public String getCalendarDescription() {
 		StringBuilder s = new StringBuilder();
-		if (!formateur.equals("")) s.append("Teacher : ").append(formateur).append(" ");
-		s.append("\nStudent : ").append(apprenants);
+		if (!teacher.equals("")) s.append("Teacher : ").append(teacher).append(" ");
+		s.append("\nStudent : ").append(students);
 		return s.toString();
 	}
 
@@ -52,22 +61,21 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		String FinDuMonde = "20121221";
 		Date t2 = null, t1 = null;
 		try {
-			t1 = sdf.parse(FinDuMonde + " " + this.debut);
-			t2 = sdf.parse(FinDuMonde + " " + another.debut);
+			t1 = sdf.parse(FinDuMonde + " " + this.startTime);
+			t2 = sdf.parse(FinDuMonde + " " + another.endTime);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
 		return (int) ((t1.getTime() - t2.getTime())/1000);
 	}
 
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((debut == null) ? 0 : debut.hashCode());
-		result = prime * result + ((login == null) ? 0 : login.hashCode());
-		result = prime * result
-				+ ((position == null) ? 0 : position.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
 		return result;
 	}
 
@@ -80,24 +88,10 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		if (getClass() != obj.getClass())
 			return false;
 		ClassInfo other = (ClassInfo) obj;
-		if (debut == null) {
-			if (other.debut != null)
-				return false;
-		} else if (!debut.equals(other.debut))
-			return false;
-		if (login == null) {
-			if (other.login != null)
-				return false;
-		} else if (!login.equals(other.login))
-			return false;
-		if (position == null) {
-			if (other.position != null)
-				return false;
-		} else if (!position.equals(other.position))
+		if (id != other.id)
 			return false;
 		return true;
 	}
 	
 	
-
 }

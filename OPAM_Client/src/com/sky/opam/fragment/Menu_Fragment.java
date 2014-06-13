@@ -38,7 +38,7 @@ public class Menu_Fragment extends ListFragment{
 		super.onActivityCreated(savedInstanceState);
 		MyApp myApp = (MyApp)getActivity().getApplication();
 		login = myApp.getLogin();
-		user_name = new DBworker(getActivity()).findUser(myApp.getLogin()).getUsename();
+		user_name = new DBworker(getActivity()).getUser(myApp.getLogin()).getName();
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));

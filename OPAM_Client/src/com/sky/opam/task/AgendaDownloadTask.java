@@ -17,14 +17,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.google.gson.Gson;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassInfo;
+import com.sky.opam.model.ClassType;
 import com.sky.opam.model.DataCompo;
 import com.sky.opam.model.User;
+import com.sky.opam.model.UserClassPackage;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.FailException;
-import com.sky.opam.tool.PullXMLReader;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -79,32 +81,40 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 		String password = params[1];
 		String msg = null;
 		try {
-			String agendaXML = getAgendaXML(login, password);
-			DataCompo dataCompo = PullXMLReader.readXML(new ByteArrayInputStream(agendaXML.getBytes("UTF-8")));
-			if (dataCompo.getId() == 2) {
-                msg = dataCompo.getCours().get(0).type;
-	        } else {
-	        	User u = worker.findUser(login);
-	        	if(u==null){
-	        		u = new User(login, Chiffrement.encrypt(password,"OPAM"), dataCompo.getUsername());
+			String agendaJson = getAgendaJSON(login, password);
+			Gson gson = new Gson();
+			UserClassPackage mypackage = (UserClassPackage) gson.fromJson(agendaJson, UserClassPackage.class);
+			if(mypackage.getClassInfos().size()==1 && mypackage.getClassInfos().get(0).name.equals("FailException")){
+				msg = mypackage.getClassInfos().get(0).students;
+			}else {
+	        	User u = worker.getUser(login);
+	        	if(u == null){
+	        		u = new User(login, Chiffrement.encrypt(password,"OPAM"), mypackage.getUser().getName(), mypackage.getUser().getNumWeekUpdated());
 	        		worker.addUser(u);
-	        	}
-	        	u.setThisweek(dataCompo.getNumweek());
-                worker.updateUser(u);
-                worker.updateDefaultUser(login);
+	        	}else {
+	        		u.setNumWeekUpdated(mypackage.getUser().getNumWeekUpdated());
+	                worker.updateUser(u);
+				}
+	        	
+                worker.setDefaultUser(login);
                 worker.delClassInfo(login);
                 //worker.delAllEventID(context, login);
-                List<ClassInfo> cours = dataCompo.getCours();
+                List<ClassInfo> cours = mypackage.getClassInfos();
                 for (ClassInfo c : cours) {
-                        c.login = login;
-                        worker.addCours(c);
+                    c.login = login;
+                    c.color.id = 0; //default color
+                    long id = worker.addGetRoom(c.room);
+                    if(id==-1) c.room = null;
+                    else c.room.id = id;
+                    id = worker.addGetClassType(c.classType);
+                    if(id==-1) c.classType = null;
+                    else c.classType.id = id;
+                    worker.addClassInfo(c);
                 }
 	        }
 		} catch (FailException e) {
 			msg = e.getMessage();
-		} catch (UnsupportedEncodingException e) {
-			msg = e.getMessage();
-		}		
+		}	
 		return msg;
 	}
 	
@@ -125,10 +135,10 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
             }
     }
 	
-	private String getAgendaXML(String login, String password) throws FailException{
-		String agendaXML;
+	private String getAgendaJSON(String login, String password) throws FailException{
+		String agendaJson;
 		HttpClient client = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost( "http://openopam-loic.rhcloud.com/agendaopam");
+        HttpPost httpPost = new HttpPost( "http://openopam-loic.rhcloud.com/agendaopamjson");
         List<NameValuePair> data = new ArrayList<NameValuePair>();
         data.add(new BasicNameValuePair("username", login));
         data.add(new BasicNameValuePair("password", Chiffrement.encrypt(password, "OPAM")));
@@ -138,9 +148,9 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
             int status = response.getStatusLine().getStatusCode();
             if (status == 200) {
                 HttpEntity entity = response.getEntity();
-                agendaXML = EntityUtils.toString(entity);
+                agendaJson = EntityUtils.toString(entity);
                 httpPost.abort();
-                return agendaXML;
+                return agendaJson;
             } else {
             	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
             }
@@ -151,7 +161,7 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 		} catch (IOException e) {
 			throw new FailException(e.getMessage());
 		} finally {
-                client.getConnectionManager().shutdown();
+            client.getConnectionManager().shutdown();
         }
 	}
 

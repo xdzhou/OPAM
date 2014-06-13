@@ -3,30 +3,17 @@ package com.sky.opam.model;
 public class User {
 	private String login = "";
 	private String passwoed = "";
-	private String usename = "";
-	private int thisweek;
-	// if 1, this user is the default user
-	private int defaultUser = 0;
+	private String name = "";
+	private int numWeekUpdated;
 
 	public User() {
-		super();
 	}
 
-	public User(String login, String passwoed, String username) {
-		super();
+	public User(String login, String passwoed, String name, int numWeekUpdated) {
 		this.login = login;
 		this.passwoed = passwoed;
-		this.usename = username;
-	}
-
-	public User(String login, String passwoed, String username,
-			int defaultUser, int thisweek) {
-		super();
-		this.login = login;
-		this.passwoed = passwoed;
-		this.usename = username;
-		this.thisweek = thisweek;
-		this.defaultUser = defaultUser;
+		this.name = name;
+		this.numWeekUpdated = numWeekUpdated;
 	}
 
 	public String getLogin() {
@@ -45,35 +32,22 @@ public class User {
 		this.passwoed = passwoed;
 	}
 
-	public int getThisweek() {
-		return thisweek;
+	public String getName() {
+		return name;
 	}
 
-	public void setThisweek(int thisweek) {
-		this.thisweek = thisweek;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getUsename() {
-		return usename;
+	public int getNumWeekUpdated() {
+		return numWeekUpdated;
 	}
 
-	public void setUsename(String usename) {
-		this.usename = usename;
+	public void setNumWeekUpdated(int numWeekUpdated) {
+		this.numWeekUpdated = numWeekUpdated;
 	}
-
-	public int getDefaultUser() {
-		return defaultUser;
-	}
-
-	public void setDefaultUser(int defaultUser) {
-		this.defaultUser = defaultUser;
-	}
-
-	@Override
-	public String toString() {
-		return "User [login=" + login + ", passwoed=" + passwoed + ", usename="
-				+ usename + ", thisweek=" + thisweek + ", defaultUser="
-				+ defaultUser + "]";
-	}
+	
+	
 
 }

@@ -61,8 +61,8 @@ public class GoogleCalendarAPI {
 		ContentValues event = new ContentValues();
 		event.put("calendar_id", calId);
 		event.put("title", c.getCalendarTitle());
-		if (!c.salle.equals(""))
-			event.put("eventLocation", "room:" + c.salle);
+		if (!c.room.name.equals(""))
+			event.put("eventLocation", "room:" + c.room.name);
 		event.put("eventTimezone", "Europe/Paris");
 		event.put("description", c.getCalendarDescription());
 		if (Integer.parseInt(Build.VERSION.SDK) < 14)
@@ -70,16 +70,10 @@ public class GoogleCalendarAPI {
 		// if(c.type.contains("CF1")) event.put("eventColor",Color.RED);
 		// if(c.type.contains("CF2")) event.put("eventColor",Color.YELLOW);
 
-		int numweek, numday, hour, min, year;
-		String nums[];
-
-		nums = c.debut.split(":");
+		int hour, min, year;
+		String nums[] = c.startTime.split(":");
 		hour = Integer.parseInt(nums[0]);
 		min = Integer.parseInt(nums[1]);
-
-		nums = c.position.split("_");
-		numweek = Integer.parseInt(nums[0]);
-		numday = Integer.parseInt(nums[1]);
 
 		Calendar calendar = Calendar.getInstance();
 		year = calendar.get(Calendar.YEAR);
@@ -88,11 +82,11 @@ public class GoogleCalendarAPI {
 		calendar.set(Calendar.YEAR, year);
 		calendar.set(Calendar.HOUR_OF_DAY, hour);
 		calendar.set(Calendar.MINUTE, min);
-		calendar.set(Calendar.WEEK_OF_YEAR, numweek);
-		calendar.set(Calendar.DAY_OF_WEEK, numday + 1);
+		calendar.set(Calendar.WEEK_OF_YEAR, c.weekOfYear);
+		calendar.set(Calendar.DAY_OF_WEEK, c.dayOfWeek);
 		event.put("dtstart", calendar.getTime().getTime());
 
-		nums = c.fin.split(":");
+		nums = c.endTime.split(":");
 		hour = Integer.parseInt(nums[0]);
 		min = Integer.parseInt(nums[1]);
 		calendar.set(Calendar.HOUR_OF_DAY, hour);

@@ -170,14 +170,14 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	}
 
 	private void drawCours(Canvas canvas, ClassInfo c) {
-		if (c.type.contains("Examen")) {
+		if (c.classType.name.contains("Examen")) {
 			NamePaint.setColor(Color.argb(255, 248, 220, 24));
 		} else {
 			NamePaint.setColor(Color.argb(255, 41, 199, 230));
 		}
 		float nameY, timeY, salleY;
-		long d1 = getDistance(c.debut);
-		long d2 = getDistance(c.fin);
+		long d1 = getDistance(c.startTime);
+		long d2 = getDistance(c.endTime);
 		float totalHeight = getTextHeight(NamePaint) + 2
 				* getTextHeight(TextPaint) + 2 * offset;
 
@@ -208,9 +208,9 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 
 		// write the contenu of class
 		canvas.drawText(c.name, (SW + timeW + r) / 2, nameY, NamePaint);
-		canvas.drawText(c.debut + "--" + c.fin, (SW + timeW + r) / 2, timeY,
+		canvas.drawText(c.startTime + "--" + c.endTime, (SW + timeW + r) / 2, timeY,
 				TextPaint);
-		canvas.drawText(c.salle, (SW + timeW + r) / 2, salleY, TextPaint);
+		canvas.drawText(c.room.name, (SW + timeW + r) / 2, salleY, TextPaint);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -116,8 +116,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	}
 	
 	private void drawClassInfo(Canvas canvas, ClassInfo c) {
-		float startP = getTimeDistance(c.debut);
-		float endP = getTimeDistance(c.fin);
+		float startP = getTimeDistance(c.startTime);
+		float endP = getTimeDistance(c.endTime);
 		canvas.drawRect(d, startP+d, view_width-d, endP-d, backgroundPaint);
 		canvas.save();
 		StaticLayout sl= new StaticLayout(c.name, textPaint, (int)(view_width-2*d), Alignment.ALIGN_CENTER, 1f, 0f, false);
@@ -206,20 +206,20 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 			
 			for(int i=0; i<class_list.size(); i++){
 				ClassInfo c = class_list.get(i);
-				float startP = getTimeDistance(c.debut);
-				float endP = getTimeDistance(c.fin);
+				float startP = getTimeDistance(c.startTime);
+				float endP = getTimeDistance(c.endTime);
 				if(e.getY() < startP){
 					float previousP;
 					if(i-1 == -1) {
 						previousP = 0f;
 						vocationStartTime = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
 					}else {
-						vocationStartTime = class_list.get(i-1).fin;
+						vocationStartTime = class_list.get(i-1).endTime;
 						previousP = getTimeDistance(vocationStartTime);
 					}
 					if(previousP < e.getY()){
 						enableSelectDraw(previousP, startP);
-						myLongPressListener.onLongPressEvent(this, null, vocationStartTime, c.debut);
+						myLongPressListener.onLongPressEvent(this, null, vocationStartTime, c.startTime);
 						break;
 					}
 				}else if (startP < e.getY() && e.getY() < endP) {
@@ -232,12 +232,12 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 						vocationEndTime = (endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00");
 						nestP = getTimeDistance(vocationEndTime);			
 					}else {
-						vocationEndTime = class_list.get(i+1).debut;
+						vocationEndTime = class_list.get(i+1).startTime;
 						nestP = getTimeDistance(vocationEndTime);				
 					}
 					if(nestP > e.getY()){
 						enableSelectDraw(endP, nestP);
-						myLongPressListener.onLongPressEvent(this, null, c.fin, vocationEndTime);
+						myLongPressListener.onLongPressEvent(this, null, c.endTime, vocationEndTime);
 						break;
 					}
 				}
@@ -270,8 +270,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	public boolean onSingleTapUp(MotionEvent e) {
 		if(myClcLis!=null){
 			for (ClassInfo c: class_list) {
-				float startP = getTimeDistance(c.debut);
-				float endP = getTimeDistance(c.fin);
+				float startP = getTimeDistance(c.startTime);
+				float endP = getTimeDistance(c.endTime);
 				if (startP < e.getY() && e.getY() < endP) {
 					myClcLis.onTouchEvent(this, e, c);
 					break;

@@ -105,7 +105,7 @@ public class WeekViewActivity extends ActionBarActivity{
 		b.putFloat("time_distance", time_distance);
 		fragment.setArguments(b);
 		
-		for(int i=0; i<5; i++) fragment.setData(i+Calendar.MONDAY, worker.findClassInfo(myApp.getLogin(), weekN, i+1));
+		for(int i=0; i<5; i++) fragment.setData(i+Calendar.MONDAY, worker.getClassInfo(myApp.getLogin(), weekN, i+Calendar.MONDAY));
         
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.agenda_fragement,fragment);

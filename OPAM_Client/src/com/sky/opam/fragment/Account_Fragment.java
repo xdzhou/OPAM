@@ -38,12 +38,12 @@ public class Account_Fragment extends ListFragment{
 		myApp = (MyApp)getActivity().getApplication();
 		String CurrentLogin = myApp.getLogin();
 		worker = new DBworker(getActivity());
-		users = worker.findAllUser();
+		users = worker.getAllUser();
 		
 		AccountAdapter adapter = new AccountAdapter(getActivity());
 		for(int i=0; i<users.size(); i++){
 			User u = users.get(i);
-			adapter.add(new AccountItemContent(u.getLogin(), u.getUsename()));
+			adapter.add(new AccountItemContent(u.getLogin(), u.getName()));
 		}
 		adapter.add(new AccountItemContent(null, "add new account"));
 		setListAdapter(adapter);

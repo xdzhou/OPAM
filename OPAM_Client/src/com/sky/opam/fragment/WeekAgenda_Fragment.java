@@ -185,11 +185,11 @@ public class WeekAgenda_Fragment extends Fragment{
 		win.setContentView(R.layout.cours_detail_pop);
 
 		((TextView) win.findViewById(R.id.className)).setText(c.name);
-		((TextView) win.findViewById(R.id.classType)).setText(c.type);
-		((TextView) win.findViewById(R.id.classTime)).setText(c.debut + "--" + c.fin);
+		((TextView) win.findViewById(R.id.classType)).setText(c.classType.name);
+		((TextView) win.findViewById(R.id.classTime)).setText(c.startTime + "--" + c.endTime);
 		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe.replace("__", "\n"));
-		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle.replace("__", "\n"));
-		if(c.formateur!=null || !c.formateur.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.formateur.replace("__", "\n"));
+		if(c.room.name!=null || !c.room.name.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
+		if(c.teacher!=null || !c.teacher.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new View.OnClickListener() {
@@ -231,7 +231,7 @@ public class WeekAgenda_Fragment extends Fragment{
 	private void createEventDialog(final DayTabClassView v, final ClassInfo c){
 		String[] mItems = {"Edit Event", "Remove Event"};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle("Class Time: "+c.debut+" - "+c.fin);
+		builder.setTitle("Class Time: "+c.startTime+" - "+c.endTime);
 		builder.setOnCancelListener(new OnCancelListener() {			
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -246,7 +246,7 @@ public class WeekAgenda_Fragment extends Fragment{
 			        intent.setClass(getActivity(), ClassInfoEditActivity.class);     
 			        getActivity().startActivityForResult(intent, MyApp.rsqCode);
 				}else{
-					worker.delClassInfo(myApp.getLogin(), c.position, c.debut);
+					worker.delClassInfo(c.id);
 					v.removeClass(c);
 				}			
 			}

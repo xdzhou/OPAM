@@ -44,7 +44,7 @@ public class DayViewActivity extends ActionBarActivity{
         
         DayClassView dayClassView = new DayClassView(this);
 		dayClassView.setSW(Tool.getScreenWidth(this));
-		dayClassView.setCours(worker.findClassInfo(login, numWeek, dayOfWeek));
+		dayClassView.setCours(worker.getClassInfo(login, numWeek, dayOfWeek));
 		dayClassView.setClickListener(new ClassInfoClickListener() {
 			@Override
 			public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
@@ -72,11 +72,11 @@ public class DayViewActivity extends ActionBarActivity{
 		win.setContentView(R.layout.cours_detail_pop);
 
 		((TextView) win.findViewById(R.id.className)).setText(c.name);
-		((TextView) win.findViewById(R.id.classType)).setText(c.type);
-		((TextView) win.findViewById(R.id.classTime)).setText(c.debut + "--" + c.fin);
+		((TextView) win.findViewById(R.id.classType)).setText(c.classType.name);
+		((TextView) win.findViewById(R.id.classTime)).setText(c.startTime + "--" + c.endTime);
 		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe.replace("__", "\n"));
-		if(c.salle!=null || !c.salle.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.salle.replace("__", "\n"));
-		if(c.formateur!=null || !c.formateur.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.formateur.replace("__", "\n"));
+		if(c.room.name!=null || !c.room.name.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
+		if(c.teacher!=null || !c.teacher.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
 
 		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
 		button.setOnClickListener(new View.OnClickListener() {

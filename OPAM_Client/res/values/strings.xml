@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title">Welcome to OPAM</string>
-    <string name="app_name">OPAM</string>
+    <string name="title" translatable="false">Welcome to OPAM</string>
+    <string name="app_name" translatable="false">OPAM</string>
 </resources>
