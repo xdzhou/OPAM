@@ -1,6 +1,7 @@
 package com.sky.opam.view;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.sky.opam.R;
 
@@ -198,98 +199,90 @@ public class RangeSeekBar<T extends Number> extends ImageView {
          */
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-
-                if (!isEnabled())
-                        return false;
-
-                int pointerIndex;
-
-                final int action = event.getAction();
-                switch (action & MotionEvent.ACTION_MASK) {
-
+            if (!isEnabled()) return false;
+            int pointerIndex;
+            final int action = event.getAction();
+            switch (action & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
-                        // Remember where the motion event started
-                        mActivePointerId = event.getPointerId(event.getPointerCount() - 1);
-                        pointerIndex = event.findPointerIndex(mActivePointerId);
-                        mDownMotionX = event.getX(pointerIndex);
+                    // Remember where the motion event started
+                    mActivePointerId = event.getPointerId(event.getPointerCount() - 1);
+                    pointerIndex = event.findPointerIndex(mActivePointerId);
+                    mDownMotionX = event.getX(pointerIndex);
 
-                        pressedThumb = evalPressedThumb(mDownMotionX);
+                    pressedThumb = evalPressedThumb(mDownMotionX);
 
-                        // Only handle thumb presses.
-                        if (pressedThumb == null)
-                                return super.onTouchEvent(event);
+                    // Only handle thumb presses.
+                    if (pressedThumb == null) return super.onTouchEvent(event);
 
-                        setPressed(true);
-                        invalidate();
-                        onStartTrackingTouch();
-                        trackTouchEvent(event);
-                        attemptClaimDrag();
+                    setPressed(true);
+                    invalidate();
+                    onStartTrackingTouch();
+                    trackTouchEvent(event);
+                    attemptClaimDrag();
 
-                        break;
+                    break;
                 case MotionEvent.ACTION_MOVE:
-                        if (pressedThumb != null) {
-
-                                if (mIsDragging) {
-                                        trackTouchEvent(event);
-                                }
-                                else {
-                                        // Scroll to follow the motion event
-                                        pointerIndex = event.findPointerIndex(mActivePointerId);
-                                        final float x = event.getX(pointerIndex);
-
-                                        if (Math.abs(x - mDownMotionX) > mScaledTouchSlop) {
-                                                setPressed(true);
-                                                invalidate();
-                                                onStartTrackingTouch();
-                                                trackTouchEvent(event);
-                                                attemptClaimDrag();
-                                        }
-                                }
-
-                                if (notifyWhileDragging && listener != null) {
-                                        listener.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue());
-                                }
-                        }
-                        break;
-                case MotionEvent.ACTION_UP:
+                    if (pressedThumb != null) {
                         if (mIsDragging) {
-                                trackTouchEvent(event);
-                                onStopTrackingTouch();
-                                setPressed(false);
+                            trackTouchEvent(event);
                         }
                         else {
-                                // Touch up when we never crossed the touch slop threshold
-                                // should be interpreted as a tap-seek to that location.
-                                onStartTrackingTouch();
-                                trackTouchEvent(event);
-                                onStopTrackingTouch();
-                        }
+                            // Scroll to follow the motion event
+                            pointerIndex = event.findPointerIndex(mActivePointerId);
+                            final float x = event.getX(pointerIndex);
 
-                        pressedThumb = null;
-                        invalidate();
-                        if (listener != null) {
+                            if (Math.abs(x - mDownMotionX) > mScaledTouchSlop) {
+                                    setPressed(true);
+                                    invalidate();
+                                    onStartTrackingTouch();
+                                    trackTouchEvent(event);
+                                    attemptClaimDrag();
+                            }
+                        }
+                        if (notifyWhileDragging && listener != null) {
                                 listener.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue());
                         }
-                        break;
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (mIsDragging) {
+                        trackTouchEvent(event);
+                        onStopTrackingTouch();
+                        setPressed(false);
+                    }
+                    else {
+                        // Touch up when we never crossed the touch slop threshold
+                        // should be interpreted as a tap-seek to that location.
+                        onStartTrackingTouch();
+                        trackTouchEvent(event);
+                        onStopTrackingTouch();
+                    }
+
+                    pressedThumb = null;
+                    invalidate();
+                    if (listener != null) {
+                        listener.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue());
+                    }
+                    break;
                 case MotionEvent.ACTION_POINTER_DOWN: {
-                        final int index = event.getPointerCount() - 1;
-                        // final int index = ev.getActionIndex();
-                        mDownMotionX = event.getX(index);
-                        mActivePointerId = event.getPointerId(index);
-                        invalidate();
-                        break;
+                    final int index = event.getPointerCount() - 1;
+                    // final int index = ev.getActionIndex();
+                    mDownMotionX = event.getX(index);
+                    mActivePointerId = event.getPointerId(index);
+                    invalidate();
+                    break;
                 }
                 case MotionEvent.ACTION_POINTER_UP:
-                        onSecondaryPointerUp(event);
-                        invalidate();
-                        break;
+                    onSecondaryPointerUp(event);
+                    invalidate();
+                    break;
                 case MotionEvent.ACTION_CANCEL:
-                        if (mIsDragging) {
-                                onStopTrackingTouch();
-                                setPressed(false);
-                        }
-                        invalidate(); // see above explanation
-                        break;
+                    if (mIsDragging) {
+                            onStopTrackingTouch();
+                            setPressed(false);
+                    }
+                    invalidate(); // see above explanation
+                    break;
                 }
                 return true;
         }
@@ -469,8 +462,8 @@ public class RangeSeekBar<T extends Number> extends ImageView {
          *            The new normalized min value to set.
          */
         public void setNormalizedMinValue(double value) {
-                normalizedMinValue = Math.max(0d, Math.min(1d, Math.min(value, normalizedMaxValue)));
-                invalidate();
+            normalizedMinValue = Math.max(0d, Math.min(1d, Math.min(value, normalizedMaxValue)));
+            invalidate();
         }
 
         /**
@@ -480,8 +473,8 @@ public class RangeSeekBar<T extends Number> extends ImageView {
          *            The new normalized max value to set.
          */
         public void setNormalizedMaxValue(double value) {
-                normalizedMaxValue = Math.max(0d, Math.min(1d, Math.max(value, normalizedMinValue)));
-                invalidate();
+            normalizedMaxValue = Math.max(0d, Math.min(1d, Math.max(value, normalizedMinValue)));
+            invalidate();
         }
 
         /**

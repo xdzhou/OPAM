@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.sky.opam.model.ClassColor;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Room;
@@ -34,7 +33,7 @@ public class DBworker {
     
     public void updateUser(User user) {
         db = helper.getWritableDatabase();
-        db.execSQL("update user set password = ?,name =?, numWeekUpdated=? where login = ?",
+        db.execSQL("update USER set password = ?,name =?, numWeekUpdated=? where login = ?",
             new Object[] { user.getPasswoed(), user.getName(),user.getNumWeekUpdated(), user.getLogin() });
         db.close();
     }
@@ -132,7 +131,7 @@ public class DBworker {
 	    return rooms;
     }
     
-    private Room getRoom(long id){
+    public Room getRoom(long id){
     	if(id == -1) return null;
         db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from ROOM where id='" + id + "';", null);
@@ -150,7 +149,7 @@ public class DBworker {
             return null;
         }
     }
-    private Room getRoom(String name){
+    public Room getRoom(String name){
     	if(name == null || name.equals("")) return null;
         db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from ROOM where name='" + name + "';", null);
@@ -201,7 +200,7 @@ public class DBworker {
 	    db.close();
 	    return list;
     }
-    private ClassType getClassType(long id){
+    public ClassType getClassType(long id){
     	if(id == -1) return null;
         db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CLASSTYPE where id='" + id + "';", null);
@@ -219,7 +218,7 @@ public class DBworker {
             return null;
         }
     }
-    private ClassType getClassType(String name){
+    public ClassType getClassType(String name){
     	if(name==null || name.equals("")) return null;
         db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CLASSTYPE where name='" + name + "';", null);
@@ -238,52 +237,7 @@ public class DBworker {
         }
     }
     
- // ClassColor
-    public long addClassColor(ClassColor classColor){
-    	return addClassColor(classColor.color);
-    }
-    
-    public long addClassColor(int color){
-    	ContentValues cv = new ContentValues();
-        cv.put("color", color);
-        return insertData("CLASSCOLOR", cv);
-    }
-
-    public List<ClassColor> getAllClassColor(){
-    	db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select id,color from CLASSCOLOR", null);
-        List<ClassColor> list = new ArrayList<ClassColor>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        	ClassColor classColor = new ClassColor();
-        	classColor.id = cursor.getInt(0);
-        	classColor.color = cursor.getInt(1);
-            list.add(classColor);
-	    }
-	    cursor.close();
-	    db.close();
-	    return list;
-    }
-    private ClassColor getClassColor(long id){
-    	if(id == -1) return null;
-        db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from CLASSCOLOR where id='" + id + "';", null);
-        if (cursor.getCount() == 1) {
-            cursor.moveToFirst();
-            ClassColor classColor = new ClassColor();
-            classColor.id = id;
-            classColor.color = cursor.getInt(1);
-            cursor.close();
-            db.close();
-            return classColor;
-        } else {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    
-    //class info
-    
+    //class info  
     public long addClassInfo(ClassInfo c) {       
         ContentValues cv = new ContentValues();
         cv.put("login", c.login);
@@ -298,8 +252,8 @@ public class DBworker {
         cv.put("groupe", c.groupe);
         if(c.classType != null) cv.put("typeId", c.classType.id);       
         if(c.room != null) cv.put("roomId", c.room.id);
-        if(c.color != null) cv.put("colorId", c.color.id);
-        cv.put("isSync", c.isSync);
+        cv.put("bgColor", c.bgColor);
+        cv.put("eventId", c.eventId);
         return insertData("CLASSINFO", cv);
     }
     
@@ -318,7 +272,8 @@ public class DBworker {
         cv.put("groupe", c.groupe);
         if(c.classType != null) cv.put("typeId", c.classType.id);
         if(c.room != null) cv.put("roomId", c.room.id);
-        if(c.color != null) cv.put("colorId", c.color.id);
+        cv.put("bgColor", c.bgColor);
+        cv.put("eventId", c.eventId);
         db.update("CLASSINFO", cv, "id = ?", new String[]{c.id+""});
         db.close();
     }
@@ -336,16 +291,40 @@ public class DBworker {
         db.close();
     }
 
-    public void delClassInfo(String login) {
+    public void delDownloadClassInfo(String login, GoogleCalendarAPI calendarAPI) {
+    	int currentWeekOfYear = Tool.getNumWeek();
+    	String sql = "select * from CLASSINFO where login='"+ login + 
+    			"' AND weekOfYear>=" + currentWeekOfYear +" AND eventId>0" +" AND auteur!='"+login+"';";
+    	List<ClassInfo> list = getClassInfoViaSql(sql);
+    	for(ClassInfo c : list){
+    		calendarAPI.delEvent(c.eventId);
+    	}
         db = helper.getWritableDatabase();
-        db.execSQL("delete from CLASSINFO where login ='" + login + "';");
+        db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur!='"+login+"';");
+        db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur='"+login+"' AND weekOfYear<"+currentWeekOfYear+" ;");
         db.close();
     }
 
     public List<ClassInfo> getClassInfo(String login, int weekOfYear, int dayOfWeek) {
-        db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from CLASSINFO where login='"
-            + login + "' AND weekOfYear=" + weekOfYear +" AND dayOfWeek="+dayOfWeek+ ";", null);
+    	String sql = "select * from CLASSINFO where login='"
+                + login + "' AND weekOfYear=" + weekOfYear +" AND dayOfWeek="+dayOfWeek+ ";";
+    	return getClassInfoViaSql(sql);
+    }
+    
+    public List<ClassInfo> getUnsyncClassInfo(String login) {
+        return getClassInfoViaSql("select * from CLASSINFO where login='"+ login + "' AND eventId = 0 ;");
+    }
+    
+    public void setClassSynced(long classId, long eventId){
+    	db = helper.getWritableDatabase();
+    	db.execSQL("update CLASSINFO set eventId=? where id = ?",
+                new Object[] { eventId, classId });
+    	db.close();
+    }
+    
+    private List<ClassInfo> getClassInfoViaSql(String sql) {
+    	db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
         List<ClassInfo> cours = new ArrayList<ClassInfo>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             ClassInfo c = new ClassInfo();
@@ -362,8 +341,8 @@ public class DBworker {
             c.students = cursor.getString(10);
             c.groupe = cursor.getString(11);
             c.room = getRoom(cursor.getLong(12));
-            c.color = getClassColor(cursor.getLong(13));
-            c.isSync = Boolean.parseBoolean(cursor.getString(14));
+            c.bgColor = cursor.getString(13);
+            c.eventId = cursor.getLong(14);
             cours.add(c);
         }
         cursor.close();
@@ -379,40 +358,10 @@ public class DBworker {
         return cours;
     }
 
-    public List<ClassInfo> getClassInfo(String login) {
-        List<ClassInfo> cours = new ArrayList<ClassInfo>();
-        int startNumWeek = getUser(login).getNumWeekUpdated();
-        List<ClassInfo> classInfos;
-        do{
-        	classInfos = getClassInfo(login, startNumWeek);
-        	cours.addAll(classInfos);
-        	startNumWeek++;
-        }while(classInfos.size()!=0);
-        
-        return cours;
-    }
-
-    //calendar sync
-    public boolean isCalendarSynced(String login) {
-            boolean b = false;
-            db = helper.getReadableDatabase();
-            Cursor cursor = db.rawQuery("select sync from user where login='"
-                            + login + "';", null);
-            if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    b = cursor.getInt(cursor.getColumnIndex("sync")) == 1;
-            }
-            cursor.close();
-            db.close();
-            return b;
-    }
-
-    public void setCalendarSynced(String login, boolean synced) {
-            int flag = synced ? 1 : 0;
-            db = helper.getWritableDatabase();
-            db.execSQL("update user set sync =? where login = ?", new Object[] {
-                            flag, login });
-            db.close();
+    public ClassInfo getClassInfo(long id) {
+    	String sql = "select * from CLASSINFO where id = "+id+" ;";
+        List<ClassInfo> cours = getClassInfoViaSql(sql);
+        return cours.get(0);
     }
 
     //////////////////////////////////////////////////////////

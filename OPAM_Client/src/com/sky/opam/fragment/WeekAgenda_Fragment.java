@@ -106,6 +106,7 @@ public class WeekAgenda_Fragment extends Fragment{
 		innerLayout.addView(tiView);
 		for(int i=0; i<5; i++){
 			DayTabClassView dView = new DayTabClassView(context);
+			dView.setId(i+Calendar.MONDAY);
         	dView.setViewWidth(day_view_width);
         	dView.setTimeDistance(time_distance);
         	dView.setStartTime(startTime);
@@ -113,7 +114,7 @@ public class WeekAgenda_Fragment extends Fragment{
         	dView.setMyLongPressListener(dayViewLongPressListener);
         	dView.setClickListener(classInfoClickListener);
         	dView.addClass(dateMap.get(i+Calendar.MONDAY));
-        	if(myApp.getCurrentWeekNum()==numWeek && Tool.getDayOfWeek()==i+1) dView.setBackgroundColor(Color.LTGRAY);
+        	if(myApp.getCurrentWeekNum() == numWeek && Tool.getDayOfWeek()==i+1) dView.setBackgroundColor(Color.LTGRAY);
         	innerLayout.addView(dView);
 		}
 		
@@ -135,9 +136,9 @@ public class WeekAgenda_Fragment extends Fragment{
 		@Override
 		public void onLongPressEvent(DayTabClassView v, ClassInfo c, String vocationStartTime,String vocationEndTime) {
 			if(c == null){
-				createVocationDialog(v, vocationStartTime, vocationEndTime);
+				createEventDialog(v, vocationStartTime, vocationEndTime);
 			}else {
-				createEventDialog(v, c);
+				EventEditDialog(v, c, vocationStartTime, vocationEndTime);
 			}
 		}
 	};
@@ -153,23 +154,22 @@ public class WeekAgenda_Fragment extends Fragment{
 		@Override
 		public void onClick(View v) {
 			if(v instanceof TextView){
-				System.out.println("OO<<>>OO");
 				TextView tv = (TextView) v;
 				Intent intent = new Intent();
 	            intent.setClass(getActivity(), DayViewActivity.class);
 	            Bundle bundle = new Bundle();
 	            bundle.putInt("numWeek", numWeek);
-	            int dayOfWeek = 0;
+	            int dayOfWeek;
 				if(tv.getText().equals(tab_title[0])){
-					dayOfWeek = 1;
+					dayOfWeek = Calendar.MONDAY;
 				}else if (tv.getText().equals(tab_title[1])) {
-					dayOfWeek = 2;
+					dayOfWeek = Calendar.TUESDAY;
 				}else if (tv.getText().equals(tab_title[2])) {
-					dayOfWeek = 3;
+					dayOfWeek = Calendar.WEDNESDAY;
 				}else if (tv.getText().equals(tab_title[3])) {
-					dayOfWeek = 4;
+					dayOfWeek = Calendar.THURSDAY;
 				}else {
-					dayOfWeek = 5;
+					dayOfWeek = Calendar.FRIDAY;
 				}
 				bundle.putInt("dayOfWeek", dayOfWeek);
 				intent.putExtras(bundle);
@@ -208,7 +208,7 @@ public class WeekAgenda_Fragment extends Fragment{
 	/*
 	 * 
 	 */
-	private void createVocationDialog(final DayTabClassView v, String vocationStartTime, String vocationEndTime){
+	private void createEventDialog(final DayTabClassView v, final String vocationStartTime, final String vocationEndTime){
 		String[] mItems = {"Add Event"};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle("Free Time: "+vocationStartTime+" - "+vocationEndTime);
@@ -221,14 +221,22 @@ public class WeekAgenda_Fragment extends Fragment{
 		builder.setItems(mItems, new DialogInterface.OnClickListener() {			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				
+				Intent intent = new Intent();
+		        intent.setClass(getActivity(), ClassInfoEditActivity.class);
+		        Bundle bundle = new Bundle();
+		        bundle.putLong("classId", -1);
+		        bundle.putString("minTime", vocationStartTime);
+		        bundle.putString("maxTime", vocationEndTime);
+		        bundle.putInt("weekOfYear", numWeek);
+		        bundle.putInt("dayOfWeek", v.getId());
+		        intent.putExtras(bundle);
+		        getActivity().startActivityForResult(intent, MyApp.rsqCode);
 			}
 		});
 		builder.create().show();
 	}
 	
-	private void createEventDialog(final DayTabClassView v, final ClassInfo c){
+	private void EventEditDialog(final DayTabClassView v, final ClassInfo c, final String vocationStartTime, final String vocationEndTime){
 		String[] mItems = {"Edit Event", "Remove Event"};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle("Class Time: "+c.startTime+" - "+c.endTime);
@@ -243,7 +251,12 @@ public class WeekAgenda_Fragment extends Fragment{
 			public void onClick(DialogInterface dialog, int which) {
 				if(which==0){
 					Intent intent = new Intent();
-			        intent.setClass(getActivity(), ClassInfoEditActivity.class);     
+			        intent.setClass(getActivity(), ClassInfoEditActivity.class);
+			        Bundle bundle = new Bundle();
+			        bundle.putLong("classId", c.id);
+			        bundle.putString("minTime", vocationStartTime);
+			        bundle.putString("maxTime", vocationEndTime);
+			        intent.putExtras(bundle);
 			        getActivity().startActivityForResult(intent, MyApp.rsqCode);
 				}else{
 					worker.delClassInfo(c.id);

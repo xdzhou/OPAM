@@ -8,6 +8,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 import com.sky.opam.fragment.Menu_Fragment;
 import com.sky.opam.fragment.WeekAgenda_Fragment;
+import com.sky.opam.task.AgendaSyncTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
@@ -48,7 +49,7 @@ public class WeekViewActivity extends ActionBarActivity{
         setContentView(R.layout.seul_fragment);
 
         myApp = (MyApp)getApplication();
-        numWeek = (Integer) getIntent().getExtras().get("numWeek");       
+        numWeek = getIntent().getExtras().getInt("numWeek");       
         worker = new DBworker(this);
         
         setActionBar();  
@@ -69,6 +70,9 @@ public class WeekViewActivity extends ActionBarActivity{
 			}			
 		});
         profile_menu.setMenu(getMenuView(R.layout.menu_fragment));
+        
+        //class sync task
+        new AgendaSyncTask(this).execute();
 	}
 	
 	private void setActionBar(){

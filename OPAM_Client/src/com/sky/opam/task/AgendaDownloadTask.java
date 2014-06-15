@@ -1,6 +1,5 @@
 package com.sky.opam.task;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -20,13 +19,12 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassInfo;
-import com.sky.opam.model.ClassType;
-import com.sky.opam.model.DataCompo;
 import com.sky.opam.model.User;
 import com.sky.opam.model.UserClassPackage;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.FailException;
+import com.sky.opam.tool.GoogleCalendarAPI;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -39,13 +37,13 @@ import android.os.Message;
 public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 	private ProgressDialog pdialog;
 	private DBworker worker;
-	private Context context;
 	private Handler handler;
+	private GoogleCalendarAPI calendarAPI;
 	
-	public AgendaDownloadTask(Context context, DBworker worker,Handler handler) {
-		this.worker = worker;
-		this.context = context;
+	public AgendaDownloadTask(Context context,Handler handler) {
+		this.worker = new DBworker(context);
 		this.handler = handler;
+		calendarAPI = new GoogleCalendarAPI(context);
         pdialog = new ProgressDialog(context, 0);
         pdialog.setCancelable(true);
         pdialog.setButton("cancel", new DialogInterface.OnClickListener() {
@@ -82,6 +80,7 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 		String msg = null;
 		try {
 			String agendaJson = getAgendaJSON(login, password);
+			System.out.println(agendaJson);
 			Gson gson = new Gson();
 			UserClassPackage mypackage = (UserClassPackage) gson.fromJson(agendaJson, UserClassPackage.class);
 			if(mypackage.getClassInfos().size()==1 && mypackage.getClassInfos().get(0).name.equals("FailException")){
@@ -97,12 +96,11 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 				}
 	        	
                 worker.setDefaultUser(login);
-                worker.delClassInfo(login);
-                //worker.delAllEventID(context, login);
+                worker.delDownloadClassInfo(login, calendarAPI);
                 List<ClassInfo> cours = mypackage.getClassInfos();
                 for (ClassInfo c : cours) {
                     c.login = login;
-                    c.color.id = 0; //default color
+                    c.bgColor = "#999999"; //default color
                     long id = worker.addGetRoom(c.room);
                     if(id==-1) c.room = null;
                     else c.room.id = id;
@@ -120,19 +118,20 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 	
 	@Override
     protected void onPostExecute(String result) {
-            if (pdialog != null && pdialog.isShowing()) {
-                pdialog.dismiss();
-                pdialog = null;
-            }
-            if (result == null) {
-                handler.sendEmptyMessage(R.integer.OK);
-            } else {
-            	Message msg = new Message();
-            	Bundle b = new Bundle();// 存放数据
-            	b.putString("error", result);
-            	msg.setData(b);
-            	handler.sendMessage(msg);
-            }
+		worker = null;
+        if (pdialog != null && pdialog.isShowing()) {
+            pdialog.dismiss();
+            pdialog = null;
+        }
+        if (result == null) {
+            handler.sendEmptyMessage(R.integer.OK);
+        } else {
+        	Message msg = new Message();
+        	Bundle b = new Bundle();// 存放数据
+        	b.putString("error", result);
+        	msg.setData(b);
+        	handler.sendMessage(msg);
+        }
     }
 	
 	private String getAgendaJSON(String login, String password) throws FailException{

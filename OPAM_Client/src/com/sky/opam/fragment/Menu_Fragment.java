@@ -2,10 +2,7 @@ package com.sky.opam.fragment;
 
 import com.sky.opam.AccountActivity;
 import com.sky.opam.DayViewActivity;
-import com.sky.opam.LoginActivity;
 import com.sky.opam.R;
-import com.sky.opam.WeekViewActivity;
-import com.sky.opam.R.integer;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -38,7 +35,7 @@ public class Menu_Fragment extends ListFragment{
 		super.onActivityCreated(savedInstanceState);
 		MyApp myApp = (MyApp)getActivity().getApplication();
 		login = myApp.getLogin();
-		user_name = new DBworker(getActivity()).getUser(myApp.getLogin()).getName();
+		user_name = new DBworker(getActivity()).getUser(login).getName();
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));

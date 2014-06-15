@@ -1,9 +1,6 @@
 package com.sky.opam.tool;
 
-import com.sky.opam.R.integer;
-
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -33,10 +30,6 @@ public class DBHelper extends SQLiteOpenHelper {
         	db.execSQL("create table if not exists CLASSTYPE ("
         			+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "name varchar(50));");
-        	//Table Color
-        	db.execSQL("create table if not exists CLASSCOLOR ("
-        			+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "color int);");
         	//Table Config
         	db.execSQL("create table if not exists CONFIG ("
         			+ "login varchar(10) PRIMARY KEY,"
@@ -58,11 +51,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     + "students text,"
                     + "groupe varchar(30),"
                     + "roomId int,"
-                    + "colorId int,"
-                    + "isSync BOOLEAN,"
+                    + "bgColor varchar(10),"
+                    + "eventId INTEGER,"
                     + "foreign key(typeId) references CLASSTYPE(id),"
                     + "foreign key(roomId) references ROOM(id),"
-                    + "foreign key(colorId) references COLOR(id),"
                     + "foreign key(login) references USER(login));");
         }
 
@@ -73,37 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
             	db.execSQL("DROP table if exists cours;");
             	db.execSQL("DROP table if exists syncevent;");
             }
-            onCreate(db);
-            // set a default color
-            db.execSQL("insert into CLASSCOLOR values (?,?)",new Object[] { 0, 0xff888888});
-        }
-
-        public void addConfigTable() {
-
-        }
-
-        public Cursor queryUser() {
-                SQLiteDatabase db = getWritableDatabase();
-                Cursor c = db.query("user", null, null, null, null, null, null);
-                return c;
-        }
-
-        public Cursor queryCours() {
-                SQLiteDatabase db = getWritableDatabase();
-                Cursor c = db.query("cours", null, null, null, null, null, null);
-                return c;
-        }
-
-        public void delUser(int id) {
-                if (db == null)
-                        db = getWritableDatabase();
-                db.delete("user", "login=?", new String[] { String.valueOf(id) });
-        }
-
-        public void delCours(int id) {
-                if (db == null)
-                        db = getWritableDatabase();
-                db.delete("cours", "id=?", new String[] { String.valueOf(id) });
+            onCreate(db);         
         }
 
         public void close() {

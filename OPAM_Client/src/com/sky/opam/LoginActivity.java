@@ -128,8 +128,14 @@ public class LoginActivity extends Activity {
     private void downloadCharge() {
         if (Tool.isNetworkAvailable(context)) {
         	login = tfID.getText().toString();
-            password = tfMDP.getText().toString();
-            AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, worker, new AgendaHandler());
+        	if(login.equals(myApp.getLogin())){
+        		password = tfMDP.getText().toString();
+        	}else {
+				login = myApp.getLogin();
+				password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
+			}
+            
+            AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
         } else {
             Tool.showInfo(context, "Network is not available;");

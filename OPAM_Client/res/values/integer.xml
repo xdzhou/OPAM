@@ -2,4 +2,5 @@
 <resources>
     <integer name="OK">10</integer>
     <integer name="title_hight">30</integer>
+    <integer name="colorGridColumnWidth">65</integer>
 </resources>

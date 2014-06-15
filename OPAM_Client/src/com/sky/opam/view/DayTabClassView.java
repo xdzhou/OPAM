@@ -15,8 +15,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -118,6 +116,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	private void drawClassInfo(Canvas canvas, ClassInfo c) {
 		float startP = getTimeDistance(c.startTime);
 		float endP = getTimeDistance(c.endTime);
+		backgroundPaint.setColor(Color.parseColor(c.bgColor));
 		canvas.drawRect(d, startP+d, view_width-d, endP-d, backgroundPaint);
 		canvas.save();
 		StaticLayout sl= new StaticLayout(c.name, textPaint, (int)(view_width-2*d), Alignment.ALIGN_CENTER, 1f, 0f, false);
@@ -224,7 +223,11 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 					}
 				}else if (startP < e.getY() && e.getY() < endP) {
 					enableSelectDraw(startP, endP);
-					myLongPressListener.onLongPressEvent(this, c, null, null);
+					if(i-1 < 0) vocationStartTime = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
+					else vocationStartTime = class_list.get(i-1).endTime;
+					if(i+1 >= class_list.size()) vocationEndTime = (endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00");
+					else vocationEndTime = class_list.get(i+1).startTime;
+					myLongPressListener.onLongPressEvent(this, c, vocationStartTime, vocationEndTime);
 					break;
 				}else {
 					float nestP;

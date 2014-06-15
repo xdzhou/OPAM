@@ -11,7 +11,7 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 	public long id;
 	public String login;
 	public String name;
-	public ClassType classType;
+	public ClassType classType = new ClassType();
 	public int weekOfYear;
 	public int dayOfWeek;
 	public String startTime;
@@ -20,9 +20,9 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 	public String teacher;
 	public String students;
 	public String groupe;
-	public Room room;
-	public ClassColor color;
-	public boolean isSync = false;
+	public Room room = new Room();
+	public String bgColor;
+	public long eventId ;
 
 	public ClassInfo() {
 		login=name=auteur=teacher=students=groupe="";
@@ -35,10 +35,16 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		return "ClassInfo [id=" + id + ", login=" + login + ", name=" + name
 				+ ", weekOfYear=" + weekOfYear + ", dayOfWeek=" + dayOfWeek
 				+ ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", isSync=" + isSync + "]";
+				+ ", eventId=" + eventId + "]";
 	}
 
-
+	public static ClassInfo getCustomedClass(String login){
+		ClassInfo c = new ClassInfo();
+		c.id = -1;
+		c.login = c.auteur = login;
+		c.bgColor = "#999999";
+		return c;
+	}
 
 	public String getCalendarTitle() {
 		if (name.contains("Point de Rencontre"))
