@@ -169,6 +169,7 @@ public class LoginActivity extends Activity {
     };
 
     private void WeekAgendaShow(int numWeek) {
+    	worker.setDefaultUser(u.getLogin());
         Intent intent = new Intent();
         intent.setClass(LoginActivity.this, WeekViewActivity.class);
         Bundle bundle = new Bundle();

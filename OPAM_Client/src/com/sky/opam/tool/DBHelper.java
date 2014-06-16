@@ -33,8 +33,8 @@ public class DBHelper extends SQLiteOpenHelper {
         	//Table Config
         	db.execSQL("create table if not exists CONFIG ("
         			+ "login varchar(10) PRIMARY KEY,"
-        			+ "startTime varchar(10),"
-        			+ "endTime varchar(10),"
+        			+ "startTime int,"
+        			+ "endTime int,"
                     + "isDefaultUser BOOLEAN);");
         	//Table ClassInfo
         	db.execSQL("create table if not exists CLASSINFO ("

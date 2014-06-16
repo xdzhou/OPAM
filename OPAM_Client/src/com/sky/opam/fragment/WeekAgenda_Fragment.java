@@ -261,6 +261,7 @@ public class WeekAgenda_Fragment extends Fragment{
 				}else{
 					worker.delClassInfo(c.id);
 					v.removeClass(c);
+					dialog.cancel();
 				}			
 			}
 		});

@@ -25,6 +25,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class DayViewActivity extends ActionBarActivity{
@@ -51,7 +52,7 @@ public class DayViewActivity extends ActionBarActivity{
 				showClassInfo(c);
 			}
 		});
-		
+		ScrollView scrollView = new ScrollView(this);
 		LinearLayout linearLayout = new LinearLayout(this);
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		TextView tView = new TextView(this);
@@ -59,10 +60,11 @@ public class DayViewActivity extends ActionBarActivity{
 		tView.setTextSize(Tool.dip2px(this, 8));
 		int padding = Tool.dip2px(this, 5);
 		tView.setPadding(padding, padding, padding, padding);
-		tView.setText("Class of "+Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek-1+Calendar.MONDAY));
+		tView.setText("Class of "+Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
 		linearLayout.addView(tView);
 		linearLayout.addView(dayClassView);
-		setContentView(linearLayout);
+		scrollView.addView(linearLayout);
+		setContentView(scrollView);
 	}
 	
 	private void showClassInfo(ClassInfo c) {

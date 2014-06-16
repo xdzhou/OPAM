@@ -12,7 +12,7 @@ public class AccountActivity extends FragmentActivity{
     public void onCreate(Bundle savedInstanceState) {
 		System.out.println("AccountActivity created");
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.seul_fragment);
+        setContentView(R.layout.seul_fragment_activity);
         
         Account_Fragment fragment = new Account_Fragment();
         

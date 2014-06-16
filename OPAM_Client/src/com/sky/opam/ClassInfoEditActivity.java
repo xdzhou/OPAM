@@ -13,6 +13,7 @@ import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Room;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
+import com.sky.opam.tool.Tool;
 import com.sky.opam.view.ColorPickerAdapter;
 import com.sky.opam.view.RangeSeekBar;
 import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -180,20 +181,25 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 	@Override
     public boolean onOptionsItemSelected(MenuItem menu) {
 		if(menu.getTitle().equals("cancel")){
-			finish();
-		}else if (menu.getTitle().equals("save")) {
-			classInfo.name = nameEditText.getText().toString();
-			classInfo.startTime = startTimeTV.getText().toString();
-			classInfo.endTime = endTimeTV.getText().toString();
-			classInfo.teacher = teacherEditText.getText().toString();
-			classInfo.groupe = groupEditText.getText().toString();
-			classInfo.classType = worker.getClassType(((ArrayAdapter<String>)typeSpinner.getAdapter()).getItem((int) typeSpinner.getSelectedItemId()));
-			classInfo.room = worker.getRoom(((ArrayAdapter<String>)roomSpinner.getAdapter()).getItem((int) roomSpinner.getSelectedItemId()));
-			classInfo.bgColor = bgColor;
-			if(classInfo.id == -1) worker.addClassInfo(classInfo);
-			else worker.updateClassInfo(classInfo);
 			setResult(MyApp.Refresh);
 			finish();
+		}else if (menu.getTitle().equals("save")) {
+			String name = nameEditText.getText().toString();
+			if(name==null || name.equals("")) Tool.showInfo(this, "input the class name, please!");
+			else {
+				classInfo.name = nameEditText.getText().toString();
+				classInfo.startTime = startTimeTV.getText().toString();
+				classInfo.endTime = endTimeTV.getText().toString();
+				classInfo.teacher = teacherEditText.getText().toString();
+				classInfo.groupe = groupEditText.getText().toString();
+				classInfo.classType = worker.getClassType(((ArrayAdapter<String>)typeSpinner.getAdapter()).getItem((int) typeSpinner.getSelectedItemId()));
+				classInfo.room = worker.getRoom(((ArrayAdapter<String>)roomSpinner.getAdapter()).getItem((int) roomSpinner.getSelectedItemId()));
+				classInfo.bgColor = bgColor;
+				if(classInfo.id == -1) worker.addClassInfo(classInfo);
+				else worker.updateClassInfo(classInfo);
+				setResult(MyApp.Refresh);
+				finish();
+			}		
 		}
 		return super.onOptionsItemSelected(menu);
 	}

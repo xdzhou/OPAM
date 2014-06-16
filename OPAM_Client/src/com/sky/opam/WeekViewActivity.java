@@ -13,6 +13,7 @@ import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
+import android.R.anim;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -44,9 +45,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-		System.out.println("WeekViewActivity created");
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.seul_fragment);
+        setContentView(R.layout.seul_fragment_activity);
 
         myApp = (MyApp)getApplication();
         numWeek = getIntent().getExtras().getInt("numWeek");       
@@ -102,8 +102,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	private void setWeekAgenda(int weekN){
 		WeekAgenda_Fragment fragment = new WeekAgenda_Fragment();
         Bundle b = new Bundle();
-        b.putInt("startTime", 8);
-		b.putInt("endTime", 19);
+        b.putInt("startTime", worker.getConfigStartTime(myApp.getLogin()));
+		b.putInt("endTime", worker.getConfigEndTime(myApp.getLogin()));
 		b.putInt("numWeek", weekN);
 		float time_distance = Tool.dip2px(this,50);
 		b.putFloat("time_distance", time_distance);
@@ -131,7 +131,7 @@ public class WeekViewActivity extends ActionBarActivity{
 	@Override  
     public boolean onCreateOptionsMenu(Menu menu) { 
         //MenuItemCompat.setShowAsAction(menu.add("select").setIcon(R.drawable.icon_next), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setShowAsAction(menu.add("menu").setIcon(R.drawable.menu_list), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add("menu").setIcon(android.R.drawable.ic_dialog_dialer), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return true;  
     }
 	

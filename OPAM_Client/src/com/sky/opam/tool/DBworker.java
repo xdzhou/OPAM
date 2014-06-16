@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.sky.opam.R.integer;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Room;
@@ -27,7 +28,7 @@ public class DBworker {
         db.execSQL("insert into USER (login,password,name,numWeekUpdated) values (?,?,?,?)",
         		new Object[] { user.getLogin(), user.getPasswoed(),user.getName(),user.getNumWeekUpdated()});
         db.execSQL("insert into CONFIG values (?,?,?,?)",
-            new Object[] { user.getLogin(), "08:00", "19:00", 0});
+            new Object[] { user.getLogin(), 8, 19, 0});
         db.close();
     }
     
@@ -78,6 +79,13 @@ public class DBworker {
         db.execSQL("delete from USER;");
         db.close();
     }
+    
+    public void delUser(String login){
+    	db = helper.getWritableDatabase();
+    	db.execSQL("delete from USER where login ='" + login + "' ;");
+    	db.execSQL("delete from CONFIG where login ='" + login + "' ;");
+        db.close();
+    }
 
     public User getDefaultUser() {
         db = helper.getReadableDatabase();
@@ -89,7 +97,13 @@ public class DBworker {
         }
         cursor.close();
         db.close();
-        return getUser(login);
+        if(login==null){
+        	List<User> list = getAllUser();
+        	if(list.size()>1) return list.get(0);
+        	else return null; 
+        }else {
+        	return getUser(login);
+		}      
     }
     
     public void setDefaultUser(String login) {
@@ -97,6 +111,13 @@ public class DBworker {
     	db.execSQL("update CONFIG set isDefaultUser = 0 where isDefaultUser = 1");
     	db.execSQL("update CONFIG set isDefaultUser = ? where login = ?",new Object[] { 1, login });
     	db.close();
+    }
+    
+    public boolean isLoginExist(String login){
+    	if(login==null) return false;
+        db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from USER where login='" + login + "';", null);
+        return cursor.getCount() == 1;
     }
     // Room
     public long addGetRoom(Room room){
@@ -362,6 +383,32 @@ public class DBworker {
     	String sql = "select * from CLASSINFO where id = "+id+" ;";
         List<ClassInfo> cours = getClassInfoViaSql(sql);
         return cours.get(0);
+    }
+    //get config
+    public int getConfigStartTime(String login){
+    	int startTime = 8;
+    	db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select startTime from CONFIG where login='" + login + "';", null);
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            startTime = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+        return startTime;        
+    }
+    
+    public int getConfigEndTime(String login){
+    	int endTime = 19;
+    	db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select endTime from CONFIG where login='" + login + "';", null);
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            endTime = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+        return endTime;        
     }
 
     //////////////////////////////////////////////////////////

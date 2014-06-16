@@ -80,7 +80,6 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 		String msg = null;
 		try {
 			String agendaJson = getAgendaJSON(login, password);
-			System.out.println(agendaJson);
 			Gson gson = new Gson();
 			UserClassPackage mypackage = (UserClassPackage) gson.fromJson(agendaJson, UserClassPackage.class);
 			if(mypackage.getClassInfos().size()==1 && mypackage.getClassInfos().get(0).name.equals("FailException")){
@@ -93,9 +92,8 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
 	        	}else {
 	        		u.setNumWeekUpdated(mypackage.getUser().getNumWeekUpdated());
 	                worker.updateUser(u);
-				}
-	        	
-                worker.setDefaultUser(login);
+				}	        	
+                //worker.setDefaultUser(login);
                 worker.delDownloadClassInfo(login, calendarAPI);
                 List<ClassInfo> cours = mypackage.getClassInfos();
                 for (ClassInfo c : cours) {
