@@ -81,7 +81,7 @@ public class WeekViewActivity extends ActionBarActivity{
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_layout,getData());
+        SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, R.layout.date_dropdown_spinner_layout,getData());
         actionBar.setListNavigationCallbacks(spinnerAdapter, new  ActionBar.OnNavigationListener() {			
 			@Override
 			public boolean onNavigationItemSelected(int position, long itemId) {

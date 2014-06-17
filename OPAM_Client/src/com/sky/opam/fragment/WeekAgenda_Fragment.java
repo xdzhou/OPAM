@@ -11,9 +11,9 @@ import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
-import com.sky.opam.view.ClassInfoClickListener;
 import com.sky.opam.view.DayTabClassView;
-import com.sky.opam.view.DayViewLongPressListener;
+import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
+import com.sky.opam.view.DayTabClassView.DayViewLongPressListener;
 import com.sky.opam.view.TimeLineView;
 
 import android.app.AlertDialog;
@@ -182,7 +182,7 @@ public class WeekAgenda_Fragment extends Fragment{
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
-		win.setContentView(R.layout.cours_detail_pop);
+		win.setContentView(R.layout.cours_detail_dialog);
 
 		((TextView) win.findViewById(R.id.className)).setText(c.name);
 		((TextView) win.findViewById(R.id.classType)).setText(c.classType.name);

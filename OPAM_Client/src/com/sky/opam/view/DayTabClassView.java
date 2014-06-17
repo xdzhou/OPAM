@@ -288,5 +288,12 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		this.myClcLis = clickListener;
 	}
 	
+	// 2 listener
+	public interface ClassInfoClickListener {
+		public void onTouchEvent(View v, MotionEvent e, ClassInfo c);
+	}
 	
+	public interface DayViewLongPressListener {
+		public void onLongPressEvent(DayTabClassView v, ClassInfo c, String vocationStartTime, String vocationEndTime);
+	}
 }

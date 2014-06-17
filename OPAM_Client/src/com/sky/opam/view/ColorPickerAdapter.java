@@ -3,8 +3,6 @@ package com.sky.opam.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sky.opam.R;
-import com.sky.opam.R.integer;
 import com.sky.opam.tool.Tool;
 
 import android.content.Context;

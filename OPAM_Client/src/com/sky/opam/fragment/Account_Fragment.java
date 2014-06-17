@@ -43,7 +43,6 @@ public class Account_Fragment extends ListFragment{
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		myApp = (MyApp)getActivity().getApplication();
-		String CurrentLogin = myApp.getLogin();
 		worker = new DBworker(getActivity());
 		users = worker.getAllUser();
 		
@@ -105,6 +104,7 @@ public class Account_Fragment extends ListFragment{
 			final EditText loginET = (EditText) viewDia.findViewById(R.id.txtID);
 			final EditText pwET = (EditText) viewDia.findViewById(R.id.txtMDP);
 			login_dialog.setTitle("Add new account");
+			login_dialog.setIcon(android.R.drawable.ic_dialog_info);
 			login_dialog.setView(viewDia);
 			login_dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {		
 				@Override
@@ -161,6 +161,7 @@ public class Account_Fragment extends ListFragment{
 		public void onClick(View v) {
 			AlertDialog.Builder del_dialog = new AlertDialog.Builder(getActivity());
 			del_dialog.setTitle("Account Delete");
+			del_dialog.setIcon(android.R.drawable.ic_dialog_alert);
 			del_dialog.setMessage("Do you really want to delete the account: "+users.get(position).getName()+" ?");
 			del_dialog.setNegativeButton("NO", null);
 			del_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){

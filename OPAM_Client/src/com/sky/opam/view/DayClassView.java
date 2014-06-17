@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.sky.opam.model.ClassInfo;
+import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -22,6 +23,15 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.GestureDetector;
+
+/**
+ * Widget that shows a class Info of a day.<br />
+ * <br />
+ * Improved {@link MotionEvent} handling for smoother use, anti-aliased painting for improved aesthetics.
+ * 
+ * @author Xiandong ZHOU (xdzhou.loic@gmail.com)
+ * 
+ */
 
 @SuppressLint("SimpleDateFormat")
 public class DayClassView extends View implements GestureDetector.OnGestureListener {
