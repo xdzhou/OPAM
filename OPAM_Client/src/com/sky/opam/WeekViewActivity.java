@@ -8,6 +8,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 import com.sky.opam.fragment.Menu_Fragment;
 import com.sky.opam.fragment.WeekAgenda_Fragment;
+import com.sky.opam.model.Config;
 import com.sky.opam.task.AgendaSyncTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -72,7 +73,7 @@ public class WeekViewActivity extends ActionBarActivity{
         profile_menu.setMenu(getMenuView(R.layout.menu_fragment));
         
         //class sync task
-        new AgendaSyncTask(this).execute();
+        if(worker.getConfig(myApp.getLogin()).isAutoSync) new AgendaSyncTask(this).execute();
 	}
 	
 	private void setActionBar(){
@@ -100,10 +101,11 @@ public class WeekViewActivity extends ActionBarActivity{
     }
 	
 	private void setWeekAgenda(int weekN){
+		Config currentUserConfig = worker.getConfig(myApp.getLogin());
 		WeekAgenda_Fragment fragment = new WeekAgenda_Fragment();
         Bundle b = new Bundle();
-        b.putInt("startTime", worker.getConfigStartTime(myApp.getLogin()));
-		b.putInt("endTime", worker.getConfigEndTime(myApp.getLogin()));
+        b.putInt("startTime", currentUserConfig.startTime);
+		b.putInt("endTime", currentUserConfig.endTime);
 		b.putInt("numWeek", weekN);
 		float time_distance = Tool.dip2px(this,50);
 		b.putFloat("time_distance", time_distance);
@@ -173,8 +175,24 @@ public class WeekViewActivity extends ActionBarActivity{
                 }
             }
             return true;
-	    } else {
+	    }else if (keyCode == KeyEvent.KEYCODE_MENU) {
+	    	if (profile_menu.isMenuShowing()) {
+				profile_menu.showContent();
+			}else {
+				profile_menu.showMenu();
+			}
+	    	return true;
+		} 
+	    else {
         	return super.onKeyDown(keyCode, event);
 	    }
     }
+
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		profile_menu.showContent();
+	}
+	
+	
 }

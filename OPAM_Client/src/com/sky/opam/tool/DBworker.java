@@ -7,6 +7,7 @@ import java.util.List;
 import com.sky.opam.R.integer;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.ClassType;
+import com.sky.opam.model.Config;
 import com.sky.opam.model.Room;
 import com.sky.opam.model.User;
 
@@ -27,8 +28,8 @@ public class DBworker {
         db = helper.getWritableDatabase();
         db.execSQL("insert into USER (login,password,name,numWeekUpdated) values (?,?,?,?)",
         		new Object[] { user.getLogin(), user.getPasswoed(),user.getName(),user.getNumWeekUpdated()});
-        db.execSQL("insert into CONFIG values (?,?,?,?)",
-            new Object[] { user.getLogin(), 8, 19, 0});
+        db.execSQL("insert into CONFIG values (?,?,?,?,?)",
+            new Object[] { user.getLogin(), 8, 19, 1, 0});
         db.close();
     }
     
@@ -384,31 +385,38 @@ public class DBworker {
         List<ClassInfo> cours = getClassInfoViaSql(sql);
         return cours.get(0);
     }
-    //get config
-    public int getConfigStartTime(String login){
-    	int startTime = 8;
-    	db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select startTime from CONFIG where login='" + login + "';", null);
+    //get config   
+    public Config getConfig(String login){
+    	if(login==null || login.equals("")) return null;
+        db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from CONFIG where login='" + login + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
-            startTime = cursor.getInt(0);
+            Config config = new Config();
+            config.login = login;
+            config.startTime = cursor.getInt(1);
+            config.endTime = cursor.getInt(2);
+            config.isAutoSync = cursor.getInt(3)==1;
+            config.isDefaultUser = cursor.getInt(4)==1;
+            cursor.close();
+            db.close();
+            return config;
+        } else {
+            cursor.close();
+            db.close();
+            return null;
         }
-        cursor.close();
-        db.close();
-        return startTime;        
     }
     
-    public int getConfigEndTime(String login){
-    	int endTime = 19;
-    	db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select endTime from CONFIG where login='" + login + "';", null);
-        if (cursor.getCount() == 1) {
-            cursor.moveToFirst();
-            endTime = cursor.getInt(0);
-        }
-        cursor.close();
+    public void updateConfig(Config config) {
+        db = helper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("startTime", config.startTime);
+        cv.put("endTime", config.endTime);
+        cv.put("isAutoSync", config.isAutoSync);
+        cv.put("isDefaultUser", config.isDefaultUser);       
+        db.update("CONFIG", cv, "login = ?", new String[]{config.login});
         db.close();
-        return endTime;        
     }
 
     //////////////////////////////////////////////////////////

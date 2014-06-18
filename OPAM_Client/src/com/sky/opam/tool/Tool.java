@@ -97,4 +97,8 @@ public class Tool {
 		return display.getWidth();
 	}
 	
+	public static String getTime(int hour){
+		return (hour < 10) ? ("0" + hour + ":00"): (hour + ":00");
+	}
+	
 }

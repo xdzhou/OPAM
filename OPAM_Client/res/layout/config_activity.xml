@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:paddingBottom="3dp"
+    android:paddingLeft="5dp"
+    android:paddingTop="3dp" >
+  
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        
+		<TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="4dp"
+            android:text="Calendar Time Range"
+            android:textSize="20dp" />
+		
+        <TextView
+            android:id="@+id/endTimeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:textSize="15dp"
+            android:text="19:00"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:id="@+id/startTimeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/endTimeTV"
+            android:layout_alignBottom="@+id/endTimeTV"
+            android:layout_marginRight="15dp"
+            android:textSize="15dp"
+            android:layout_toLeftOf="@+id/endTimeTV"
+            android:text="08:00" />
+
+    </RelativeLayout> 
+    
+    <View android:layout_width="match_parent" 
+        android:layout_height="1dip"  
+        android:background="#FF888888" 
+        android:layout_marginLeft="4dip"  
+        android:layout_marginRight="4dip"
+        android:layout_marginBottom="10dip"
+        android:layout_marginTop="10dip" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="4dp"
+        	android:textSize="20dp"
+            android:text="Google Agenda Auto Sync" />
+
+        <ToggleButton
+            android:id="@+id/autoSyncTB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="on/off" />
+
+    </RelativeLayout>
+    
+    <View android:layout_width="match_parent" 
+        android:layout_height="1dip"  
+        android:background="#FF888888"  
+        android:layout_marginLeft="4dip"  
+        android:layout_marginRight="4dip" 
+        android:layout_marginBottom="10dip"
+        android:layout_marginTop="10dip" />
+    
+    <TextView
+        android:id="@+id/endTimeTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:textSize="20dp"
+        android:text="Version" />
+
+    <TextView
+        android:id="@+id/versionTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:text="unknown version"
+        android:textSize="15dp" />
+  
+</LinearLayout> 

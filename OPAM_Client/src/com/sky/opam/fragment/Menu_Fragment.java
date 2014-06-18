@@ -1,6 +1,7 @@
 package com.sky.opam.fragment;
 
 import com.sky.opam.AccountActivity;
+import com.sky.opam.AppConfig;
 import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
 import com.sky.opam.task.DownloadImageTask;
@@ -40,11 +41,12 @@ public class Menu_Fragment extends ListFragment{
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
 		adapter.add(new MenuItemContent("Today's Class", android.R.drawable.ic_menu_compass));
-		adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
+		//adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
 		adapter.add(new MenuItemContent("Update", android.R.drawable.ic_menu_rotate));
 		adapter.add(new MenuItemContent("Account", android.R.drawable.ic_menu_myplaces));
-		//adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_lock_power_off));
+		adapter.add(new MenuItemContent("Setting", android.R.drawable.ic_menu_manage));
 		adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_menu_close_clear_cancel));
+		
 		setListAdapter(adapter);
 	}
 	
@@ -89,13 +91,15 @@ public class Menu_Fragment extends ListFragment{
 	        intent.putExtras(bundle);      
 	        startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 2) {
-			
-		}else if (position == 3) {
 			getActivity().setResult(MyApp.Update);
 			getActivity().finish();
-		}else if (position == 4) {
+		}else if (position == 3) {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), AccountActivity.class);
+			getActivity().startActivityForResult(intent, MyApp.rsqCode);
+		}else if (position == 4) {
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), AppConfig.class);
 			getActivity().startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 5){
 			getActivity().setResult(MyApp.Exit);
