@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome" >Bienvenu à OPAM</string>
+    <string name="app_name" >OPAM</string>
+    <string name="class_name" >Nom du cours</string>
+    <string name="teacher" >Formateur</string>
+    <string name="group" >Groupe</string>
+    <string name="type" >Type</string>
+    <string name="room" >Salle</string>
+    <string name="class_bg_color" >Couleur de fond</string>
+    <string name="time_range" >plage horaire d\'agenda</string>
+    <string name="calendar_auto_sync" >Google Agenda Auto Sync</string>
+    <string name="app_version" >Version d\'application</string>
+    <string name="time" >Horaire</string>
+    <string name="ok" >OK</string>
+    <string name="yes" >Oui</string>
+    <string name="no" >Non</string>
+    <string name="login" >Identifiant</string>
+    <string name="pw" >mot de passe</string>  
+    <string name="today_class" >Cours d\'aujourd\'hui</string>
+    <string name="update" >Mise à jour</string>
+    <string name="account" >Compte</string>
+    <string name="setting" >paramètre</string>
+    <string name="exit" >Quit</string>
+    <string name="edit_class" >Modifier Cours Info</string> 
+    <string name="remove_class" >Supprimer Cours Info</string>
+    <string name="free_time" >Temps libre</string>
+    <string name="class_time" >Horaire du cours</string>
+    <string name="add_class" >ajouter Cours Info</string>
+    <string name="account_del" >Suppression du compte</string>
+    <string name="add_new_account" >Nouveau Compte</string>
+    <string name="account_del_alert" >Voulez-vous vraiment suppprimer le compte</string>
+    <string name="login_null_alert" >Tapez votre identifiant, SVP!</string>
+    <string name="pw_null_alert" >Tapez votre mot de passe, SVP!</string>
+</resources>

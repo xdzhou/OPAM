@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Class Name" />
+        android:hint="@string/class_name" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:textStyle="bold"
-            android:text="Teacher"
+            android:text="@string/teacher"
             android:textSize="@dimen/edit_text_size" />
 
         <EditText
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:textStyle="bold"
-            android:text="Group"
+            android:text="@string/group"
             android:textSize="@dimen/edit_text_size" />
 
         <EditText
@@ -85,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Type"
+            android:text="@string/type"
             android:textColor="@color/chat_name" />
 
         <Spinner
@@ -98,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Room"
+            android:text="@string/room"
             android:textColor="@color/chat_name" />
 
         <Spinner
@@ -112,7 +112,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:text="Class background"
+            android:text="@string/class_bg_color"
             android:textSize="@dimen/edit_text_size" />
 
     <GridView

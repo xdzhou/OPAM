@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
-            android:text="Calendar Time Range"
+            android:text="@string/time_range"
             android:textSize="20dp" />
 		
         <TextView
@@ -60,7 +60,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
         	android:textSize="20dp"
-            android:text="Google Agenda Auto Sync" />
+            android:text="@string/calendar_auto_sync" />
 
         <ToggleButton
             android:id="@+id/autoSyncTB"
@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:textSize="20dp"
-        android:text="Version" />
+        android:text="@string/app_version" />
 
     <TextView
         android:id="@+id/versionTV"

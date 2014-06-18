@@ -57,7 +57,7 @@ public class Account_Fragment extends ListFragment{
 			adapter.add(new AccountItemContent(u.getLogin(), u.getName()));
 			LastLoginPosition ++;
 		}
-		adapter.add(new AccountItemContent(null, "add new account"));
+		adapter.add(new AccountItemContent(null, getResources().getString(R.string.add_new_account)));
 	}
 	
 	private class AccountItemContent {
@@ -103,18 +103,18 @@ public class Account_Fragment extends ListFragment{
 			final View viewDia = LayoutInflater.from(getActivity()).inflate(R.layout.login_dialog, null);
 			final EditText loginET = (EditText) viewDia.findViewById(R.id.txtID);
 			final EditText pwET = (EditText) viewDia.findViewById(R.id.txtMDP);
-			login_dialog.setTitle("Add new account");
+			login_dialog.setTitle(getResources().getString(R.string.add_new_account));
 			login_dialog.setIcon(android.R.drawable.ic_dialog_info);
 			login_dialog.setView(viewDia);
-			login_dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {		
+			login_dialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {		
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					newLogin = loginET.getText().toString();
 					String password = pwET.getText().toString();
                     if (newLogin.length() == 0)
-                        Tool.showInfo(getActivity(),"input your login, please!");
+                        Tool.showInfo(getActivity(),getResources().getString(R.string.login_null_alert));
                     else if (password.length() == 0)
-                    	Tool.showInfo(getActivity(),"input your password, please!");
+                    	Tool.showInfo(getActivity(),getResources().getString(R.string.pw_null_alert));
                     else if (worker.isLoginExist(newLogin))
                     	Tool.showInfo(getActivity(),"Login Exist !");
                     else {
@@ -160,11 +160,11 @@ public class Account_Fragment extends ListFragment{
 		@Override
 		public void onClick(View v) {
 			AlertDialog.Builder del_dialog = new AlertDialog.Builder(getActivity());
-			del_dialog.setTitle("Account Delete");
+			del_dialog.setTitle(getResources().getString(R.string.account_del));
 			del_dialog.setIcon(android.R.drawable.ic_dialog_alert);
-			del_dialog.setMessage("Do you really want to delete the account: "+users.get(position).getName()+" ?");
-			del_dialog.setNegativeButton("NO", null);
-			del_dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+			del_dialog.setMessage(getResources().getString(R.string.account_del_alert)+": "+users.get(position).getName()+" ?");
+			del_dialog.setNegativeButton(getResources().getString(R.string.no), null);
+			del_dialog.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener(){
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					worker.delUser(users.get(position).getLogin());

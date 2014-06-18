@@ -80,9 +80,9 @@ public class LoginActivity extends Activity {
                     password = tfMDP.getText().toString();
 
                     if (login.length() == 0)
-                        Tool.showInfo(context,"input your login, please!");
+                        Tool.showInfo(context,getResources().getString(R.string.login_null_alert));
                     else if (password.length() == 0)
-                    	Tool.showInfo(context,"input your password, please!");
+                    	Tool.showInfo(context,getResources().getString(R.string.pw_null_alert));
                     else {
                         u = worker.getUser(login);
                         myApp.setLogin(login);

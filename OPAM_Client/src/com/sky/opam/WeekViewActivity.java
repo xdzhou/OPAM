@@ -47,7 +47,7 @@ public class WeekViewActivity extends ActionBarActivity{
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.seul_fragment_activity);
+        setContentView(R.layout.seul_fragment);
 
         myApp = (MyApp)getApplication();
         numWeek = getIntent().getExtras().getInt("numWeek");       
@@ -114,7 +114,7 @@ public class WeekViewActivity extends ActionBarActivity{
 		for(int i=0; i<5; i++) fragment.setData(i+Calendar.MONDAY, worker.getClassInfo(myApp.getLogin(), weekN, i+Calendar.MONDAY));
         
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.agenda_fragement,fragment);
+		ft.replace(R.id.seul_fragement,fragment);
 		ft.commit();
 	}
 	
@@ -156,7 +156,7 @@ public class WeekViewActivity extends ActionBarActivity{
 		View view = LayoutInflater.from(this).inflate(menu_fragment, null);
 		Menu_Fragment fragment = new Menu_Fragment();
 		FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.menu_fragment,fragment);
+		ft.replace(R.id.menu_fragement,fragment);
 		ft.commit();
 		return view;
 	}

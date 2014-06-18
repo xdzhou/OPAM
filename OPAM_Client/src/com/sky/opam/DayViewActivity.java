@@ -57,10 +57,10 @@ public class DayViewActivity extends ActionBarActivity{
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		TextView tView = new TextView(this);
 		tView.setGravity(Gravity.CENTER);
-		tView.setTextSize(Tool.dip2px(this, 8));
+		tView.setTextSize(Tool.dip2px(this, 15));
 		int padding = Tool.dip2px(this, 5);
 		tView.setPadding(padding, padding, padding, padding);
-		tView.setText("Class of "+Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
+		tView.setText(Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
 		linearLayout.addView(tView);
 		linearLayout.addView(dayClassView);
 		scrollView.addView(linearLayout);

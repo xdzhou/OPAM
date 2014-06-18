@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title" translatable="false">Welcome to OPAM</string>
-    <string name="app_name" translatable="false">OPAM</string>
+    <string name="welcome" >Welcome to OPAM</string>
+    <string name="app_name" >OPAM</string>
+    <string name="class_name" >Class Name</string>
+    <string name="teacher" >Teacher</string>
+    <string name="group" >Group</string>
+    <string name="type" >Type</string>
+    <string name="room" >Room</string>
+    <string name="class_bg_color" >Class Background Color</string>
+    <string name="time_range" >Calendar Time Range</string>
+    <string name="calendar_auto_sync" >Google Calendar Auto Sync</string>
+    <string name="app_version" >App version</string>
+    <string name="time" >Time</string>
+    <string name="ok" >OK</string>
+    <string name="yes" >Yes</string>
+    <string name="no" >No</string>
+    <string name="login" >login</string>
+    <string name="pw" >password</string>
+    <string name="today_class" >Today\'s Class</string>
+    <string name="update" >Update</string>
+    <string name="account" >Account</string>
+    <string name="setting" >Setting</string> 
+    <string name="exit" >Exit</string>
+    <string name="edit_class" >Edit Class Info</string> 
+    <string name="remove_class" >Remove Class Info</string>
+    <string name="free_time" >Free time</string> 
+    <string name="class_time" >Class time</string>
+    <string name="add_class" >Add Class Info</string>
+    <string name="account_del" >Account Delete</string>
+    <string name="add_new_account" >Add New Account</string>
+    <string name="account_del_alert" >Do you really want to delete the account</string>
+    <string name="login_null_alert" >Input your login, please!</string>
+    <string name="pw_null_alert" >Input your password, please!</string>
 </resources>

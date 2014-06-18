@@ -40,12 +40,12 @@ public class Menu_Fragment extends ListFragment{
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
-		adapter.add(new MenuItemContent("Today's Class", android.R.drawable.ic_menu_compass));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.today_class), android.R.drawable.ic_menu_compass));
 		//adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
-		adapter.add(new MenuItemContent("Update", android.R.drawable.ic_menu_rotate));
-		adapter.add(new MenuItemContent("Account", android.R.drawable.ic_menu_myplaces));
-		adapter.add(new MenuItemContent("Setting", android.R.drawable.ic_menu_manage));
-		adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_menu_close_clear_cancel));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.update), android.R.drawable.ic_menu_rotate));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.account), android.R.drawable.ic_menu_myplaces));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.setting), android.R.drawable.ic_menu_manage));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.exit), android.R.drawable.ic_menu_close_clear_cancel));
 		
 		setListAdapter(adapter);
 	}
