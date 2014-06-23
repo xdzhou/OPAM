@@ -32,4 +32,8 @@
     <string name="account_del_alert" >Do you really want to delete the account</string>
     <string name="login_null_alert" >Input your login, please!</string>
     <string name="pw_null_alert" >Input your password, please!</string>
+    <string name="share_title" >Share Class Info</string>
+    <string name="my_class_from" >My Class Info from </string>
+    <string name="to" > to </string>
+    <string name="come_from" > come from </string>
 </resources>

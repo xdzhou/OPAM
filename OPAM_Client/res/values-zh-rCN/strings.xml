@@ -32,4 +32,8 @@
     <string name="account_del_alert" >你真的想删除帐号</string>
     <string name="login_null_alert" >请输入你的用户名!</string>
     <string name="pw_null_alert" >请输入你的密码!</string>
+    <string name="share_title" >分享一周课程信息</string>
+    <string name="my_class_from" >我的课程信息从 </string>
+    <string name="to" > 到 </string>
+    <string name="come_from" > 来自 </string>
 </resources>

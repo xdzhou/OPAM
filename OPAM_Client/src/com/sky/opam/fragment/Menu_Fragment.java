@@ -4,6 +4,7 @@ import com.sky.opam.AccountActivity;
 import com.sky.opam.AppConfig;
 import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
+import com.sky.opam.WeekViewActivity;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;

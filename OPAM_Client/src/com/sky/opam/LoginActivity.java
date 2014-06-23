@@ -41,75 +41,74 @@ public class LoginActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	System.out.println("LoginActivity created");
-            super.onCreate(savedInstanceState);
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            setContentView(R.layout.login_activity);
-            context = this;
-            myApp = (MyApp) getApplication();
-            myApp.setCurrentWeekNum(Tool.getNumWeek());
-            worker = new DBworker(context);
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.login_activity);
+        context = this;
+        myApp = (MyApp) getApplication();
+        myApp.setCurrentWeekNum(Tool.getNumWeek());
+        worker = new DBworker(context);
 
-            Button monBtn = (Button) findViewById(R.id.btnVAD);
-            monBtn.getBackground().setAlpha(150);
-            tfID = (AutoCompleteTextView) findViewById(R.id.txtID);
-            String[] countries = new String[] { "afghanistan", "albania","algeria", "american aamoa", "andorra" };
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, countries);
-            tfID.setAdapter(adapter);
-            // tfID.getBackground().setAlpha(150);
-            tfMDP = (EditText) findViewById(R.id.txtMDP);
-            tfMDP.getBackground().setAlpha(150);
+        Button monBtn = (Button) findViewById(R.id.btnVAD);
+        monBtn.getBackground().setAlpha(150);
+        tfID = (AutoCompleteTextView) findViewById(R.id.txtID);
+        String[] countries = new String[] { "afghanistan", "albania","algeria", "american aamoa", "andorra" };
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, countries);
+        tfID.setAdapter(adapter);
+        // tfID.getBackground().setAlpha(150);
+        tfMDP = (EditText) findViewById(R.id.txtMDP);
+        tfMDP.getBackground().setAlpha(150);
 
-            User fUser = worker.getDefaultUser();
-            if (fUser != null) {
-                u = fUser;
-                login = fUser.getLogin();
-                myApp.setLogin(login);  
-                tfID.setText(fUser.getLogin());
-                tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));
-                if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
-                    WeekAgendaShow(myApp.getCurrentWeekNum());
-                } else {
-                    askForUpdate();
-                }
+        User fUser = worker.getDefaultUser();
+        if (fUser != null) {
+            u = fUser;
+            login = fUser.getLogin();
+            myApp.setLogin(login);  
+            tfID.setText(fUser.getLogin());
+            tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));
+            if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
+                WeekAgendaShow(myApp.getCurrentWeekNum());
+            } else {
+                askForUpdate();
             }
+        }
 
-            monBtn.setOnClickListener(new android.view.View.OnClickListener() {
-                public void onClick(View v) {
-                    login = tfID.getText().toString();
-                    password = tfMDP.getText().toString();
+        monBtn.setOnClickListener(new android.view.View.OnClickListener() {
+            public void onClick(View v) {
+                login = tfID.getText().toString();
+                password = tfMDP.getText().toString();
 
-                    if (login.length() == 0)
-                        Tool.showInfo(context,getResources().getString(R.string.login_null_alert));
-                    else if (password.length() == 0)
-                    	Tool.showInfo(context,getResources().getString(R.string.pw_null_alert));
-                    else {
-                        u = worker.getUser(login);
-                        myApp.setLogin(login);
-                        if (u == null) {
-                                downloadCharge();
+                if (login.length() == 0)
+                    Tool.showInfo(context,getResources().getString(R.string.login_null_alert));
+                else if (password.length() == 0)
+                	Tool.showInfo(context,getResources().getString(R.string.pw_null_alert));
+                else {
+                    u = worker.getUser(login);
+                    myApp.setLogin(login);
+                    if (u == null) {
+                            downloadCharge();
+                    } else {
+                        worker.setDefaultUser(u.getLogin());
+                        String mdp = Chiffrement.decrypt(u.getPasswoed(),"OPAM");
+                        if (!mdp.equals(password)) {
+                            Tool.showInfo(context,"Password incorrect.");
                         } else {
-                            worker.setDefaultUser(u.getLogin());
-                            String mdp = Chiffrement.decrypt(u.getPasswoed(),"OPAM");
-                            if (!mdp.equals(password)) {
-                                Tool.showInfo(context,"Password incorrect.");
+                            if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
+                                WeekAgendaShow(myApp.getCurrentWeekNum());
                             } else {
-                                if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
-                                    WeekAgendaShow(myApp.getCurrentWeekNum());
-                                } else {
-                                    askForUpdate();
-                                }
+                                askForUpdate();
                             }
                         }
                     }
                 }
-            });
-            // animation en debut
-            Resources res = this.getResources();
-            TransitionDrawable transition = (TransitionDrawable) res.getDrawable(R.drawable.expand_collapse);
-            ImageView image = (ImageView) findViewById(R.id.bgID);
-            image.setImageDrawable(transition);
-            transition.startTransition(5000);
+            }
+        });
+        // animation en debut
+        Resources res = this.getResources();
+        TransitionDrawable transition = (TransitionDrawable) res.getDrawable(R.drawable.expand_collapse);
+        ImageView image = (ImageView) findViewById(R.id.bgID);
+        image.setImageDrawable(transition);
+        transition.startTransition(5000);
     }
 
     // reponse au le update request

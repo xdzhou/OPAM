@@ -1,5 +1,8 @@
 package com.sky.opam;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -16,8 +19,12 @@ import com.sky.opam.tool.Tool;
 
 import android.R.anim;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -27,6 +34,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
@@ -74,6 +83,7 @@ public class WeekViewActivity extends ActionBarActivity{
         
         //class sync task
         if(worker.getConfig(myApp.getLogin()).isAutoSync) new AgendaSyncTask(this).execute();
+        
 	}
 	
 	private void setActionBar(){
@@ -120,7 +130,6 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		System.out.println("WeekView "+requestCode+" "+ resultCode);
         if (resultCode == myApp.Refresh) {
         	finish();
         	startActivityForResult(getIntent(), MyApp.rsqCode);
@@ -132,8 +141,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	@Override  
     public boolean onCreateOptionsMenu(Menu menu) { 
-        //MenuItemCompat.setShowAsAction(menu.add("select").setIcon(R.drawable.icon_next), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setShowAsAction(menu.add("menu").setIcon(android.R.drawable.ic_dialog_dialer), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add("share").setIcon(android.R.drawable.ic_menu_share), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add("menu").setIcon(android.R.drawable.ic_menu_sort_by_size), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return true;  
     }
 	
@@ -145,8 +154,8 @@ public class WeekViewActivity extends ActionBarActivity{
 			}else {
 				profile_menu.showMenu();
 			}
-		}else if (menu.getTitle().equals("select")) {
-			
+		}else if (menu.getTitle().equals("share")) {
+			shareClassFromView();
 		}
 		return super.onOptionsItemSelected(menu);
 	}
@@ -194,5 +203,38 @@ public class WeekViewActivity extends ActionBarActivity{
 		profile_menu.showContent();
 	}
 	
-	
+	private void shareClassFromView(){
+		WeekAgenda_Fragment fragment = (WeekAgenda_Fragment) getSupportFragmentManager().findFragmentById(R.id.seul_fragement);
+		View view = fragment.getView();
+		Bitmap bitmap = Tool.convertViewToBitmap(view, this);
+		//Bitmap bitmap = fragment.getFragmentBM();
+		
+		
+		String imgPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "opam.jpg";
+		File document = new File(imgPath);
+		if(document.exists()) document.delete();
+        try {  
+            FileOutputStream fos = new FileOutputStream(document);  
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);// 把数据写入文件  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }
+        view.setDrawingCacheEnabled(false);
+        Uri uri = Uri.fromFile(new File(imgPath));
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.putExtra(Intent.EXTRA_STREAM, uri);
+		StringBuilder sBuilder = new StringBuilder();
+		sBuilder.append(getResources().getString(R.string.my_class_from));
+		sBuilder.append(Tool.getDateViaNumWeek(numWeek, Calendar.MONDAY));
+		sBuilder.append(getResources().getString(R.string.to));
+		sBuilder.append(Tool.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
+		sBuilder.append(" (");
+		sBuilder.append(getResources().getString(R.string.come_from));
+		sBuilder.append(getResources().getString(R.string.app_name));
+		sBuilder.append(").");
+		intent.putExtra(Intent.EXTRA_TEXT, sBuilder.toString());//附带的说明信息  
+        intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));  
+        intent.setType("image/*");   //分享图片  
+        startActivity(Intent.createChooser(intent, getResources().getString(R.string.share_title)));
+	}
 }

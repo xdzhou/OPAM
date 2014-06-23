@@ -32,4 +32,8 @@
     <string name="account_del_alert" >Voulez-vous vraiment suppprimer le compte</string>
     <string name="login_null_alert" >Tapez votre identifiant, SVP!</string>
     <string name="pw_null_alert" >Tapez votre mot de passe, SVP!</string>
+    <string name="share_title" >Partager Class Info</string>
+    <string name="my_class_from" >Mes cours du </string>
+    <string name="to" > au </string>
+    <string name="come_from" > en provenance de </string>
 </resources>
