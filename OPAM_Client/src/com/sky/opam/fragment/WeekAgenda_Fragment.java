@@ -23,10 +23,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Bitmap.Config;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
@@ -45,8 +42,6 @@ public class WeekAgenda_Fragment extends Fragment{
 	private int startTime = 8;
 	private int endTime = 19;	
 	private float time_distance ;
-	private Bitmap fragmentBitmap;
-	private Canvas fragmentCanvas;
 	
 	private float day_view_width ;
 	private int title_hight ;
@@ -73,19 +68,13 @@ public class WeekAgenda_Fragment extends Fragment{
 		for(int i=0; i<tab_title.length; i++){
 			tab_title[i] += Tool.getDateViaNumWeek(numWeek, i+Calendar.MONDAY).substring(3, 5);
 		}
-		
-		fragmentBitmap = Bitmap.createBitmap(Tool.getScreenWidth(getActivity()), 
-				(int)((endTime-startTime)*time_distance)+title_hight, Config.ARGB_8888);
-		fragmentCanvas = new Canvas(fragmentBitmap);
-		fragmentCanvas.drawColor(Color.WHITE);
+
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		fragmentCanvas.drawColor(Color.WHITE);
 		Context context = getActivity();
 		LinearLayout group_view = new LinearLayout(context);
-		group_view.setDrawingCacheEnabled(true);
 		group_view.setOrientation(LinearLayout.VERTICAL);
 		//
 		LinearLayout tabLayout = new LinearLayout(context);
@@ -133,7 +122,6 @@ public class WeekAgenda_Fragment extends Fragment{
 		group_view.addView(tabLayout);
 		group_view.addView(agendaLayout);
 		//group_view.buildDrawingCache();
-		group_view.draw(fragmentCanvas);
 		return group_view;
 	}
 	
@@ -281,11 +269,8 @@ public class WeekAgenda_Fragment extends Fragment{
 		});
 		builder.create().show();
 	}
-	
-	public Bitmap getFragmentBM(){
-		fragmentCanvas.save(Canvas.ALL_SAVE_FLAG);  
-		fragmentCanvas.restore();
-		return fragmentBitmap;
-	}
 
+	public int getNumWeek() {
+		return numWeek;
+	}
 }

@@ -1,6 +1,5 @@
 package com.sky.opam;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -17,10 +16,8 @@ import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
-import android.R.anim;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,8 +31,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.MeasureSpec;
-import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
@@ -155,7 +150,7 @@ public class WeekViewActivity extends ActionBarActivity{
 				profile_menu.showMenu();
 			}
 		}else if (menu.getTitle().equals("share")) {
-			shareClassFromView();
+			shareAgendaView();
 		}
 		return super.onOptionsItemSelected(menu);
 	}
@@ -203,12 +198,11 @@ public class WeekViewActivity extends ActionBarActivity{
 		profile_menu.showContent();
 	}
 	
-	private void shareClassFromView(){
+	private void shareAgendaView(){
 		WeekAgenda_Fragment fragment = (WeekAgenda_Fragment) getSupportFragmentManager().findFragmentById(R.id.seul_fragement);
+		int fragmentNumWeek = fragment.getNumWeek();
 		View view = fragment.getView();
-		Bitmap bitmap = Tool.convertViewToBitmap(view, this);
-		//Bitmap bitmap = fragment.getFragmentBM();
-		
+		Bitmap bitmap = Tool.ViewToBitmap(view);
 		
 		String imgPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "opam.jpg";
 		File document = new File(imgPath);
@@ -219,7 +213,9 @@ public class WeekViewActivity extends ActionBarActivity{
         } catch (Exception e) {  
             e.printStackTrace();  
         }
-        view.setDrawingCacheEnabled(false);
+        
+        setWeekAgenda(fragmentNumWeek); //reset agenda view
+        
         Uri uri = Uri.fromFile(new File(imgPath));
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.putExtra(Intent.EXTRA_STREAM, uri);

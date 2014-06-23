@@ -9,9 +9,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.view.Display;
@@ -48,54 +48,22 @@ public class Tool {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
 	}
 	
-	public static Bitmap convertViewToBitmap(View view, Activity activity){
+	public static Bitmap ViewToBitmap(View view){
 		if(view==null) return null;
-		Bitmap bitmap;
-		int viewWidth;
-		view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-		int numBitMap = view.getMeasuredHeight() / getScreenHeight(activity) +1;
-		if(numBitMap == 1){
-			view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight());
-			view.buildDrawingCache();
-			Bitmap b1 = view.getDrawingCache();
-			Bitmap newmap = Bitmap.createBitmap(b1.getWidth(), b1.getHeight(), Config.ARGB_8888);
-			Canvas canvas = new Canvas(newmap);
-			canvas.drawColor(Color.WHITE);
-		    canvas.drawBitmap(b1, 0, 0, null);
-		    canvas.save(Canvas.ALL_SAVE_FLAG);  
-		    canvas.restore();
-		    bitmap = newmap;
-		}else {
-			view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight()/2);
-			view.buildDrawingCache();
-			Bitmap b1 = Bitmap.createBitmap(view.getDrawingCache());
-			view.destroyDrawingCache();
-			view.setDrawingCacheEnabled(true);
-			view.layout(0,view.getMeasuredHeight()/2, view.getMeasuredWidth(), view.getMeasuredHeight());
-			view.buildDrawingCache();
-			Bitmap b2 = view.getDrawingCache();
-			bitmap = combineBitmap(b1, b2);
-		}
-		view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight());
-
+		view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), 
+                     MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+		//Define a bitmap with the same size as the view		
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(bitmap);
+        //Get the view's background
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null) bgDrawable.draw(canvas);
+        else canvas.drawColor(Color.WHITE);
+        // draw the view on the canvas
+        view.draw(canvas);
         return bitmap;
-	} 
-	
-	public static Bitmap combineBitmap(Bitmap b1, Bitmap b2) {  
-	    if (b1 == null) {  
-	        return null;  
-	    }  
-	    int bgWidth = b1.getWidth();  
-	    int bgHeight = b1.getHeight();
-	    int fgHeight = b2.getHeight();  
-	    Bitmap newmap = Bitmap.createBitmap(bgWidth, bgHeight + fgHeight, Config.ARGB_8888);  
-	    Canvas canvas = new Canvas(newmap);  
-	    canvas.drawColor(Color.WHITE);
-	    canvas.drawBitmap(b1, 0, 0, null);  
-	    canvas.drawBitmap(b2, 0, bgHeight, null);  
-	    canvas.save(Canvas.ALL_SAVE_FLAG);  
-	    canvas.restore();  
-	    return newmap;  
 	} 
 	
 	public static int getNumWeek() {
