@@ -77,6 +77,7 @@ public class Account_Fragment extends ListFragment{
 		}
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+			if(convertView != null) return convertView;
 			convertView = LayoutInflater.from(getContext()).inflate(R.layout.account_item_view, null);
 			ImageView icon = (ImageView) convertView.findViewById(R.id.icon_view);
 			icon.getLayoutParams().height = icon.getLayoutParams().width = imageSize;
@@ -104,9 +105,9 @@ public class Account_Fragment extends ListFragment{
 			final EditText loginET = (EditText) viewDia.findViewById(R.id.txtID);
 			final EditText pwET = (EditText) viewDia.findViewById(R.id.txtMDP);
 			login_dialog.setTitle(getResources().getString(R.string.add_new_account));
-			login_dialog.setIcon(android.R.drawable.ic_dialog_info);
+			login_dialog.setIcon(android.R.drawable.ic_menu_edit);
 			login_dialog.setView(viewDia);
-			login_dialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {		
+			login_dialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {		
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					newLogin = loginET.getText().toString();
@@ -161,7 +162,7 @@ public class Account_Fragment extends ListFragment{
 		public void onClick(View v) {
 			AlertDialog.Builder del_dialog = new AlertDialog.Builder(getActivity());
 			del_dialog.setTitle(getResources().getString(R.string.account_del));
-			del_dialog.setIcon(android.R.drawable.ic_dialog_alert);
+			del_dialog.setIcon(android.R.drawable.ic_menu_info_details);
 			del_dialog.setMessage(getResources().getString(R.string.account_del_alert)+": "+users.get(position).getName()+" ?");
 			del_dialog.setNegativeButton(getResources().getString(R.string.no), null);
 			del_dialog.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener(){

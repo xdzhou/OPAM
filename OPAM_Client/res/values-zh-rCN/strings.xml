@@ -27,7 +27,7 @@
     <string name="free_time" >自由时间</string>
     <string name="class_time" >课程时间</string> 
     <string name="add_class" >添加课程信息</string>
-    <string name="account_del" >账户删除</string>
+    <string name="account_del" >删除账户</string>
     <string name="add_new_account" >添加新账户</string>
     <string name="account_del_alert" >你真的想删除帐号</string>
     <string name="login_null_alert" >请输入你的用户名!</string>
@@ -36,4 +36,5 @@
     <string name="my_class_from" >我的课程信息从 </string>
     <string name="to" > 到 </string>
     <string name="come_from" > 来自 </string>
+    <string name="add" >添加</string>
 </resources>

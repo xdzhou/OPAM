@@ -36,4 +36,5 @@
     <string name="my_class_from" >Mes cours du </string>
     <string name="to" > au </string>
     <string name="come_from" > en provenance de </string>
+    <string name="add" >ajouter</string>
 </resources>

@@ -213,6 +213,7 @@ public class WeekAgenda_Fragment extends Fragment{
 	private void createEventDialog(final DayTabClassView v, final String vocationStartTime, final String vocationEndTime){
 		String[] mItems = {getResources().getString(R.string.add_class)};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setIcon(android.R.drawable.ic_menu_info_details);
 		builder.setTitle(getResources().getString(R.string.free_time)+": "+vocationStartTime+" - "+vocationEndTime);
 		builder.setOnCancelListener(new OnCancelListener() {			
 			@Override
@@ -241,6 +242,7 @@ public class WeekAgenda_Fragment extends Fragment{
 	private void EventEditDialog(final DayTabClassView v, final ClassInfo c, final String vocationStartTime, final String vocationEndTime){
 		String[] mItems = {getResources().getString(R.string.edit_class), getResources().getString(R.string.remove_class)};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setIcon(android.R.drawable.ic_menu_info_details);
 		builder.setTitle(getResources().getString(R.string.class_time)+": "+c.startTime+" - "+c.endTime);
 		builder.setOnCancelListener(new OnCancelListener() {			
 			@Override

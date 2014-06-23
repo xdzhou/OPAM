@@ -186,8 +186,7 @@ public class WeekViewActivity extends ActionBarActivity{
 				profile_menu.showMenu();
 			}
 	    	return true;
-		} 
-	    else {
+		}else {
         	return super.onKeyDown(keyCode, event);
 	    }
     }

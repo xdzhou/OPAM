@@ -36,4 +36,5 @@
     <string name="my_class_from" >My Class Info from </string>
     <string name="to" > to </string>
     <string name="come_from" > come from </string>
+    <string name="add" >add</string>
 </resources>
