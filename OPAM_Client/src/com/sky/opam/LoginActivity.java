@@ -1,7 +1,9 @@
 package com.sky.opam;
 
+import com.google.gson.Gson;
 import com.sky.opam.R;
 import com.sky.opam.model.User;
+import com.sky.opam.model.VersionInfo;
 import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
@@ -37,7 +39,7 @@ public class LoginActivity extends Activity {
     private MyApp myApp;
 
     private DBworker worker;
-    private User u;
+    private User currentUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,30 +50,43 @@ public class LoginActivity extends Activity {
         myApp = (MyApp) getApplication();
         myApp.setCurrentWeekNum(Tool.getNumWeek());
         worker = new DBworker(context);
-
+        
+        //First Use App, show Version Info
+        boolean oldAutoLoginFlag = worker.getAutoLogin();
+        boolean isFirstUse = Tool.isFirstUseApp(context);
+        if(isFirstUse){
+        	worker.setAutoLogin(false);
+            VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_10_info), VersionInfo.class);
+            getSharedPreferences("share", 0).edit().putBoolean("isFirstIn", false).commit(); 
+            Tool.showVersionInfo(context, versionInfo);
+        }       
+        
         Button monBtn = (Button) findViewById(R.id.btnVAD);
         monBtn.getBackground().setAlpha(150);
         tfID = (AutoCompleteTextView) findViewById(R.id.txtID);
-        String[] countries = new String[] { "afghanistan", "albania","algeria", "american aamoa", "andorra" };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, countries);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line);
+        for(User tempUser : worker.getAllUser()){
+        	adapter.add(tempUser.getLogin());
+        }
+        tfID.setThreshold(1);
         tfID.setAdapter(adapter);
-        // tfID.getBackground().setAlpha(150);
         tfMDP = (EditText) findViewById(R.id.txtMDP);
         tfMDP.getBackground().setAlpha(150);
 
         User fUser = worker.getDefaultUser();
         if (fUser != null) {
-            u = fUser;
+            currentUser = fUser;
             login = fUser.getLogin();
             myApp.setLogin(login);  
             tfID.setText(fUser.getLogin());
             tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));
-            if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
-                WeekAgendaShow(myApp.getCurrentWeekNum());
-            } else {
-                askForUpdate();
+            
+            if(worker.getAutoLogin()){
+            	if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) WeekAgendaShow(myApp.getCurrentWeekNum());
+            	else askForUpdate();
             }
         }
+        if(isFirstUse) worker.setAutoLogin(oldAutoLoginFlag);
 
         monBtn.setOnClickListener(new android.view.View.OnClickListener() {
             public void onClick(View v) {
@@ -83,17 +98,17 @@ public class LoginActivity extends Activity {
                 else if (password.length() == 0)
                 	Tool.showInfo(context,getResources().getString(R.string.pw_null_alert));
                 else {
-                    u = worker.getUser(login);
+                    currentUser = worker.getUser(login);
                     myApp.setLogin(login);
-                    if (u == null) {
+                    if (currentUser == null) {
                             downloadCharge();
                     } else {
-                        worker.setDefaultUser(u.getLogin());
-                        String mdp = Chiffrement.decrypt(u.getPasswoed(),"OPAM");
+                        worker.setDefaultUser(currentUser.getLogin());
+                        String mdp = Chiffrement.decrypt(currentUser.getPasswoed(),"OPAM");
                         if (!mdp.equals(password)) {
                             Tool.showInfo(context,"Password incorrect.");
                         } else {
-                            if (myApp.getCurrentWeekNum() == u.getNumWeekUpdated()) {
+                            if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) {
                                 WeekAgendaShow(myApp.getCurrentWeekNum());
                             } else {
                                 askForUpdate();
@@ -132,8 +147,7 @@ public class LoginActivity extends Activity {
         	}else {
 				login = myApp.getLogin();
 				password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
-			}
-            
+			}         
             AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
         } else {
@@ -146,8 +160,8 @@ public class LoginActivity extends Activity {
         new AlertDialog.Builder(this)
             .setTitle("update")
             .setMessage("Your courses are a bit outdated, do you want to update ?")
-            .setPositiveButton("Yes", onclick)
-            .setNegativeButton("No", onclick).show();
+            .setPositiveButton(R.string.yes, onclick)
+            .setNegativeButton(R.string.no, onclick).show();
     }
 
     DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() {
@@ -155,7 +169,7 @@ public class LoginActivity extends Activity {
         public void onClick(DialogInterface dialog, int which) {
             switch (which) {
             case Dialog.BUTTON_NEGATIVE:
-                WeekAgendaShow(u.getNumWeekUpdated());
+                WeekAgendaShow(currentUser.getNumWeekUpdated());
                 break;
             case Dialog.BUTTON_NEUTRAL:
                 Tool.showInfo(context,"unknow choise...");
@@ -168,7 +182,7 @@ public class LoginActivity extends Activity {
     };
 
     private void WeekAgendaShow(int numWeek) {
-    	worker.setDefaultUser(u.getLogin());
+    	worker.setDefaultUser(currentUser.getLogin());
         Intent intent = new Intent();
         intent.setClass(LoginActivity.this, WeekViewActivity.class);
         Bundle bundle = new Bundle();
@@ -178,7 +192,6 @@ public class LoginActivity extends Activity {
     }
 
     long exitTime = 0;
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -199,9 +212,8 @@ public class LoginActivity extends Activity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			if(msg.what == R.integer.OK){
-				//Tool.showInfo(context, "Data updated !");
-				u = worker.getUser(login);
-				WeekAgendaShow(u.getNumWeekUpdated());
+				currentUser = worker.getUser(login);
+				WeekAgendaShow(currentUser.getNumWeekUpdated());
 			}else {
 				Bundle b = msg.getData();
 				String errorMsg = b.getString("error");

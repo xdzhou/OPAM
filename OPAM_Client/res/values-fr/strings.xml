@@ -37,4 +37,10 @@
     <string name="to" > au </string>
     <string name="come_from" > en provenance de </string>
     <string name="add" >ajouter</string>
+    <string name="new_version_feature" >nouvelle version</string>
+    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"Afficher les cours d\u0027une semaine\",
+        \"gestion des comptes (multi-compte)\",\"modifier / supprimer / ajouter des cours\",
+        \"afficher l\u0027avatar d\u0027utilisateur\",\"partager des cours sur réseaux sociaux\",
+        \"faciliter le gestion des paramètres d\u0027app\"]}
+	</string>
 </resources>

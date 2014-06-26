@@ -37,4 +37,9 @@
     <string name="to" > 到 </string>
     <string name="come_from" > 来自 </string>
     <string name="add" >添加</string>
+    <string name="new_version_feature" >新版本信息</string>
+    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"新增一周课程视图\",
+        \"新增账户管理，允许多用户切换\",\"新增课程修改/删除/添加功能\",\"新增显示用户头像功能\",
+        \"新增分享功能，把你的一周课程晒给小伙伴们\",\"全新设置界面，可调节日历时间范围\"]}
+	</string>
 </resources>

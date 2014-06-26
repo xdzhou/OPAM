@@ -387,7 +387,7 @@ public class DBworker {
     }
     //get config   
     public Config getConfig(String login){
-    	if(login==null || login.equals("")) return null;
+    	if(login == null || login.equals("")) return null;
         db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CONFIG where login='" + login + "';", null);
         if (cursor.getCount() == 1) {
@@ -417,6 +417,46 @@ public class DBworker {
         cv.put("isDefaultUser", config.isDefaultUser);       
         db.update("CONFIG", cv, "login = ?", new String[]{config.login});
         db.close();
+    }
+    
+    //指示App配置
+    public void setAutoLogin(boolean b){
+    	createRootConfigIfNotExist();
+    	db = helper.getWritableDatabase();
+    	ContentValues cv = new ContentValues();
+        cv.put("isAutoSync", b);
+        db.update("CONFIG", cv, "login = ?", new String[]{"root"});
+        db.close();
+    }
+    
+    public void setAutoUpdateNotify(boolean b){
+    	createRootConfigIfNotExist();
+    	db = helper.getWritableDatabase();
+    	ContentValues cv = new ContentValues();
+        cv.put("isDefaultUser", b);
+        db.update("CONFIG", cv, "login = ?", new String[]{"root"});
+        db.close();
+    }
+    
+    public boolean getAutoLogin(){
+    	createRootConfigIfNotExist();
+    	Config config = getConfig("root");
+    	return config.isAutoSync;    	
+    }
+    
+    public boolean getAutoUpdateNotify(){
+    	createRootConfigIfNotExist();
+    	Config config = getConfig("root");
+    	return config.isDefaultUser;
+    }
+    
+    private void createRootConfigIfNotExist(){
+    	Config config = getConfig("root");
+    	if(config == null){
+    		db = helper.getWritableDatabase();
+    		db.execSQL("insert into CONFIG values (?,?,?,?,?)", new Object[] { "root", 0, 0, 1, 1});
+        	db.close();
+    	}  	
     }
 
     //////////////////////////////////////////////////////////

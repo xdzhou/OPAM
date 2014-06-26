@@ -77,7 +77,6 @@ public class Account_Fragment extends ListFragment{
 		}
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			if(convertView != null) return convertView;
 			convertView = LayoutInflater.from(getContext()).inflate(R.layout.account_item_view, null);
 			ImageView icon = (ImageView) convertView.findViewById(R.id.icon_view);
 			icon.getLayoutParams().height = icon.getLayoutParams().width = imageSize;

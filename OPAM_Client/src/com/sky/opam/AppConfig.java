@@ -45,14 +45,8 @@ public class AppConfig extends ActionBarActivity{
         endTimeTV = (TextView)findViewById(R.id.endTimeTV);
         endTimeTV.setText(Tool.getTime(config.endTime));
         TextView VersionTV = (TextView)findViewById(R.id.versionTV);
-        String version = null;
-		try {
-			PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-			version = pInfo.versionName;
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
-        if(version!=null) VersionTV.setText(version);
+        String version = Tool.getVersionName(this);
+        if(version != null) VersionTV.setText(version);
         
         autoSyncTB = (ToggleButton)findViewById(R.id.autoSyncTB);
         autoSyncTB.setChecked(config.isAutoSync);

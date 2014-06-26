@@ -37,4 +37,9 @@
     <string name="to" > to </string>
     <string name="come_from" > come from </string>
     <string name="add" >add</string>
+    <string name="new_version_feature" >new version feature</string>
+    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"New week class view\",\"New account management, 
+        allowing multiple users to switch\",\"New courses modify / delete / add functions\",\"New feature to display user\u0027s photo\",
+        \"New feature to share a week\u0027s courses\",\"New settings interface, adjust the calendar time\"]}
+	</string>
 </resources>
