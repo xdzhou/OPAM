@@ -1,7 +1,7 @@
 package com.sky.opam.fragment;
 
 import com.sky.opam.AccountActivity;
-import com.sky.opam.AppConfig;
+import com.sky.opam.AppConfigActivity;
 import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
 import com.sky.opam.WeekViewActivity;
@@ -99,7 +99,7 @@ public class Menu_Fragment extends ListFragment{
 			getActivity().startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 4) {
 			Intent intent = new Intent();
-			intent.setClass(getActivity(), AppConfig.class);
+			intent.setClass(getActivity(), AppConfigActivity.class);
 			getActivity().startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 5){
 			getActivity().setResult(MyApp.Exit);

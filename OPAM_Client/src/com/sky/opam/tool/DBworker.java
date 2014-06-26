@@ -13,6 +13,7 @@ import com.sky.opam.model.User;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -420,34 +421,22 @@ public class DBworker {
     }
     
     //指示App配置
-    public void setAutoLogin(boolean b){
-    	createRootConfigIfNotExist();
-    	db = helper.getWritableDatabase();
-    	ContentValues cv = new ContentValues();
-        cv.put("isAutoSync", b);
-        db.update("CONFIG", cv, "login = ?", new String[]{"root"});
-        db.close();
+    public void setAutoLogin(Context context, boolean b){
+    	context.getSharedPreferences("share", 0).edit().putBoolean("autoLogin", b).commit();    	
     }
     
-    public void setAutoUpdateNotify(boolean b){
-    	createRootConfigIfNotExist();
-    	db = helper.getWritableDatabase();
-    	ContentValues cv = new ContentValues();
-        cv.put("isDefaultUser", b);
-        db.update("CONFIG", cv, "login = ?", new String[]{"root"});
-        db.close();
+    public void setAutoUpdateNotify(Context context, boolean b){
+    	context.getSharedPreferences("share", 0).edit().putBoolean("autoUpdateNotify", b).commit(); 
     }
     
-    public boolean getAutoLogin(){
-    	createRootConfigIfNotExist();
-    	Config config = getConfig("root");
-    	return config.isAutoSync;    	
+    public boolean getAutoLogin(Context context){
+    	SharedPreferences pref = context.getSharedPreferences("share", 0); 
+		return pref.getBoolean("autoLogin", true);   	
     }
     
-    public boolean getAutoUpdateNotify(){
-    	createRootConfigIfNotExist();
-    	Config config = getConfig("root");
-    	return config.isDefaultUser;
+    public boolean getAutoUpdateNotify(Context context){
+    	SharedPreferences pref = context.getSharedPreferences("share", 0); 
+		return pref.getBoolean("autoUpdateNotify", true);
     }
     
     private void createRootConfigIfNotExist(){

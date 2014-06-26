@@ -1,7 +1,5 @@
 package com.sky.opam;
 
-import java.util.Date;
-
 import com.sky.opam.model.Config;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -9,19 +7,16 @@ import com.sky.opam.tool.Tool;
 import com.sky.opam.view.RangeSeekBar;
 import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class AppConfig extends ActionBarActivity{
+public class AppConfigActivity extends ActionBarActivity{
 	private MyApp myApp;
 	private DBworker worker;
 	private Config config;
@@ -29,6 +24,8 @@ public class AppConfig extends ActionBarActivity{
 	private TextView startTimeTV;
 	private TextView endTimeTV;
 	private ToggleButton autoSyncTB;
+	private ToggleButton autoLoginTB;
+	private ToggleButton autoUpdateNotifyTB;
 	private RangeSeekBar<Integer> rangeSeekBar;
 	
 	@Override
@@ -50,6 +47,10 @@ public class AppConfig extends ActionBarActivity{
         
         autoSyncTB = (ToggleButton)findViewById(R.id.autoSyncTB);
         autoSyncTB.setChecked(config.isAutoSync);
+        autoLoginTB = (ToggleButton)findViewById(R.id.autoLogin);
+        autoLoginTB.setChecked(worker.getAutoLogin(this));
+        autoUpdateNotifyTB = (ToggleButton)findViewById(R.id.autoUpdateNotify);
+        autoUpdateNotifyTB.setChecked(worker.getAutoUpdateNotify(this));
         
         rangeSeekBar = new RangeSeekBar<Integer>(0, 24, this);
         rangeSeekBar.setNotifyWhileDragging(true);
@@ -81,6 +82,8 @@ public class AppConfig extends ActionBarActivity{
 			config.endTime = rangeSeekBar.getSelectedMaxValue();
 			config.isAutoSync = autoSyncTB.isChecked();
 			worker.updateConfig(config);
+			worker.setAutoLogin(AppConfigActivity.this, autoLoginTB.isChecked());
+			worker.setAutoUpdateNotify(AppConfigActivity.this, autoUpdateNotifyTB.isChecked());
 			setResult(MyApp.Refresh);
 			finish();
 		}

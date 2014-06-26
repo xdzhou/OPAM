@@ -73,6 +73,64 @@
     
     <View android:layout_width="match_parent" 
         android:layout_height="1dip"  
+        android:background="#FF888888" 
+        android:layout_marginLeft="4dip"  
+        android:layout_marginRight="4dip"
+        android:layout_marginBottom="10dip"
+        android:layout_marginTop="10dip" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="4dp"
+            android:text="@string/auto_login"
+            android:textSize="20dp" />
+
+        <ToggleButton
+            android:id="@+id/autoLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="on/off" />
+
+    </RelativeLayout>
+    
+    <View android:layout_width="match_parent" 
+        android:layout_height="1dip"  
+        android:background="#FF888888" 
+        android:layout_marginLeft="4dip"  
+        android:layout_marginRight="4dip"
+        android:layout_marginBottom="10dip"
+        android:layout_marginTop="10dip" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="4dp"
+            android:text="@string/auto_update_notify"
+            android:textSize="20dp" />
+
+        <ToggleButton
+            android:id="@+id/autoUpdateNotify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="on/off" />
+
+    </RelativeLayout>
+    
+    <View android:layout_width="match_parent" 
+        android:layout_height="1dip"  
         android:background="#FF888888"  
         android:layout_marginLeft="4dip"  
         android:layout_marginRight="4dip" 

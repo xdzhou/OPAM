@@ -10,6 +10,8 @@
     <string name="class_bg_color" >Class Background Color</string>
     <string name="time_range" >Calendar Time Range</string>
     <string name="calendar_auto_sync" >Google Calendar Auto Sync</string>
+    <string name="auto_login" >Auto-Login</string>
+    <string name="auto_update_notify" >New Version Notify</string>
     <string name="app_version" >App version</string>
     <string name="time" >Time</string>
     <string name="ok" >OK</string>

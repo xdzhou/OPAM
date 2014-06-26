@@ -52,10 +52,10 @@ public class LoginActivity extends Activity {
         worker = new DBworker(context);
         
         //First Use App, show Version Info
-        boolean oldAutoLoginFlag = worker.getAutoLogin();
+        boolean oldAutoLoginFlag = worker.getAutoLogin(context);
         boolean isFirstUse = Tool.isFirstUseApp(context);
         if(isFirstUse){
-        	worker.setAutoLogin(false);
+        	worker.setAutoLogin(context, false);
             VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_10_info), VersionInfo.class);
             getSharedPreferences("share", 0).edit().putBoolean("isFirstIn", false).commit(); 
             Tool.showVersionInfo(context, versionInfo);
@@ -81,12 +81,12 @@ public class LoginActivity extends Activity {
             tfID.setText(fUser.getLogin());
             tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));
             
-            if(worker.getAutoLogin()){
+            if(worker.getAutoLogin(context)){
             	if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) WeekAgendaShow(myApp.getCurrentWeekNum());
             	else askForUpdate();
             }
         }
-        if(isFirstUse) worker.setAutoLogin(oldAutoLoginFlag);
+        if(isFirstUse) worker.setAutoLogin(context, oldAutoLoginFlag);
 
         monBtn.setOnClickListener(new android.view.View.OnClickListener() {
             public void onClick(View v) {

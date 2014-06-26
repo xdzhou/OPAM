@@ -10,6 +10,8 @@
     <string name="class_bg_color" >Couleur de fond</string>
     <string name="time_range" >plage horaire d\'agenda</string>
     <string name="calendar_auto_sync" >Google Agenda Auto Sync</string>
+    <string name="auto_login" >Auto-Login</string>
+    <string name="auto_update_notify" >Nouvelle Version Notification</string>
     <string name="app_version" >Version d\'application</string>
     <string name="time" >Horaire</string>
     <string name="ok" >OK</string>

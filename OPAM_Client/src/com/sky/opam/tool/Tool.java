@@ -247,7 +247,7 @@ public class Tool {
      */
 	public static String getLocalLanguage(){
 		//return context.getResources().getConfiguration().locale.getDisplayLanguage();
-		return Locale.getDefault().getDisplayLanguage();
+		return Locale.getDefault().getLanguage();
 	}
 	
 	public static void showVersionInfo(Context context, VersionInfo versionInfo){

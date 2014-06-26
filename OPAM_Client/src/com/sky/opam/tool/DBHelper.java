@@ -57,9 +57,6 @@ public class DBHelper extends SQLiteOpenHelper {
                     + "foreign key(typeId) references CLASSTYPE(id),"
                     + "foreign key(roomId) references ROOM(id),"
                     + "foreign key(login) references USER(login));");
-        	//增加root用户，用于指示App配置
-        	//isAutoSync用于是否自动登录 isDefaultUser用于是否自动更新提示
-        	db.execSQL("insert into CONFIG values (?,?,?,?,?)", new Object[] { "root", 0, 0, 1, 1});
         }
 
         @Override

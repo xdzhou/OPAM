@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 import com.sky.opam.fragment.Menu_Fragment;
 import com.sky.opam.fragment.WeekAgenda_Fragment;
 import com.sky.opam.model.Config;
+import com.sky.opam.model.VersionInfo;
 import com.sky.opam.task.AgendaSyncTask;
+import com.sky.opam.task.CheckAppVersionTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
@@ -22,6 +25,8 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -78,8 +83,20 @@ public class WeekViewActivity extends ActionBarActivity{
         
         //class sync task
         if(worker.getConfig(myApp.getLogin()).isAutoSync) new AgendaSyncTask(this).execute();
-        
+        //check new version Info
+        if(worker.getAutoUpdateNotify(this)) new CheckAppVersionTask(this, new CheckUpdateHandler()).execute();
 	}
+	
+	private class CheckUpdateHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			Bundle b = msg.getData();
+			String vInfo = b.getString("versionInfo");
+			VersionInfo versionInfo = (VersionInfo)new Gson().fromJson(vInfo, VersionInfo.class);
+			Tool.showVersionInfo(WeekViewActivity.this, versionInfo);
+		} 	
+    }
 	
 	private void setActionBar(){
 		ActionBar actionBar = getSupportActionBar();

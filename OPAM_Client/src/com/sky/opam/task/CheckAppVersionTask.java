@@ -11,38 +11,52 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
-import com.sky.opam.model.VersionInfo;
 import com.sky.opam.tool.FailException;
 import com.sky.opam.tool.Tool;
+
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
-public class CheckAppVersionTask extends AsyncTask<Void, Void, Void>{
+public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
 	private Context context;
+	private Handler handler;
 	
-	public CheckAppVersionTask(Context context) {
+	public CheckAppVersionTask(Context context, Handler handler) {
 		this.context = context;
+		this.handler = handler;
 	}
 
 	@Override
-	protected Void doInBackground(Void... params) {
+	protected String doInBackground(Void... params) {
 		try {
-			int currentVersionCode = getCurrentVersionCode();
-			if(currentVersionCode > Tool.getVersionCode(context)){
-				VersionInfo versionInfo = getVersionInfo();
-				Tool.showVersionInfo(context, versionInfo);
+			int lastVersionCode = getLastVersionCode();
+			if(lastVersionCode > Tool.getVersionCode(context)){
+				return getVersionInfo();
 			}
 		}catch (FailException e) {
-			Tool.showInfo(context, e.getMessage());
+			return null;
 		}
 		return null;
 	}
 	
-	private int getCurrentVersionCode() throws FailException{
+	@Override
+    protected void onPostExecute(String result) {
+        if (result != null) {
+        	Message msg = new Message();
+        	Bundle b = new Bundle();// 存放数据
+        	b.putString("versionInfo", result);
+        	msg.setData(b);
+        	handler.sendMessage(msg);
+        }
+    }
+	
+	private int getLastVersionCode() throws FailException{
 		int versionCode = 0;
 		HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson");
+        HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para=code");
         try {
             HttpResponse response = client.execute(httpGet);
             int status = response.getStatusLine().getStatusCode();
@@ -65,9 +79,11 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, Void>{
         }
 	}
 	
-	private VersionInfo getVersionInfo() throws FailException{
+	private String getVersionInfo() throws FailException{
+		String localLanguage = Tool.getLocalLanguage();
+		//System.out.println(localLanguage);
 		HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson");
+        HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para="+localLanguage);
         try {
             HttpResponse response = client.execute(httpGet);
             int status = response.getStatusLine().getStatusCode();
@@ -75,8 +91,7 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, Void>{
                 HttpEntity entity = response.getEntity();
                 String resulta = EntityUtils.toString(entity);
                 httpGet.abort();
-                Gson gson = new Gson();
-                return (VersionInfo) gson.fromJson(resulta, VersionInfo.class);
+                return resulta;
             } else {
             	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
             }
