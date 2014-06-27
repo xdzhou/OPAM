@@ -118,12 +118,7 @@ public class LoginActivity extends Activity {
                 }
             }
         });
-        // animation en debut
-        Resources res = this.getResources();
-        TransitionDrawable transition = (TransitionDrawable) res.getDrawable(R.drawable.expand_collapse);
-        ImageView image = (ImageView) findViewById(R.id.bgID);
-        image.setImageDrawable(transition);
-        transition.startTransition(5000);
+
     }
 
     // reponse au le update request

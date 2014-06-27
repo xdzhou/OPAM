@@ -116,7 +116,7 @@ public class WeekAgenda_Fragment extends Fragment{
         	dView.setMyLongPressListener(dayViewLongPressListener);
         	dView.setClickListener(classInfoClickListener);
         	dView.addClass(dateMap.get(i+Calendar.MONDAY));
-        	if(myApp.getCurrentWeekNum() == numWeek && Tool.getDayOfWeek()==i+1) dView.setBackgroundColor(Color.LTGRAY);
+        	if(myApp.getCurrentWeekNum() == numWeek && Tool.getDayOfWeek()==i+Calendar.MONDAY) dView.setBackgroundColor(Color.LTGRAY);
         	innerLayout.addView(dView);
 		}
 		

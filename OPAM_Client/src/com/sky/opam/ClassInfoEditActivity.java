@@ -257,7 +257,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 			String itemString = getItem(position);
 			tv.setText(itemString);
 			if(position == getCount()-1 ){
-				tv.setBackgroundColor(Color.GRAY);
+				//tv.setBackgroundColor(Color.GRAY);
+				tv.setBackgroundResource(R.drawable.important_bg);
 			}
 			return convertView;
 		}

@@ -249,7 +249,7 @@ public class WeekViewActivity extends ActionBarActivity{
 		sBuilder.append(" (");
 		sBuilder.append(getResources().getString(R.string.come_from));
 		sBuilder.append(getResources().getString(R.string.app_name));
-		sBuilder.append(" -https://play.google.com/store/apps/details?id=com.sky.opam");		
+		sBuilder.append(" - https://play.google.com/store/apps/details?id=com.sky.opam ");		
 		sBuilder.append(").");
 		intent.putExtra(Intent.EXTRA_TEXT, sBuilder.toString());//附带的说明信息  
         intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));  

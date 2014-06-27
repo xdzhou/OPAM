@@ -76,7 +76,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 
 	private void initia(Context context){
 		mGestureDetector = new GestureDetector(getContext(), this);
-		outLinePaint.setColor(Color.BLUE);
+		//outLinePaint.setColor(Color.BLUE);
+		outLinePaint.setColor(Color.argb(500, 0x33, 0xb5, 0xe5));
 		outLinePaint.setStrokeWidth(Tool.dip2px(context, 1));
 		selectePaint.setColor(Color.argb(100, 0xff, 0, 0));
 		selectePaint.setStrokeWidth(Tool.dip2px(context, 3));

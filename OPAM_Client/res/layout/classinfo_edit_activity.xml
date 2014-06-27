@@ -22,7 +22,7 @@
             android:layout_marginRight="30dp"
             android:textSize="20dp"
             android:text="19:00"
-            android:background="@drawable/new_bg"
+            android:background="@drawable/important_bg"
             android:layout_alignParentRight="true" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="30dp"
             android:text="08:00"
-            android:background="@drawable/new_bg"
+            android:background="@drawable/important_bg"
             android:textSize="20dp" />
 
     </RelativeLayout>

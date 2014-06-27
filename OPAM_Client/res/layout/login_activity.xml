@@ -4,7 +4,7 @@
     android:layout_height="wrap_content" 
     android:layout_width="match_parent"
     android:gravity="center_vertical|center_horizontal"
-    android:background="@drawable/new_bg">
+    android:background="@drawable/important_bg">
 <ImageView 
   android:id="@+id/bgID"  
   android:layout_width="wrap_content"
