@@ -1,7 +1,5 @@
 package com.sky.opam.tool;
 
-import com.sky.opam.R.integer;
-
 import android.app.Application;
 
 public class MyApp extends Application{

@@ -129,11 +129,10 @@ public class LoginActivity extends Activity {
     // reponse au le update request
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	System.out.println("Login "+requestCode+" "+ resultCode);
-        if (resultCode == myApp.Update) {
+        if (resultCode == MyApp.Update) {
             finishActivity(requestCode);
             downloadCharge();
-        } else if (resultCode == myApp.Exit || resultCode == 0) {
+        } else if (resultCode == MyApp.Exit || resultCode == 0) {
             finish();
         }
     }

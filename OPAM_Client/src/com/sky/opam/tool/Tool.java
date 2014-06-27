@@ -6,10 +6,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import com.sky.opam.R;
-import com.sky.opam.R.string;
 import com.sky.opam.model.VersionInfo;
 
-import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;

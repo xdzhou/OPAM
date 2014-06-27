@@ -1,9 +1,5 @@
 package com.sky.opam;
 
-import java.util.Calendar;
-
-import com.sky.opam.R.integer;
-import com.sky.opam.fragment.WeekAgenda_Fragment;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -13,16 +9,12 @@ import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;

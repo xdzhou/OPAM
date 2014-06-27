@@ -47,8 +47,6 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	private List<float[]> flag = new ArrayList<float[]>();
 	private int SW;
 	private ClassInfoClickListener myClcLis;
-	private boolean timeOut = true;
-	private int cr = 4;
 	long d; // the distance of time now
 	private GestureDetector mGestureDetector;
 
@@ -82,7 +80,6 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		offset = dip2px(2);
 		r = dip2px(3);
 		l = dip2px(45);
-		cr = dip2px(4);
 		// mGestureDetector = new GestureDetector(getContext(), this);
 		linePaint.setColor(Color.BLUE);
 		linePaint.setStrokeWidth(dip2px(2));
@@ -260,7 +257,6 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		System.out.println("onSingleTapUp");
 		if (e.getX() > timeW) {
 			for (int i = 0; i < flag.size(); i++) {
 				float[] f = flag.get(i);

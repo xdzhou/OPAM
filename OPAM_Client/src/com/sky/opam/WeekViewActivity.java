@@ -144,10 +144,10 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == myApp.Refresh) {
+        if (resultCode == MyApp.Refresh) {
         	finish();
         	startActivityForResult(getIntent(), MyApp.rsqCode);
-        } else if (resultCode == myApp.Exit) {
+        } else if (resultCode == MyApp.Exit) {
         	setResult(MyApp.Exit);
             finish();
         }
