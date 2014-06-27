@@ -18,14 +18,14 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
             android:text="@string/time_range"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 		
         <TextView
             android:id="@+id/endTimeTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:text="19:00"
             android:layout_alignParentRight="true" />
 
@@ -36,7 +36,7 @@
             android:layout_alignBaseline="@+id/endTimeTV"
             android:layout_alignBottom="@+id/endTimeTV"
             android:layout_marginRight="15dp"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:layout_toLeftOf="@+id/endTimeTV"
             android:text="08:00" />
 
@@ -59,15 +59,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
-        	android:textSize="20dp"
+        	android:textSize="20sp"
             android:text="@string/calendar_auto_sync" />
 
         <ToggleButton
             android:id="@+id/autoSyncTB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="on/off" />
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
     
@@ -89,14 +88,13 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
             android:text="@string/auto_login"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
         <ToggleButton
             android:id="@+id/autoLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="on/off" />
+            android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
     
@@ -118,14 +116,13 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
             android:text="@string/auto_update_notify"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
         <ToggleButton
             android:id="@+id/autoUpdateNotify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="on/off" />
+            android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
     
@@ -138,11 +135,10 @@
         android:layout_marginTop="10dip" />
     
     <TextView
-        android:id="@+id/endTimeTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:text="@string/app_version" />
 
     <TextView
@@ -151,6 +147,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:text="unknown version"
-        android:textSize="15dp" />
+        android:textSize="15sp" />
   
 </LinearLayout> 

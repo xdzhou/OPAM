@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
-            android:textSize="25dp"
+            android:textSize="20dp"
             android:text="19:00"
             android:layout_alignParentRight="true" />
 
@@ -31,7 +31,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="30dp"
             android:text="08:00"
-            android:textSize="25dp" />
+            android:textSize="20dp" />
 
     </RelativeLayout>
 
@@ -85,6 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="15dp"
             android:text="@string/type"
             android:textColor="@color/chat_name" />
 
@@ -98,6 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="15dp"
             android:text="@string/room"
             android:textColor="@color/chat_name" />
 

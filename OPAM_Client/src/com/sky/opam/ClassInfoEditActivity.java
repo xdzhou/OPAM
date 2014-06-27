@@ -9,6 +9,7 @@ import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Room;
 import com.sky.opam.tool.DBworker;
+import com.sky.opam.tool.GoogleCalendarAPI;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 import com.sky.opam.view.ColorPickerAdapter;
@@ -16,6 +17,8 @@ import com.sky.opam.view.RangeSeekBar;
 import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
 
 import android.app.AlertDialog;
+import android.app.TimePickerDialog;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -39,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 public class ClassInfoEditActivity extends ActionBarActivity{
 	private DBworker worker;
@@ -88,10 +92,14 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		groupEditText.setText(classInfo.groupe);
 		
 		startTimeTV = (TextView) findViewById(R.id.startTimeTV);
+		startTimeTV.setId(0);
 		startTimeTV.setText(minTime);
+		startTimeTV.setOnClickListener(timePickListener);
 		
 		endTimeTV = (TextView)findViewById(R.id.endTimeTV);
+		endTimeTV.setId(1);
 		endTimeTV.setText(maxTime);
+		endTimeTV.setOnClickListener(timePickListener);
 		
 		//rangeSeekBar
 		LinearLayout classEditLayout = (LinearLayout)findViewById(R.id.classEditLayout);
@@ -189,7 +197,7 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 	private void setActionBar(){
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 	}
 	
@@ -228,8 +236,9 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 				classInfo.classType = worker.getClassType(((AddAdapter)typeSpinner.getAdapter()).getItem((int) typeSpinner.getSelectedItemId()));
 				classInfo.room = worker.getRoom(((AddAdapter)roomSpinner.getAdapter()).getItem((int) roomSpinner.getSelectedItemId()));
 				classInfo.bgColor = bgColor;
-				if(classInfo.id == -1) worker.addClassInfo(classInfo);
-				else worker.updateClassInfo(classInfo);
+				GoogleCalendarAPI googleCalendarAPI = new GoogleCalendarAPI(ClassInfoEditActivity.this);
+				if(classInfo.id == -1) worker.addClassInfo(classInfo);				
+				else worker.updateClassInfo(classInfo, googleCalendarAPI);
 				setResult(MyApp.Refresh);
 				finish();
 			}		
@@ -295,8 +304,34 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 				}
 			}				
 		});
-		
 		return builder;
 	}
-
+	
+	private View.OnClickListener timePickListener = new View.OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			final TextView tView = (TextView) v;
+			String[] hm = tView.getText().toString().split(":");
+			int hour = Integer.parseInt(hm[0]);
+			int min = Integer.parseInt(hm[1]);
+			TimePickerDialog timePickerDialog = new TimePickerDialog(ClassInfoEditActivity.this, new OnTimeSetListener(){
+				@Override
+				public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+					String timeSelect = hourOfDay+":"+minute;
+					try {
+						if(tView.getId() == 0){
+							rangeSeekBar.setSelectedMinValue(simpleFormat.parse(timeSelect).getTime());
+							startTimeTV.setText(simpleFormat.format(rangeSeekBar.getSelectedMinValue()));
+						}else {
+							rangeSeekBar.setSelectedMaxValue(simpleFormat.parse(timeSelect).getTime());
+							endTimeTV.setText(simpleFormat.format(rangeSeekBar.getSelectedMaxValue()));
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}			
+				}
+			}, hour, min, true);
+			timePickerDialog.show();
+		}
+	};
 }

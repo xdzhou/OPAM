@@ -144,6 +144,8 @@ public class LoginActivity extends Activity {
         	login = tfID.getText().toString();
         	if(login.equals(myApp.getLogin())){
         		password = tfMDP.getText().toString();
+        		//从weekViewActivity的更新命令 需要设置密码
+        		if(password.equals("")) password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
         	}else {
 				login = myApp.getLogin();
 				password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
@@ -151,7 +153,7 @@ public class LoginActivity extends Activity {
             AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
         } else {
-            Tool.showInfo(context, "Network is not available;");
+            Tool.showInfo(context, getResources().getString(R.string.network_unavailable));
         }
     }
 
@@ -159,7 +161,7 @@ public class LoginActivity extends Activity {
     private void askForUpdate() {
         new AlertDialog.Builder(this)
             .setTitle("update")
-            .setMessage("Your courses are a bit outdated, do you want to update ?")
+            .setMessage(R.string.update_classInfo_msg)
             .setPositiveButton(R.string.yes, onclick)
             .setNegativeButton(R.string.no, onclick).show();
     }

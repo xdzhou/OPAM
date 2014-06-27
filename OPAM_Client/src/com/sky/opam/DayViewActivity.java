@@ -35,10 +35,11 @@ public class DayViewActivity extends ActionBarActivity{
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
         
         int numWeek = (Integer) getIntent().getExtras().get("numWeek");
         int dayOfWeek = (Integer) getIntent().getExtras().get("dayOfWeek");
+        
         MyApp myApp = (MyApp)getApplication();
         String login = myApp.getLogin();
         DBworker worker = new DBworker(this);

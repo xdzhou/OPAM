@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+    
     <string name="welcome" >Welcome to OPAM</string>
     <string name="app_name" >OPAM</string>
     <string name="class_name" >Class Name</string>
@@ -11,7 +13,7 @@
     <string name="time_range" >Calendar Time Range</string>
     <string name="calendar_auto_sync" >Google Calendar Auto Sync</string>
     <string name="auto_login" >Auto-Login</string>
-    <string name="auto_update_notify" >New Version Notify</string>
+    <string name="auto_update_notify" >New Version Notification</string>
     <string name="app_version" >App version</string>
     <string name="time" >Time</string>
     <string name="ok" >OK</string>
@@ -40,9 +42,14 @@
     <string name="come_from" > come from </string>
     <string name="add" >add</string>
     <string name="new_version_feature" >new version feature</string>
-    <string name="app_update" >Update APP</string>
+    <string name="update_app" >Update APP</string>
+    <string name="update_classInfo_msg" >Courses outdated, do you want to download the new courses ?</string>
+    <string name="network_unavailable" >Network is not available</string>
+    <string name="zero_course" >Sorry, No class Info to share !</string>
+    <string name="downloading" >Downloading</string>
+    <string name="download_class_msg" >Please wait while loading the list of class...</string>
     <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"New week class view\",\"New account management, 
-        allowing multiple users to switch\",\"New courses modify / delete / add functions\",\"New feature to display user\u0027s photo\",
+        allowing multiple users to switch\",\"New courses modify / delete / add functions (long press on the agenda to trigger this function)\",\"New feature to display user\u0027s photo\",
         \"New feature to share a week\u0027s courses\",\"New settings interface, adjust the calendar time\"]}
 	</string>
 </resources>

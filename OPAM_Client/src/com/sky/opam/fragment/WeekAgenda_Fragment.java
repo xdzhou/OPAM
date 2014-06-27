@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 public class WeekAgenda_Fragment extends Fragment{
 	private int numWeek;
+	private int numClassInfo = 0;
 	private int startTime = 8;
 	private int endTime = 19;	
 	private float time_distance ;
@@ -205,6 +206,7 @@ public class WeekAgenda_Fragment extends Fragment{
 	public void setData(int position, List<ClassInfo> data){
 		if(position>=Calendar.MONDAY && position<=Calendar.FRIDAY){
 			dateMap.put(position, data);
+			numClassInfo += data.size();
 		}
 	}
 	/*
@@ -265,6 +267,7 @@ public class WeekAgenda_Fragment extends Fragment{
 				}else{
 					worker.delClassInfo(c.id);
 					v.removeClass(c);
+					numClassInfo--;
 					dialog.cancel();
 				}			
 			}
@@ -274,5 +277,8 @@ public class WeekAgenda_Fragment extends Fragment{
 
 	public int getNumWeek() {
 		return numWeek;
+	}
+	public int getNumClassInfo() {
+		return numClassInfo;
 	}
 }

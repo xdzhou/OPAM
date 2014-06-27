@@ -40,7 +40,7 @@
 	    android:completionThreshold="1"
 	    android:drawableLeft="@drawable/user_logo"
 	    android:ems="10"
-	    android:hint="login"
+	    android:hint="@string/login"
 	    android:maxLength="8"
 	    android:shadowColor="#ff0000"
 	    android:singleLine="true"

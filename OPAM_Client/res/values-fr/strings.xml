@@ -8,7 +8,7 @@
     <string name="type" >Type</string>
     <string name="room" >Salle</string>
     <string name="class_bg_color" >Couleur de fond</string>
-    <string name="time_range" >plage horaire d\'agenda</string>
+    <string name="time_range" >Plage horaire d\'agenda</string>
     <string name="calendar_auto_sync" >Google Agenda Auto Sync</string>
     <string name="auto_login" >Auto-Login</string>
     <string name="auto_update_notify" >Nouvelle Version Notification</string>
@@ -20,9 +20,9 @@
     <string name="login" >Identifiant</string>
     <string name="pw" >mot de passe</string>  
     <string name="today_class" >Cours d\'aujourd\'hui</string>
-    <string name="update" >Mise à jour</string>
+    <string name="update" >Mis à jour</string>
     <string name="account" >Compte</string>
-    <string name="setting" >paramètre</string>
+    <string name="setting" >Paramètre</string>
     <string name="exit" >Quit</string>
     <string name="edit_class" >Modifier Cours Info</string> 
     <string name="remove_class" >Supprimer Cours Info</string>
@@ -40,9 +40,14 @@
     <string name="come_from" > en provenance de </string>
     <string name="add" >ajouter</string>
     <string name="new_version_feature" >nouvelle version</string>
-    <string name="app_update" >Mis A Jour APP</string>
+    <string name="update_app" >Mis A Jour APP</string>
+    <string name="update_classInfo_msg" >Cours désuets, Télécharger les cours les plus recents?</string>
+    <string name="network_unavailable" >Réseau NON disponible</string>
+    <string name="zero_course" >Pas de cours A Partager !</string>
+    <string name="downloading" >Téléchargement</string>
+    <string name="download_class_msg" >Veuillez patienter pendant le téléchargement des cours...</string>
     <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"Afficher les cours d\u0027une semaine\",
-        \"gestion des comptes (multi-compte)\",\"modifier / supprimer / ajouter des cours\",
+        \"gestion des comptes (multi-compte)\",\"modifier / supprimer / ajouter des cours (appui long sur l\'agenda pour déclencher cette fonction)\",
         \"afficher l\u0027avatar d\u0027utilisateur\",\"partager des cours sur réseaux sociaux\",
         \"faciliter le gestion des paramètres d\u0027app\"]}
 	</string>

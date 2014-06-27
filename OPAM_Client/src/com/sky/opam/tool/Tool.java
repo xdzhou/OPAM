@@ -156,11 +156,7 @@ public class Tool {
 	public static int getDayOfWeek() {
 		Calendar c = Calendar.getInstance();
 		int xq = c.get(Calendar.DAY_OF_WEEK);
-		if (xq == 1) {
-			return 7;
-		} else {
-			return xq - 1;
-		}
+		return xq;
 	}
 	
 	/**
@@ -274,7 +270,7 @@ public class Tool {
 	public static AlertDialog.Builder showVersionInfoAndUpdate(final Context context, VersionInfo versionInfo){	
 		AlertDialog.Builder builder = showVersionInfo(context, versionInfo);
 		builder.setNegativeButton(R.string.no, null);
-		builder.setPositiveButton(R.string.app_update, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.update_app, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String appPackageName = context.getPackageName(); // getPackageName() from Context or Activity object

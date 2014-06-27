@@ -103,7 +103,7 @@ public class WeekViewActivity extends ActionBarActivity{
 	private void setActionBar(){
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, R.layout.date_dropdown_spinner_layout,getData());
@@ -218,6 +218,10 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	private void shareAgendaView(){
 		WeekAgenda_Fragment fragment = (WeekAgenda_Fragment) getSupportFragmentManager().findFragmentById(R.id.seul_fragement);
+		if(fragment.getNumClassInfo() == 0){
+			Tool.showInfo(WeekViewActivity.this, getResources().getString(R.string.zero_course));
+			return;
+		}
 		int fragmentNumWeek = fragment.getNumWeek();
 		View view = fragment.getView();
 		Bitmap bitmap = Tool.ViewToBitmap(view);

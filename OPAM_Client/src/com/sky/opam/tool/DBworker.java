@@ -291,7 +291,9 @@ public class DBworker {
         return insertData("CLASSINFO", cv);
     }
     
-    public void updateClassInfo(ClassInfo c) {
+    public void updateClassInfo(ClassInfo c, GoogleCalendarAPI googleCalendarAPI) {
+    	googleCalendarAPI.delEvent(c.eventId);
+    	c.eventId = 0;
         db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("login", c.login);
