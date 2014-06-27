@@ -35,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         			+ "login varchar(10) PRIMARY KEY,"
         			+ "startTime int,"
         			+ "endTime int,"
+        			+ "isAutoSync BOOLEAN,"
                     + "isDefaultUser BOOLEAN);");
         	//Table ClassInfo
         	db.execSQL("create table if not exists CLASSINFO ("

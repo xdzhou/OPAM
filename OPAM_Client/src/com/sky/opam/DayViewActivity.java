@@ -1,9 +1,5 @@
 package com.sky.opam;
 
-import java.util.Calendar;
-
-import com.sky.opam.R.integer;
-import com.sky.opam.fragment.WeekAgenda_Fragment;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -13,16 +9,12 @@ import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -35,10 +27,11 @@ public class DayViewActivity extends ActionBarActivity{
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
         
         int numWeek = (Integer) getIntent().getExtras().get("numWeek");
         int dayOfWeek = (Integer) getIntent().getExtras().get("dayOfWeek");
+        
         MyApp myApp = (MyApp)getApplication();
         String login = myApp.getLogin();
         DBworker worker = new DBworker(this);
@@ -57,10 +50,10 @@ public class DayViewActivity extends ActionBarActivity{
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		TextView tView = new TextView(this);
 		tView.setGravity(Gravity.CENTER);
-		tView.setTextSize(Tool.dip2px(this, 8));
+		tView.setTextSize(Tool.dip2px(this, 15));
 		int padding = Tool.dip2px(this, 5);
 		tView.setPadding(padding, padding, padding, padding);
-		tView.setText("Class of "+Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
+		tView.setText(Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
 		linearLayout.addView(tView);
 		linearLayout.addView(dayClassView);
 		scrollView.addView(linearLayout);

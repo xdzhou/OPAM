@@ -44,7 +44,8 @@
 
 			<TextView
 			    android:layout_width="wrap_content"
-			    android:text="Type:   "
+			    android:text="@string/type"
+			    android:layout_marginRight="10dp"
 			    android:textColor="#853a82" />
 
 			<TextView
@@ -59,7 +60,8 @@
             android:layout_height="wrap_content" >
 			<TextView
 			    android:layout_width="wrap_content"
-	      		android:text="Time:   "
+	      		android:text="@string/time"
+	      		android:layout_marginRight="10dp"
 	      		android:textColor="#853a82" />
 			<TextView
 			    android:id="@+id/classTime"
@@ -73,7 +75,8 @@
             android:layout_height="wrap_content" >
 			<TextView
 			    android:layout_width="wrap_content"
-	      		android:text="Group:   "
+	      		android:text="@string/group"
+	      		android:layout_marginRight="10dp"
 	      		android:textColor="#853a82" />
 			<TextView
 			    android:id="@+id/classGroup"
@@ -87,7 +90,8 @@
             android:layout_height="wrap_content" >
 			<TextView
 			    android:layout_width="wrap_content"
-	      		android:text="Room:   "
+	      		android:text="@string/room"
+	      		android:layout_marginRight="10dp"
 	      		android:textColor="#853a82" />
 			<TextView
 			    android:id="@+id/classRoom"
@@ -101,7 +105,8 @@
             android:layout_height="wrap_content" >
 			<TextView
 			    android:layout_width="wrap_content"
-	      		android:text="Teacher:   "
+	      		android:text="@string/teacher"
+	      		android:layout_marginRight="10dp"
 	      		android:textColor="#853a82" />
 			<TextView
 			    android:id="@+id/classTeacher"
@@ -118,7 +123,7 @@
             android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:text="  OK  " />
+            android:text="@string/ok" />
 
     </LinearLayout>
 </LinearLayout>

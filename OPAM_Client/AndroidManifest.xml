@@ -38,7 +38,12 @@
         <activity android:name="com.sky.opam.ClassInfoEditActivity"
             android:screenOrientation="portrait"
         	android:label="@string/app_name">
-        </activity>     
+        </activity> 
+        
+        <activity android:name="com.sky.opam.AppConfigActivity"
+            android:screenOrientation="portrait"
+        	android:label="@string/app_name">
+        </activity>
     </application>
     
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" ></uses-permission>
@@ -49,5 +54,7 @@
   	<uses-permission android:name="android.permission.WAKE_LOCK" ></uses-permission>
   	<uses-permission android:name="android.permission.READ_CALENDAR"/>   
 	<uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
   	
 </manifest>

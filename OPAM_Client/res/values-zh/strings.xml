@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome" >欢迎来到 OPAM</string>
+    <string name="app_name" >OPAM课程表</string>
+    <string name="class_name" >课程名称</string>
+    <string name="teacher" >老师</string>
+    <string name="group" >分组</string>
+    <string name="type" >类别</string>
+    <string name="room" >教室</string>
+    <string name="class_bg_color" >课程背景色</string>
+    <string name="time_range" >日历时间范围</string>
+    <string name="calendar_auto_sync" >谷歌日历同步</string>
+    <string name="auto_login" >自动登录</string>
+    <string name="auto_update_notify" >新版本自动提示</string>
+    <string name="app_version" >应用版本</string>
+    <string name="time" >时间</string>
+    <string name="ok" >好</string>
+    <string name="yes" >是</string>
+    <string name="no" >否</string>
+    <string name="login" >登录名</string>
+    <string name="pw" >密码</string>
+    <string name="today_class" >今日课程</string>
+    <string name="update" >课程更新</string>
+    <string name="account" >账户</string>
+    <string name="setting" >设置</string> 
+    <string name="exit" >退出</string>
+    <string name="edit_class" >编辑课程信息</string> 
+    <string name="remove_class" >删除课程</string>
+    <string name="free_time" >自由时间</string>
+    <string name="class_time" >课程时间</string> 
+    <string name="add_class" >添加课程信息</string>
+    <string name="account_del" >删除账户</string>
+    <string name="add_new_account" >添加新账户</string>
+    <string name="account_del_alert" >你真的想删除帐号</string>
+    <string name="login_null_alert" >请输入你的用户名!亲！</string>
+    <string name="pw_null_alert" >请输入你的密码!亲！</string>
+    <string name="share_title" >分享一周课程信息</string>
+    <string name="my_class_from" >我的课程信息从 </string>
+    <string name="to" > 到 </string>
+    <string name="come_from" > 来自 </string>
+    <string name="add" >添加</string>
+    <string name="new_version_feature" >新版本信息</string>
+    <string name="update_app" >应用升级</string>
+    <string name="update_classInfo_msg" >课程信息过时，需要下载最新课程嘛? 亲！</string>
+    <string name="network_unavailable" >网络不可用啊，亲！</string>
+    <string name="zero_course" >没有课程可以分享，创建几个吧，亲!</string>
+    <string name="downloading" >下载中</string>
+    <string name="download_class_msg" >正在努力下载课程中，请稍等，亲...</string>
+    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"新增一周课程视图\",
+        \"新增账户管理，允许多用户切换\",\"新增课程修改/删除/添加功能 (长按课程界面以触发此功能)\",\"新增显示用户头像功能\",
+        \"新增分享功能，把你的一周课程晒给小伙伴们\",\"全新设置界面，可调节日历时间范围\"]}
+	</string>
+</resources>

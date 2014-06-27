@@ -76,7 +76,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 
 	private void initia(Context context){
 		mGestureDetector = new GestureDetector(getContext(), this);
-		outLinePaint.setColor(Color.BLUE);
+		//outLinePaint.setColor(Color.BLUE);
+		outLinePaint.setColor(Color.argb(500, 0x33, 0xb5, 0xe5));
 		outLinePaint.setStrokeWidth(Tool.dip2px(context, 1));
 		selectePaint.setColor(Color.argb(100, 0xff, 0, 0));
 		selectePaint.setStrokeWidth(Tool.dip2px(context, 3));
@@ -197,10 +198,9 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 			String vocationStartTime, vocationEndTime;
 			if(class_list.size()==0) {
 				enableSelectDraw(0,(endTime-startTime)*time_distance);
-				myLongPressListener.onLongPressEvent(this,
-					null, 
-					(startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00"),
-					(endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00"));
+				myLongPressListener.onLongPressEvent(this, null, 
+					Tool.getTime(startTime),
+					Tool.getTime(endTime));
 			}
 			
 			for(int i=0; i<class_list.size(); i++){
@@ -211,7 +211,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 					float previousP;
 					if(i-1 == -1) {
 						previousP = 0f;
-						vocationStartTime = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
+						vocationStartTime = Tool.getTime(startTime);
 					}else {
 						vocationStartTime = class_list.get(i-1).endTime;
 						previousP = getTimeDistance(vocationStartTime);
@@ -223,16 +223,16 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 					}
 				}else if (startP < e.getY() && e.getY() < endP) {
 					enableSelectDraw(startP, endP);
-					if(i-1 < 0) vocationStartTime = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
+					if(i-1 < 0) vocationStartTime = Tool.getTime(startTime);
 					else vocationStartTime = class_list.get(i-1).endTime;
-					if(i+1 >= class_list.size()) vocationEndTime = (endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00");
+					if(i+1 >= class_list.size()) vocationEndTime = Tool.getTime(endTime);
 					else vocationEndTime = class_list.get(i+1).startTime;
 					myLongPressListener.onLongPressEvent(this, c, vocationStartTime, vocationEndTime);
 					break;
 				}else {
 					float nestP;
 					if(i == class_list.size()-1) {
-						vocationEndTime = (endTime < 10) ? ("0" + endTime + ":00"): (endTime + ":00");
+						vocationEndTime = Tool.getTime(endTime);
 						nestP = getTimeDistance(vocationEndTime);			
 					}else {
 						vocationEndTime = class_list.get(i+1).startTime;

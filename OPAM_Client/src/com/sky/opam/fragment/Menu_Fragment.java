@@ -1,6 +1,7 @@
 package com.sky.opam.fragment;
 
 import com.sky.opam.AccountActivity;
+import com.sky.opam.AppConfigActivity;
 import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
 import com.sky.opam.task.DownloadImageTask;
@@ -39,12 +40,13 @@ public class Menu_Fragment extends ListFragment{
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
-		adapter.add(new MenuItemContent("Today's Class", android.R.drawable.ic_menu_compass));
-		adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
-		adapter.add(new MenuItemContent("Update", android.R.drawable.ic_menu_rotate));
-		adapter.add(new MenuItemContent("Account", android.R.drawable.ic_menu_myplaces));
-		//adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_lock_power_off));
-		adapter.add(new MenuItemContent("Exit", android.R.drawable.ic_menu_close_clear_cancel));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.today_class), android.R.drawable.ic_menu_compass));
+		//adapter.add(new MenuItemContent("Course Info", android.R.drawable.ic_menu_view));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.update), android.R.drawable.ic_menu_rotate));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.account), android.R.drawable.ic_menu_myplaces));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.setting), android.R.drawable.ic_menu_manage));
+		adapter.add(new MenuItemContent(getResources().getString(R.string.exit), android.R.drawable.ic_menu_close_clear_cancel));
+		
 		setListAdapter(adapter);
 	}
 	
@@ -63,10 +65,9 @@ public class Menu_Fragment extends ListFragment{
 		}
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				if(position == 0) convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile_item_view, null);
-				else convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_item_view, null);
-			}
+			if(convertView!=null) return convertView;
+			if(position == 0) convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile_item_view, null);
+			else convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_item_view, null);
 			ImageView icon = (ImageView) convertView.findViewById(R.id.imageview);
 			icon.setImageResource(getItem(position).iconRes);
 			TextView title = (TextView) convertView.findViewById(R.id.textview);
@@ -74,7 +75,7 @@ public class Menu_Fragment extends ListFragment{
 			
 			if(position == 0) new DownloadImageTask(icon).execute("http://trombi.it-sudparis.eu/photo.php?uid="+login+"&h=80&w=80");
 				
-			return convertView;
+			return convertView;			
 		}
 	}
 
@@ -89,13 +90,15 @@ public class Menu_Fragment extends ListFragment{
 	        intent.putExtras(bundle);      
 	        startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 2) {
-			
-		}else if (position == 3) {
 			getActivity().setResult(MyApp.Update);
 			getActivity().finish();
-		}else if (position == 4) {
+		}else if (position == 3) {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), AccountActivity.class);
+			getActivity().startActivityForResult(intent, MyApp.rsqCode);
+		}else if (position == 4) {
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), AppConfigActivity.class);
 			getActivity().startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 5){
 			getActivity().setResult(MyApp.Exit);

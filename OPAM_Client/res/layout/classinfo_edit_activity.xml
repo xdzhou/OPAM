@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Class Name" />
+        android:hint="@string/class_name" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,8 +20,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
-            android:textSize="25dp"
+            android:textSize="20dp"
             android:text="19:00"
+            android:background="@drawable/important_bg"
             android:layout_alignParentRight="true" />
 
         <TextView
@@ -31,7 +32,8 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="30dp"
             android:text="08:00"
-            android:textSize="25dp" />
+            android:background="@drawable/important_bg"
+            android:textSize="20dp" />
 
     </RelativeLayout>
 
@@ -44,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:textStyle="bold"
-            android:text="Teacher"
+            android:text="@string/teacher"
             android:textSize="@dimen/edit_text_size" />
 
         <EditText
@@ -65,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:textStyle="bold"
-            android:text="Group"
+            android:text="@string/group"
             android:textSize="@dimen/edit_text_size" />
 
         <EditText
@@ -85,7 +87,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Type"
+            android:textSize="15dp"
+            android:text="@string/type"
             android:textColor="@color/chat_name" />
 
         <Spinner
@@ -98,7 +101,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Room"
+            android:textSize="15dp"
+            android:text="@string/room"
             android:textColor="@color/chat_name" />
 
         <Spinner
@@ -112,7 +116,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:text="Class background"
+            android:text="@string/class_bg_color"
             android:textSize="@dimen/edit_text_size" />
 
     <GridView

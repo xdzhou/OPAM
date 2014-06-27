@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 public class WeekAgenda_Fragment extends Fragment{
 	private int numWeek;
+	private int numClassInfo = 0;
 	private int startTime = 8;
 	private int endTime = 19;	
 	private float time_distance ;
@@ -68,6 +69,7 @@ public class WeekAgenda_Fragment extends Fragment{
 		for(int i=0; i<tab_title.length; i++){
 			tab_title[i] += Tool.getDateViaNumWeek(numWeek, i+Calendar.MONDAY).substring(3, 5);
 		}
+
 	}
 	
 	@Override
@@ -114,12 +116,13 @@ public class WeekAgenda_Fragment extends Fragment{
         	dView.setMyLongPressListener(dayViewLongPressListener);
         	dView.setClickListener(classInfoClickListener);
         	dView.addClass(dateMap.get(i+Calendar.MONDAY));
-        	if(myApp.getCurrentWeekNum() == numWeek && Tool.getDayOfWeek()==i+1) dView.setBackgroundColor(Color.LTGRAY);
+        	if(myApp.getCurrentWeekNum() == numWeek && Tool.getDayOfWeek()==i+Calendar.MONDAY) dView.setBackgroundColor(Color.LTGRAY);
         	innerLayout.addView(dView);
 		}
 		
 		group_view.addView(tabLayout);
 		group_view.addView(agendaLayout);
+		//group_view.buildDrawingCache();
 		return group_view;
 	}
 	
@@ -203,15 +206,17 @@ public class WeekAgenda_Fragment extends Fragment{
 	public void setData(int position, List<ClassInfo> data){
 		if(position>=Calendar.MONDAY && position<=Calendar.FRIDAY){
 			dateMap.put(position, data);
+			numClassInfo += data.size();
 		}
 	}
 	/*
 	 * 
 	 */
 	private void createEventDialog(final DayTabClassView v, final String vocationStartTime, final String vocationEndTime){
-		String[] mItems = {"Add Event"};
+		String[] mItems = {getResources().getString(R.string.add_class)};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle("Free Time: "+vocationStartTime+" - "+vocationEndTime);
+		builder.setIcon(android.R.drawable.ic_menu_info_details);
+		builder.setTitle(getResources().getString(R.string.free_time)+": "+vocationStartTime+" - "+vocationEndTime);
 		builder.setOnCancelListener(new OnCancelListener() {			
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -237,9 +242,10 @@ public class WeekAgenda_Fragment extends Fragment{
 	}
 	
 	private void EventEditDialog(final DayTabClassView v, final ClassInfo c, final String vocationStartTime, final String vocationEndTime){
-		String[] mItems = {"Edit Event", "Remove Event"};
+		String[] mItems = {getResources().getString(R.string.edit_class), getResources().getString(R.string.remove_class)};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle("Class Time: "+c.startTime+" - "+c.endTime);
+		builder.setIcon(android.R.drawable.ic_menu_info_details);
+		builder.setTitle(getResources().getString(R.string.class_time)+": "+c.startTime+" - "+c.endTime);
 		builder.setOnCancelListener(new OnCancelListener() {			
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -261,6 +267,7 @@ public class WeekAgenda_Fragment extends Fragment{
 				}else{
 					worker.delClassInfo(c.id);
 					v.removeClass(c);
+					numClassInfo--;
 					dialog.cancel();
 				}			
 			}
@@ -268,4 +275,10 @@ public class WeekAgenda_Fragment extends Fragment{
 		builder.create().show();
 	}
 
+	public int getNumWeek() {
+		return numWeek;
+	}
+	public int getNumClassInfo() {
+		return numClassInfo;
+	}
 }

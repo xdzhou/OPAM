@@ -23,6 +23,7 @@
         android:id="@+id/del_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:focusable="false"
         android:padding="3dp" />

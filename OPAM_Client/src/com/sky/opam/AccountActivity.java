@@ -12,12 +12,12 @@ public class AccountActivity extends FragmentActivity{
     public void onCreate(Bundle savedInstanceState) {
 		System.out.println("AccountActivity created");
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.seul_fragment_activity);
+        setContentView(R.layout.seul_fragment);
         
         Account_Fragment fragment = new Account_Fragment();
         
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.agenda_fragement,fragment);
+		ft.replace(R.id.seul_fragement,fragment);
 		ft.commit();
 	}
 

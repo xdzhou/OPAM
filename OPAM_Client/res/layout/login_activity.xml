@@ -4,7 +4,7 @@
     android:layout_height="wrap_content" 
     android:layout_width="match_parent"
     android:gravity="center_vertical|center_horizontal"
-    android:background="@drawable/new_bg">
+    android:background="@drawable/important_bg">
 <ImageView 
   android:id="@+id/bgID"  
   android:layout_width="wrap_content"
@@ -18,7 +18,7 @@
     android:layout_alignBottom="@+id/bgID"
     android:layout_alignParentLeft="true"
     android:gravity="center_horizontal"
-    android:text="@string/title"
+    android:text="@string/welcome"
     android:textColor="#2125e2"
     android:textSize="20sp" />
 
@@ -36,11 +36,11 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
-	    android:completionHint="login"
+	    android:completionHint="@string/login"
 	    android:completionThreshold="1"
 	    android:drawableLeft="@drawable/user_logo"
 	    android:ems="10"
-	    android:hint="login"
+	    android:hint="@string/login"
 	    android:maxLength="8"
 	    android:shadowColor="#ff0000"
 	    android:singleLine="true"
@@ -59,7 +59,7 @@
 	    android:layout_marginTop="20dp"
 	    android:drawableLeft="@drawable/password_logo"
 	    android:ems="10"
-	    android:hint="password"
+	    android:hint="@string/pw"
 	    android:inputType="textPassword"
 	    android:textColor="@color/black"
 	    android:textCursorDrawable="@null"
@@ -72,7 +72,7 @@
 	    android:layout_alignRight="@+id/txtMDP"
 	    android:layout_below="@+id/txtMDP"
 	    android:layout_marginTop="20dp"
-	    android:text=" OK "
+	    android:text="@string/ok"
 	    android:textColor="@color/black" />
 
 </RelativeLayout>

@@ -59,8 +59,8 @@ public class AgendaDownloadTask extends AsyncTask<String, Void, String>{
             }
         });
         pdialog.setIcon(android.R.drawable.ic_popup_sync);
-        pdialog.setTitle("Downloading");
-        pdialog.setMessage("Please wait while loading the list of class...");
+        pdialog.setTitle(R.string.downloading);
+        pdialog.setMessage(context.getResources().getString(R.string.download_class_msg));
 	}
 	
 	@Override
