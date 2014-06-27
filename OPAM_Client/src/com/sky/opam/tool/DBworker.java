@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.sky.opam.R.integer;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Config;
@@ -151,6 +150,12 @@ public class DBworker {
 	    }
 	    cursor.close();
 	    db.close();
+	    if(rooms.size()==0) {
+	    	Room r = new Room();
+	    	r.name = "E001";
+	    	r.id = addGetRoom(r);
+	    	rooms.add(r);
+	    }
 	    return rooms;
     }
     
@@ -221,6 +226,12 @@ public class DBworker {
 	    }
 	    cursor.close();
 	    db.close();
+	    if(list.size()==0) {
+	    	ClassType ct = new ClassType();
+	    	ct.name = "Examen";
+	    	ct.id = addGetClassType(ct);
+	    	list.add(ct);
+	    }
 	    return list;
     }
     public ClassType getClassType(long id){
@@ -420,7 +431,7 @@ public class DBworker {
         db.close();
     }
     
-    //指示App配置
+    //指示App配置 自动登录  自动提示升级信息
     public void setAutoLogin(Context context, boolean b){
     	context.getSharedPreferences("share", 0).edit().putBoolean("autoLogin", b).commit();    	
     }
@@ -437,16 +448,7 @@ public class DBworker {
     public boolean getAutoUpdateNotify(Context context){
     	SharedPreferences pref = context.getSharedPreferences("share", 0); 
 		return pref.getBoolean("autoUpdateNotify", true);
-    }
-    
-    private void createRootConfigIfNotExist(){
-    	Config config = getConfig("root");
-    	if(config == null){
-    		db = helper.getWritableDatabase();
-    		db.execSQL("insert into CONFIG values (?,?,?,?,?)", new Object[] { "root", 0, 0, 1, 1});
-        	db.close();
-    	}  	
-    }
+    }   
 
     //////////////////////////////////////////////////////////
     private long insertData (String tableName, ContentValues cv){

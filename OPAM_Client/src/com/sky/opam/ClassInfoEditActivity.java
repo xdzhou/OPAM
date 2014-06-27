@@ -155,7 +155,7 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		List<Room> room_list = worker.getAllRoom();
 		for(int i=0; i<room_list.size(); i++){
 			Room room = room_list.get(i);
-			if(room.name.equals(classInfo.room.name)) roomSelecteID = i;
+			if(classInfo.room!=null && room.name.equals(classInfo.room.name)) roomSelecteID = i;
 			roomAdapter.add(room.name);
 		}
 		roomAdapter.add(getResources().getString(R.string.add)+" "+getResources().getString(R.string.room));
@@ -248,7 +248,7 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 			String itemString = getItem(position);
 			tv.setText(itemString);
 			if(position == getCount()-1 ){
-				tv.setBackgroundColor(Color.RED);
+				tv.setBackgroundColor(Color.GRAY);
 			}
 			return convertView;
 		}

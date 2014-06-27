@@ -19,6 +19,7 @@ import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -94,7 +95,8 @@ public class WeekViewActivity extends ActionBarActivity{
 			Bundle b = msg.getData();
 			String vInfo = b.getString("versionInfo");
 			VersionInfo versionInfo = (VersionInfo)new Gson().fromJson(vInfo, VersionInfo.class);
-			Tool.showVersionInfo(WeekViewActivity.this, versionInfo);
+			AlertDialog.Builder builder = Tool.showVersionInfoAndUpdate(WeekViewActivity.this, versionInfo);
+			builder.show();
 		} 	
     }
 	

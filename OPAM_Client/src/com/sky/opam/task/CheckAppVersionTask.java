@@ -81,7 +81,6 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
 	
 	private String getVersionInfo() throws FailException{
 		String localLanguage = Tool.getLocalLanguage();
-		//System.out.println(localLanguage);
 		HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para="+localLanguage);
         try {

@@ -58,7 +58,8 @@ public class LoginActivity extends Activity {
         	worker.setAutoLogin(context, false);
             VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_10_info), VersionInfo.class);
             getSharedPreferences("share", 0).edit().putBoolean("isFirstIn", false).commit(); 
-            Tool.showVersionInfo(context, versionInfo);
+            AlertDialog.Builder builder = Tool.showVersionInfo(context, versionInfo);
+            builder.show();
         }       
         
         Button monBtn = (Button) findViewById(R.id.btnVAD);
@@ -79,8 +80,7 @@ public class LoginActivity extends Activity {
             login = fUser.getLogin();
             myApp.setLogin(login);  
             tfID.setText(fUser.getLogin());
-            tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));
-            
+            //tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));         
             if(worker.getAutoLogin(context)){
             	if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) WeekAgendaShow(myApp.getCurrentWeekNum());
             	else askForUpdate();
