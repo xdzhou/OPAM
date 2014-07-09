@@ -10,7 +10,8 @@ import com.sky.opam.R;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Util;
+import com.sky.opam.tool.AndroidUtil;
+import com.sky.opam.tool.TimeUtil;
 import com.sky.opam.view.DayTabClassView;
 import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 import com.sky.opam.view.DayTabClassView.DayViewLongPressListener;
@@ -64,10 +65,10 @@ public class WeekAgenda_Fragment extends Fragment{
 		
 		myApp = (MyApp)getActivity().getApplication();
 		Resources res = getActivity().getResources();
-		title_hight = Util.dip2px(getActivity(),res.getInteger(R.integer.title_hight));
+		title_hight = AndroidUtil.dip2px(getActivity(),res.getInteger(R.integer.title_hight));
 		
 		for(int i=0; i<tab_title.length; i++){
-			tab_title[i] += Util.getDateViaNumWeek(numWeek, i+Calendar.MONDAY).substring(3, 5);
+			tab_title[i] += TimeUtil.getDateViaNumWeek(numWeek, i+Calendar.MONDAY).substring(3, 5);
 		}
 
 	}
@@ -85,7 +86,7 @@ public class WeekAgenda_Fragment extends Fragment{
 		tiView.setStartTime(startTime);
 		tiView.setEndTime(endTime);
 		float tiView_width = tiView.getViewWidth();
-		day_view_width = (Util.getScreenWidth(getActivity()) - tiView_width)/5; 
+		day_view_width = (AndroidUtil.getScreenWidth(getActivity()) - tiView_width)/5; 
 		TextView tv = new TextView(context);
 		tv.setGravity(Gravity.CENTER);
 		tv.setWidth((int)tiView_width);
@@ -116,7 +117,7 @@ public class WeekAgenda_Fragment extends Fragment{
         	dView.setMyLongPressListener(dayViewLongPressListener);
         	dView.setClickListener(classInfoClickListener);
         	dView.addClass(dateMap.get(i+Calendar.MONDAY));
-        	if(myApp.getCurrentWeekNum() == numWeek && Util.getDayOfWeek()==i+Calendar.MONDAY) dView.setBackgroundColor(Color.LTGRAY);
+        	if(myApp.getCurrentWeekNum() == numWeek && TimeUtil.getDayOfWeek()==i+Calendar.MONDAY) dView.setBackgroundColor(Color.LTGRAY);
         	innerLayout.addView(dView);
 		}
 		

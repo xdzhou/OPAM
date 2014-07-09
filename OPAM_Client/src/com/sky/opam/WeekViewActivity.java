@@ -17,7 +17,9 @@ import com.sky.opam.task.AgendaSyncTask;
 import com.sky.opam.task.CheckAppVersionTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Util;
+import com.sky.opam.tool.AndroidUtil;
+import com.sky.opam.tool.OpamUtil;
+import com.sky.opam.tool.TimeUtil;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -95,7 +97,7 @@ public class WeekViewActivity extends ActionBarActivity{
 			Bundle b = msg.getData();
 			String vInfo = b.getString("versionInfo");
 			VersionInfo versionInfo = (VersionInfo)new Gson().fromJson(vInfo, VersionInfo.class);
-			AlertDialog.Builder builder = Util.showVersionInfoAndUpdate(WeekViewActivity.this, versionInfo);
+			AlertDialog.Builder builder = OpamUtil.showVersionInfoAndUpdate(WeekViewActivity.this, versionInfo);
 			builder.show();
 		} 	
     }
@@ -119,8 +121,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	private List<String> getData(){      
         List<String> data = new ArrayList<String>();
-        data.add(Util.getDateViaNumWeek(numWeek, Calendar.MONDAY)+" - "+Util.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
-        data.add(Util.getDateViaNumWeek(numWeek+1, Calendar.MONDAY)+" - "+Util.getDateViaNumWeek(numWeek+1, Calendar.FRIDAY));        
+        data.add(TimeUtil.getDateViaNumWeek(numWeek, Calendar.MONDAY)+" - "+TimeUtil.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
+        data.add(TimeUtil.getDateViaNumWeek(numWeek+1, Calendar.MONDAY)+" - "+TimeUtil.getDateViaNumWeek(numWeek+1, Calendar.FRIDAY));        
         return data;
     }
 	
@@ -131,7 +133,7 @@ public class WeekViewActivity extends ActionBarActivity{
         b.putInt("startTime", currentUserConfig.startTime);
 		b.putInt("endTime", currentUserConfig.endTime);
 		b.putInt("numWeek", weekN);
-		float time_distance = Util.dip2px(this,50);
+		float time_distance = AndroidUtil.dip2px(this,50);
 		b.putFloat("time_distance", time_distance);
 		fragment.setArguments(b);
 		
@@ -190,7 +192,7 @@ public class WeekViewActivity extends ActionBarActivity{
 	    if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
                 if ((System.currentTimeMillis() - exitTime) > 2000) {
-                	Util.showInfo(this, "one more time to exit");
+                	AndroidUtil.showInfo(this, "one more time to exit");
                     exitTime = System.currentTimeMillis();
                 } else {
                     setResult(MyApp.Exit);
@@ -219,12 +221,12 @@ public class WeekViewActivity extends ActionBarActivity{
 	private void shareAgendaView(){
 		WeekAgenda_Fragment fragment = (WeekAgenda_Fragment) getSupportFragmentManager().findFragmentById(R.id.seul_fragement);
 		if(fragment.getNumClassInfo() == 0){
-			Util.showInfo(WeekViewActivity.this, getResources().getString(R.string.zero_course));
+			AndroidUtil.showInfo(WeekViewActivity.this, getResources().getString(R.string.zero_course));
 			return;
 		}
 		int fragmentNumWeek = fragment.getNumWeek();
 		View view = fragment.getView();
-		Bitmap bitmap = Util.ViewToBitmap(view);
+		Bitmap bitmap = AndroidUtil.ViewToBitmap(view);
 		
 		String imgPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "opam.jpg";
 		File document = new File(imgPath);
@@ -243,9 +245,9 @@ public class WeekViewActivity extends ActionBarActivity{
 		intent.putExtra(Intent.EXTRA_STREAM, uri);
 		StringBuilder sBuilder = new StringBuilder();
 		sBuilder.append(getResources().getString(R.string.my_class_from));
-		sBuilder.append(Util.getDateViaNumWeek(numWeek, Calendar.MONDAY));
+		sBuilder.append(TimeUtil.getDateViaNumWeek(numWeek, Calendar.MONDAY));
 		sBuilder.append(getResources().getString(R.string.to));
-		sBuilder.append(Util.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
+		sBuilder.append(TimeUtil.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
 		sBuilder.append(" (");
 		sBuilder.append(getResources().getString(R.string.come_from));
 		sBuilder.append(getResources().getString(R.string.app_name));

@@ -11,7 +11,7 @@ import com.sky.opam.model.Room;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.GoogleCalendarAPI;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Util;
+import com.sky.opam.tool.AndroidUtil;
 import com.sky.opam.view.ColorPickerAdapter;
 import com.sky.opam.view.RangeSeekBar;
 import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -226,7 +226,7 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 			finish();
 		}else if (menu.getTitle().equals("save")) {
 			String name = nameEditText.getText().toString();
-			if(name==null || name.equals("")) Util.showInfo(this, "input the class name, please!");
+			if(name==null || name.equals("")) AndroidUtil.showInfo(this, "input the class name, please!");
 			else {
 				classInfo.name = nameEditText.getText().toString();
 				classInfo.startTime = startTimeTV.getText().toString();
@@ -287,7 +287,7 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 			public void onClick(DialogInterface dialog, int which) {
 				String info = newInfoET.getText().toString();
 				if(info.equals("")) {
-					Util.showInfo(ClassInfoEditActivity.this, " NULL ");
+					AndroidUtil.showInfo(ClassInfoEditActivity.this, " NULL ");
 					if(flag == 0) typeSpinner.setSelection(0);
 					else roomSpinner.setSelection(0);
 				}

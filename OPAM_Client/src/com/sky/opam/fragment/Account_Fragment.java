@@ -8,7 +8,7 @@ import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Util;
+import com.sky.opam.tool.AndroidUtil;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -70,7 +70,7 @@ public class Account_Fragment extends ListFragment{
 	}
 	
 	public class AccountAdapter extends ArrayAdapter<AccountItemContent> {
-		private int imageSize = Util.dip2px(getContext(), 60);
+		private int imageSize = AndroidUtil.dip2px(getContext(), 60);
 		
 		public AccountAdapter(Context context) {
 			super(context, 0);
@@ -112,11 +112,11 @@ public class Account_Fragment extends ListFragment{
 					newLogin = loginET.getText().toString();
 					String password = pwET.getText().toString();
                     if (newLogin.length() == 0)
-                        Util.showInfo(getActivity(),getResources().getString(R.string.login_null_alert));
+                        AndroidUtil.showInfo(getActivity(),getResources().getString(R.string.login_null_alert));
                     else if (password.length() == 0)
-                    	Util.showInfo(getActivity(),getResources().getString(R.string.pw_null_alert));
+                    	AndroidUtil.showInfo(getActivity(),getResources().getString(R.string.pw_null_alert));
                     else if (worker.isLoginExist(newLogin))
-                    	Util.showInfo(getActivity(),"Login Exist !");
+                    	AndroidUtil.showInfo(getActivity(),"Login Exist !");
                     else {
                     	dialog.dismiss();
     					AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(getActivity(), new AgendaHandler());
@@ -147,7 +147,7 @@ public class Account_Fragment extends ListFragment{
 			}else {
 				Bundle b = msg.getData();
 				String errorMsg = b.getString("error");
-				Util.showInfo(getActivity(), errorMsg);
+				AndroidUtil.showInfo(getActivity(), errorMsg);
 			}		
 		} 	
     }

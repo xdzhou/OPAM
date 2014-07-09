@@ -8,7 +8,9 @@ import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Util;
+import com.sky.opam.tool.AndroidUtil;
+import com.sky.opam.tool.OpamUtil;
+import com.sky.opam.tool.TimeUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -48,17 +50,17 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.login_activity);
         context = this;
         myApp = (MyApp) getApplication();
-        myApp.setCurrentWeekNum(Util.getNumWeek());
+        myApp.setCurrentWeekNum(TimeUtil.getNumWeek());
         worker = new DBworker(context);
         
         //First Use App, show Version Info
         boolean oldAutoLoginFlag = worker.getAutoLogin(context);
-        boolean isFirstUse = Util.isFirstUseApp(context);
+        boolean isFirstUse = OpamUtil.isFirstUseApp(context);
         if(isFirstUse){
         	worker.setAutoLogin(context, false);
             VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_10_info), VersionInfo.class);
             getSharedPreferences("share", 0).edit().putBoolean("isFirstIn", false).commit(); 
-            AlertDialog.Builder builder = Util.showVersionInfo(context, versionInfo);
+            AlertDialog.Builder builder = OpamUtil.showVersionInfo(context, versionInfo);
             builder.show();
         }       
         
@@ -94,9 +96,9 @@ public class LoginActivity extends Activity {
                 password = tfMDP.getText().toString();
 
                 if (login.length() == 0)
-                    Util.showInfo(context,getResources().getString(R.string.login_null_alert));
+                    AndroidUtil.showInfo(context,getResources().getString(R.string.login_null_alert));
                 else if (password.length() == 0)
-                	Util.showInfo(context,getResources().getString(R.string.pw_null_alert));
+                	AndroidUtil.showInfo(context,getResources().getString(R.string.pw_null_alert));
                 else {
                     currentUser = worker.getUser(login);
                     myApp.setLogin(login);
@@ -106,7 +108,7 @@ public class LoginActivity extends Activity {
                         worker.setDefaultUser(currentUser.getLogin());
                         String mdp = Chiffrement.decrypt(currentUser.getPasswoed(),"OPAM");
                         if (!mdp.equals(password)) {
-                            Util.showInfo(context,"Password incorrect.");
+                            AndroidUtil.showInfo(context,"Password incorrect.");
                         } else {
                             if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) {
                                 WeekAgendaShow(myApp.getCurrentWeekNum());
@@ -134,7 +136,7 @@ public class LoginActivity extends Activity {
 
     // download the course
     private void downloadCharge() {
-        if (Util.isNetworkAvailable(context)) {
+        if (AndroidUtil.isNetworkAvailable(context)) {
         	login = tfID.getText().toString();
         	if(login.equals(myApp.getLogin())){
         		password = tfMDP.getText().toString();
@@ -147,7 +149,7 @@ public class LoginActivity extends Activity {
             AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
         } else {
-            Util.showInfo(context, getResources().getString(R.string.network_unavailable));
+            AndroidUtil.showInfo(context, getResources().getString(R.string.network_unavailable));
         }
     }
 
@@ -168,7 +170,7 @@ public class LoginActivity extends Activity {
                 WeekAgendaShow(currentUser.getNumWeekUpdated());
                 break;
             case Dialog.BUTTON_NEUTRAL:
-                Util.showInfo(context,"unknow choise...");
+                AndroidUtil.showInfo(context,"unknow choise...");
                 break;
             case Dialog.BUTTON_POSITIVE:
                 downloadCharge();
@@ -192,7 +194,7 @@ public class LoginActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN) {
             if ((System.currentTimeMillis() - exitTime) > 2000) {
-                Util.showInfo(context, "on more time to exit");
+                AndroidUtil.showInfo(context, "on more time to exit");
                 exitTime = System.currentTimeMillis();
             } else {
                 finish();
@@ -213,7 +215,7 @@ public class LoginActivity extends Activity {
 			}else {
 				Bundle b = msg.getData();
 				String errorMsg = b.getString("error");
-				Util.showInfo(context, errorMsg);
+				AndroidUtil.showInfo(context, errorMsg);
 			}		
 		} 	
     }

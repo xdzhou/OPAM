@@ -1,19 +1,12 @@
 package com.sky.opam.tool;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import com.sky.opam.R;
-import com.sky.opam.model.VersionInfo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
@@ -22,14 +15,17 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Looper;
+import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class Util {
+public class AndroidUtil {
 	/**
      * 检测网络是否可用
      * 
@@ -72,8 +68,15 @@ public class Util {
      * @param msg    
      * 			显示的信息 
      */
-	public static void showInfo(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+	public static void showInfo(final Context context, final String msg) {
+        new Thread(new Runnable() {		
+			@Override
+			public void run() {
+				Looper.prepare();
+				Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+				Looper.loop();
+			}
+		}).start();
 	}
 	
 	/**
@@ -99,63 +102,6 @@ public class Util {
         view.draw(canvas);
         return bitmap;
 	} 
-	
-	/**
-     * 得到当前的周数（一年中的第几周）
-     * 
-     */
-	public static int getNumWeek() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        int xq = c.get(Calendar.DAY_OF_WEEK);
-        if (xq == 1) {
-                c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        sdf.applyPattern("w");
-        return Integer.parseInt(sdf.format(c.getTime()));
-	}
-	
-	/**
-     * 得到日期（月/日）
-     * 
-     * @param numweek
-     *          得到当前的周数
-     * @param dayOfWeek
-     * 			星期几
-     */
-	public static String getDateViaNumWeek(int numweek, int dayOfWeek) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.WEEK_OF_YEAR, numweek);
-		cal.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-		cal.set(Calendar.WEEK_OF_YEAR, numweek);
-		int num = cal.get(Calendar.MONTH) + 1;
-
-		String date = (num < 10) ? "0" + num : "" + num;
-		date += "/";
-		num = cal.get(Calendar.DAY_OF_MONTH);
-		date += (num < 10) ? "0" + num : "" + num;
-		return date;
-	}
-	
-	/**
-     * 得到公元多少年
-     * 
-     */
-	public static int getYear() {
-		Calendar cal = Calendar.getInstance();
-		return cal.get(Calendar.YEAR);
-	}
-	
-	/**
-     * 星期几
-     * 
-     */
-	public static int getDayOfWeek() {
-		Calendar c = Calendar.getInstance();
-		int xq = c.get(Calendar.DAY_OF_WEEK);
-		return xq;
-	}
 	
 	/**
      * 把 dip 数值转换为 px（像素值）
@@ -192,16 +138,6 @@ public class Util {
 		WindowManager manager = activity.getWindowManager();
 		Display display = manager.getDefaultDisplay();
 		return display.getHeight();
-	}
-	
-	/**
-     * 显示时间 hh:mm
-     * 
-     * @param hour
-     *          小时值
-     */
-	public static String getTime(int hour){
-		return (hour < 10) ? ("0" + hour + ":00"): (hour + ":00");
 	}
 	
 	/**
@@ -247,45 +183,58 @@ public class Util {
 		return Locale.getDefault().getLanguage();
 	}
 	
-	public static AlertDialog.Builder showVersionInfo(Context context, VersionInfo versionInfo){
-		StringBuilder msg = new StringBuilder();
-		msg.append(versionInfo.vName+":\n\n");
-		int num = 1;
-		for(String s: versionInfo.features){
-			msg.append(num+": ");
-			msg.append(s+"\n\n");
-			num++;
+	/**
+     * 得到当前应用的 IMEI
+     */
+	public static String getIMEI(Context context) {
+		String imei = null;
+		try {
+			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+			imei = telephonyManager.getDeviceId();
+		} catch (Exception e) {		
 		}
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setIcon(android.R.drawable.ic_menu_info_details);
-		builder.setMessage(msg.toString());
-		builder.setTitle(R.string.new_version_feature);
-		builder.setPositiveButton(R.string.ok, null);
-		return builder;
+		return imei;
 	}
 	
-	public static AlertDialog.Builder showVersionInfoAndUpdate(final Context context, VersionInfo versionInfo){	
-		AlertDialog.Builder builder = showVersionInfo(context, versionInfo);
-		builder.setNegativeButton(R.string.no, null);
-		builder.setPositiveButton(R.string.update_app, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String appPackageName = context.getPackageName(); // getPackageName() from Context or Activity object
-				try {
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-				} catch (android.content.ActivityNotFoundException anfe) {
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
-				}
-			}		
-		});
-		return builder;
+	public static String getImsi(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		return tm.getSubscriberId();
 	}
 	
-	public static boolean isFirstUseApp(Context context){
-		Boolean isFirstIn = false;  
-		SharedPreferences pref = context.getSharedPreferences("share", 0); 
-		isFirstIn = pref.getBoolean("isFirstIn", true);
-		return isFirstIn;
+	public static String getSimSerialNumber(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		return tm.getSimSerialNumber();
 	}
+	/**
+     * 得到当前手机的 WIFI MAC
+     */
+    public static String getWifiMacAddress(final Context context) {
+        try {
+            WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            String mac = wifimanager.getConnectionInfo().getMacAddress();
+            if (StringUtils.isEmpty(mac)) return null;
+            return mac;
+        } catch (Exception e) {
+        	return null;
+        }
+    }
+    // 打印所有的 intent extra 数据
+    public static String printBundle(Bundle bundle) {
+        StringBuilder sb = new StringBuilder();
+        for (String key : bundle.keySet()) {
+            sb.append("\nkey:" + key + ", value:" + bundle.getString(key));
+        }
+        return sb.toString();
+    }
+    
+    public static boolean is2gNetwork(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.
+			getSystemService(Context.TELEPHONY_SERVICE);
+	    int type = tm.getNetworkType();
+	    if (type == TelephonyManager.NETWORK_TYPE_GPRS
+	    		|| type == TelephonyManager.NETWORK_TYPE_EDGE) {
+	    	return true;
+	    }
+	    return false;
+    }
 }
