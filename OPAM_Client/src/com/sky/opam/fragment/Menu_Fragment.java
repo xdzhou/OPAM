@@ -7,7 +7,7 @@ import com.sky.opam.R;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -85,8 +85,8 @@ public class Menu_Fragment extends ListFragment{
 			Intent intent = new Intent();
 	        intent.setClass(getActivity(), DayViewActivity.class);
 	        Bundle bundle = new Bundle();
-	        bundle.putInt("numWeek", Tool.getNumWeek());
-	        bundle.putInt("dayOfWeek", Tool.getDayOfWeek());
+	        bundle.putInt("numWeek", Util.getNumWeek());
+	        bundle.putInt("dayOfWeek", Util.getDayOfWeek());
 	        intent.putExtras(bundle);      
 	        startActivityForResult(intent, MyApp.rsqCode);
 		}else if (position == 2) {

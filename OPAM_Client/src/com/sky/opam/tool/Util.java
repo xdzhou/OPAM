@@ -29,7 +29,7 @@ import android.view.View.MeasureSpec;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class Tool {
+public class Util {
 	/**
      * 检测网络是否可用
      * 

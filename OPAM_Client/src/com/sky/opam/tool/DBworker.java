@@ -328,7 +328,7 @@ public class DBworker {
     }
 
     public void delDownloadClassInfo(String login, GoogleCalendarAPI calendarAPI) {
-    	int currentWeekOfYear = Tool.getNumWeek();
+    	int currentWeekOfYear = Util.getNumWeek();
     	String sql = "select * from CLASSINFO where login='"+ login + 
     			"' AND weekOfYear>=" + currentWeekOfYear +" AND eventId>0" +" AND auteur!='"+login+"';";
     	List<ClassInfo> list = getClassInfoViaSql(sql);

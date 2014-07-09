@@ -12,7 +12,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.sky.opam.tool.FailException;
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -33,7 +33,7 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
 	protected String doInBackground(Void... params) {
 		try {
 			int lastVersionCode = getLastVersionCode();
-			if(lastVersionCode > Tool.getVersionCode(context)){
+			if(lastVersionCode > Util.getVersionCode(context)){
 				return getVersionInfo();
 			}
 		}catch (FailException e) {
@@ -80,7 +80,7 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
 	}
 	
 	private String getVersionInfo() throws FailException{
-		String localLanguage = Tool.getLocalLanguage();
+		String localLanguage = Util.getLocalLanguage();
 		HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para="+localLanguage);
         try {

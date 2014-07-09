@@ -3,7 +3,7 @@ package com.sky.opam.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -29,7 +29,7 @@ public class ColorPickerAdapter extends BaseAdapter {
 	public ColorPickerAdapter(Context context) {
 		this.context = context;
 		// defines the width of each color square
-		colorGridColumnWidth = Tool.dip2px(context, 55);
+		colorGridColumnWidth = Util.dip2px(context, 55);
 
 		colorList = new ArrayList<Integer>();
 		// add the color array to the list

@@ -6,7 +6,7 @@ import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.GoogleCalendarAPI;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -37,7 +37,7 @@ public class AgendaSyncTask extends AsyncTask<Void, Void, Integer>{
 	@Override
 	protected void onPostExecute(Integer result) {
 		if(result!=0){
-			Tool.showInfo(context, result+ " course have been synced");
+			Util.showInfo(context, result+ " course have been synced");
 		}
 		worker = null;
 	}

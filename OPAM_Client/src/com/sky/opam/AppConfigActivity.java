@@ -3,7 +3,7 @@ package com.sky.opam;
 import com.sky.opam.model.Config;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 import com.sky.opam.view.RangeSeekBar;
 import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
 
@@ -38,11 +38,11 @@ public class AppConfigActivity extends ActionBarActivity{
         
         LinearLayout root = (LinearLayout)findViewById(R.id.root_layout);
         startTimeTV = (TextView)findViewById(R.id.startTimeTV);
-        startTimeTV.setText(Tool.getTime(config.startTime));
+        startTimeTV.setText(Util.getTime(config.startTime));
         endTimeTV = (TextView)findViewById(R.id.endTimeTV);
-        endTimeTV.setText(Tool.getTime(config.endTime));
+        endTimeTV.setText(Util.getTime(config.endTime));
         TextView VersionTV = (TextView)findViewById(R.id.versionTV);
-        String version = Tool.getVersionName(this);
+        String version = Util.getVersionName(this);
         if(version != null) VersionTV.setText(version);
         
         autoSyncTB = (ToggleButton)findViewById(R.id.autoSyncTB);
@@ -60,8 +60,8 @@ public class AppConfigActivity extends ActionBarActivity{
         rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
 			@Override
 			public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,Integer minValue, Integer maxValue) {
-				startTimeTV.setText(Tool.getTime(minValue));
-				endTimeTV.setText(Tool.getTime(maxValue));
+				startTimeTV.setText(Util.getTime(minValue));
+				endTimeTV.setText(Util.getTime(maxValue));
 			}		
 		});
     }

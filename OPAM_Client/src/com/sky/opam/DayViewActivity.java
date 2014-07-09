@@ -3,7 +3,7 @@ package com.sky.opam;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 import com.sky.opam.view.DayClassView;
 import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
@@ -37,7 +37,7 @@ public class DayViewActivity extends ActionBarActivity{
         DBworker worker = new DBworker(this);
         
         DayClassView dayClassView = new DayClassView(this);
-		dayClassView.setSW(Tool.getScreenWidth(this));
+		dayClassView.setSW(Util.getScreenWidth(this));
 		dayClassView.setCours(worker.getClassInfo(login, numWeek, dayOfWeek));
 		dayClassView.setClickListener(new ClassInfoClickListener() {
 			@Override
@@ -50,10 +50,10 @@ public class DayViewActivity extends ActionBarActivity{
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		TextView tView = new TextView(this);
 		tView.setGravity(Gravity.CENTER);
-		tView.setTextSize(Tool.dip2px(this, 15));
-		int padding = Tool.dip2px(this, 5);
+		tView.setTextSize(Util.dip2px(this, 15));
+		int padding = Util.dip2px(this, 5);
 		tView.setPadding(padding, padding, padding, padding);
-		tView.setText(Tool.getYear()+"/"+Tool.getDateViaNumWeek(numWeek, dayOfWeek));
+		tView.setText(Util.getYear()+"/"+Util.getDateViaNumWeek(numWeek, dayOfWeek));
 		linearLayout.addView(tView);
 		linearLayout.addView(dayClassView);
 		scrollView.addView(linearLayout);

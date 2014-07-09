@@ -1,6 +1,6 @@
 package com.sky.opam.view;
 
-import com.sky.opam.tool.Tool;
+import com.sky.opam.tool.Util;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -48,7 +48,7 @@ public class TimeLineView extends View{
 
 	private void initia(Context context){
 		timePaint.setColor(Color.BLACK);
-		timePaint.setTextSize(Tool.dip2px(context, 12));
+		timePaint.setTextSize(Util.dip2px(context, 12));
 		time_wdith = timePaint.measureText("08 ");
 		time_hight = getTextHeight(timePaint);		
 	}
