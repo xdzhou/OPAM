@@ -14,7 +14,7 @@ import com.loic.model.User;
 
 @Controller
 @RequestMapping("/")
-public class UserController {
+public class ClassDownlodController {
 
     @Autowired
     private UserDAO userDAO;

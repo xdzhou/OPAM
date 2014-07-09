@@ -28,8 +28,8 @@
 	<tx:annotation-driven transaction-manager="transactionManager"/>
 	  
 <!-- 	Database Configuration  -->
-<!-- 	<import resource="./database/DataSource.xml"/> -->
-<!-- 	<import resource="./database/Hibernate.xml"/> -->
+	<import resource="./database/DataSource.xml"/>
+	<import resource="./database/Hibernate.xml"/>
 	
 	<!-- Beans Declaration -->
 	<import resource="./beans/*.xml"/>

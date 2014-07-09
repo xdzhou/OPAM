@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.loic</groupId>
-    <artifactId>sprint_server</artifactId>
+    <artifactId>OPAM_Server</artifactId>
     <version>0.1.0</version>
     <packaging>war</packaging>
     
@@ -14,6 +14,18 @@
 	</properties>
 
     <dependencies>
+        
+        <dependency>
+			<groupId>cn.jpush.api</groupId>
+			<artifactId>jpush-client</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.1</version>
+		</dependency>
  
 		<!-- Spring -->
 		<dependency>
