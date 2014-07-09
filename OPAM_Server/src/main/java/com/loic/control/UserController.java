@@ -14,13 +14,8 @@ import com.loic.dao.UserDAO;
 @RequestMapping("/")
 public class UserController {
 
-    @Autowired
-    private UserDAO userDAO;
-
-    @RequestMapping(value="/", method=RequestMethod.GET)
+    @RequestMapping(method=RequestMethod.GET)
     public @ResponseBody String greeting() {
-//        List<User> users = userDAO.findByName("lili");
-//        return new Gson().toJson(users);
-    	return "HELLO !@";
+    	return "BONJOUR";
     }
 }

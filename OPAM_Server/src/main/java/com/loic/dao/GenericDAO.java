@@ -5,7 +5,6 @@ import java.lang.reflect.ParameterizedType;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,12 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class GenericDAO<T> {
 	protected Session session;
 	private Class<T> persistenceClass;
-	@Autowired
-	private SessionFactory sessionFactory;
 
-	public GenericDAO(){
-		session = sessionFactory.getCurrentSession();
-		if(session == null) session = sessionFactory.openSession();
+	public GenericDAO(SessionFactory sessionFactory){
+		session = sessionFactory.openSession();
 		this.persistenceClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
@@ -59,3 +55,26 @@ public abstract class GenericDAO<T> {
 		session.flush();
 	}
 }
+
+/*
+
+CREATE TABLE IF NOT EXISTS `User` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` char(20) NOT NULL,
+  `name` char(50) NOT NULL,
+  `numWeekUpdated` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `Message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender` int(11) NOT NULL,
+  `recevier` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sender`) REFERENCES User(`id`),
+  FOREIGN KEY (`recevier`) REFERENCES User(`id`)  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ */

@@ -8,5 +8,8 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
        <constructor-arg index="0" ref="sessionFactory"/>
    </bean>
    
+   <bean id="messageDAO" class="com.loic.dao.MessageDAO">
+       <constructor-arg index="0" ref="sessionFactory"/>
+   </bean>  
    		
 </beans>

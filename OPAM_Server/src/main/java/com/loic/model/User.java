@@ -1,7 +1,6 @@
 package com.loic.model;
 
-import java.util.Date;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,7 +12,9 @@ import javax.persistence.Table;
 public class User {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
     private long id;
+	@Column(length=20)
 	private String login;
+	@Column(length=50)
     private String name;
     private int numWeekUpdated;
     
@@ -37,8 +38,6 @@ public class User {
 	}
 	public long getId() {
 		return id;
-	}	
-    
-    
+	}	    
 	
 }

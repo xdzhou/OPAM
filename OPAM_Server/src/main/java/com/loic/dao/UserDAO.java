@@ -2,7 +2,9 @@ package com.loic.dao;
 
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.loic.model.User;
@@ -10,6 +12,11 @@ import com.loic.model.User;
 @Repository //marks the specific class as a Data Access Object
 public class UserDAO extends GenericDAO<User>{
 	
+	@Autowired
+	public UserDAO(SessionFactory sessionFactory) {
+		super(sessionFactory);
+	}
+
 	@SuppressWarnings("unchecked")
 	public User findByLogin(String login){
 		Transaction tr = session.beginTransaction();	

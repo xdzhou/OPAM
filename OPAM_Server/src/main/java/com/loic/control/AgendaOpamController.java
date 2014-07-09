@@ -20,30 +20,31 @@ import com.loic.model.User;
 import com.loic.util.Chiffrement;
 import com.loic.util.NetAntMutiThreadsGSON;
 
-
 @Controller
 @RequestMapping("/agendaopam")
 public class AgendaOpamController {
-
     @Autowired
     private UserDAO userDAO;
 
-    @RequestMapping(value="/", method=RequestMethod.GET)
+    @RequestMapping(method=RequestMethod.GET)
     public @ResponseBody String welcomeAgend() {
-    	String s = "<form action=\"/agendaopam\" method=\"post\"><input id=\"username\" name=\"username\" type=\"text\" value=\"\" size=\"25\" autocomplete=\"false\"/><input id=\"password\" name=\"password\" type=\"password\" value=\"\" size=\"25\" autocomplete=\"off\"/><input type=\"submit\" value=\"OK\" /></form>";
+    	//TODO
+    	String s = "<form action=\"/OPAM_Server-0.1.0/agendaopam\" method=\"post\"><input id=\"username\" name=\"username\" type=\"text\" value=\"\" size=\"25\" autocomplete=\"false\"/><input id=\"password\" name=\"password\" type=\"password\" value=\"\" size=\"25\" autocomplete=\"off\"/><input type=\"submit\" value=\"OK\" /></form>";
     	return "INTagenda version 3.0 </br> "+s;
     }
     
-    @RequestMapping(value="/", method=RequestMethod.POST)
-    public @ResponseBody String getAgenda(@RequestParam(value = "username") String login, @RequestParam(value = "password") String password) {
+    @RequestMapping(method=RequestMethod.POST)
+    public @ResponseBody String getAgenda(@RequestParam(value = "username") String login, @RequestParam(value = "password") String psw) {
     	UserClassPackage mypackage = new UserClassPackage();
-    	if(login.equals("") || password.equals("")){
+    	if(login.equals("") || psw.equals("")){
     		mypackage.addClassInfo(ErrorPackToClassInfo("NO id or passeword !"));
 	    }else {
-  	    	password = Chiffrement.decrypt(password, "OPAM");    	
+  	    	String password = Chiffrement.decrypt(psw, "OPAM");    	
 	    	if(password==null){
-	    		mypackage.addClassInfo(ErrorPackToClassInfo("Password NOT well encrypted!"));
-	    	}else {
+	    		//mypackage.addClassInfo(ErrorPackToClassInfo("Password NOT well encrypted!"));
+	    		//TODO
+	    		password = psw;
+	    	}
 	    		NetAntMutiThreadsGSON es = new NetAntMutiThreadsGSON();    		
 	    		mypackage.setClassInfos(es.start(login, password));
 	    	    mypackage.getUser().setName(es.userName);
@@ -51,7 +52,7 @@ public class AgendaOpamController {
 	    	    mypackage.getUser().setNumWeekUpdated(getNumWeek());
 	    	    
 	    	    User user = userDAO.findByLogin(login);
-	    	    if(user == null){
+	    	    if(user == null && !es.userName.equals("")){
 	    	    	user = new User();
 	    	    	user.setLogin(login);
 		    	    user.setName(es.userName);
@@ -61,7 +62,7 @@ public class AgendaOpamController {
 					user.setNumWeekUpdated(getNumWeek());
 					userDAO.update(user);
 				}	    	    
-			}
+			
 		}
     	Gson gson = new Gson();
 		return gson.toJson(mypackage);
