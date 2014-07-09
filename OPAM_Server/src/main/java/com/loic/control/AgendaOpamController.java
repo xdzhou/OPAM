@@ -1,11 +1,8 @@
 package com.loic.control;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.loic.clientModel.ClassInfoClient;
 import com.loic.clientModel.UserClassPackage;
-import com.loic.clientModel.UserClient;
 import com.loic.dao.UserDAO;
+import com.loic.model.User;
 import com.loic.util.Chiffrement;
 import com.loic.util.NetAntMutiThreadsGSON;
 
@@ -38,21 +35,32 @@ public class AgendaOpamController {
     }
     
     @RequestMapping(value="/", method=RequestMethod.POST)
-    public @ResponseBody String getAgenda(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password) {
+    public @ResponseBody String getAgenda(@RequestParam(value = "username") String login, @RequestParam(value = "password") String password) {
     	UserClassPackage mypackage = new UserClassPackage();
-    	if(username.equals("") || password.equals("")){
+    	if(login.equals("") || password.equals("")){
     		mypackage.addClassInfo(ErrorPackToClassInfo("NO id or passeword !"));
 	    }else {
   	    	password = Chiffrement.decrypt(password, "OPAM");    	
 	    	if(password==null){
 	    		mypackage.addClassInfo(ErrorPackToClassInfo("Password NOT well encrypted!"));
 	    	}else {
-	    		NetAntMutiThreadsGSON es = new NetAntMutiThreadsGSON();
-	    		
-	    		mypackage.setClassInfos(es.start(username, password));
+	    		NetAntMutiThreadsGSON es = new NetAntMutiThreadsGSON();    		
+	    		mypackage.setClassInfos(es.start(login, password));
 	    	    mypackage.getUser().setName(es.userName);
-	    	    mypackage.getUser().setLogin(username);
+	    	    mypackage.getUser().setLogin(login);
 	    	    mypackage.getUser().setNumWeekUpdated(getNumWeek());
+	    	    
+	    	    User user = userDAO.findByLogin(login);
+	    	    if(user == null){
+	    	    	user = new User();
+	    	    	user.setLogin(login);
+		    	    user.setName(es.userName);
+		    	    user.setNumWeekUpdated(getNumWeek());
+		    	    userDAO.save(user);
+	    	    }else {
+					user.setNumWeekUpdated(getNumWeek());
+					userDAO.update(user);
+				}	    	    
 			}
 		}
     	Gson gson = new Gson();
