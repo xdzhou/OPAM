@@ -52,7 +52,8 @@ public class MessageController {
     	payload.setNotification(Notification.android("Alert", sender_user.getName()+" send you a msg", null));
     	payload.setMessage(cn.jpush.api.push.model.Message.newBuilder()
                 .setMsgContent(msg)
-                .setTitle(sender_user.getName())
+                .addExtra("SenderLogin", sender_user.getLogin())
+                .addExtra("SenderName", sender_user.getName())
                 .build());
     	try {
 			jpushClient.sendPush(payload.build());

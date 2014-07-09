@@ -3,7 +3,7 @@ package com.loic.config;
 public class Config {
     
     public static final String JPUSH_MASTER_SECRET = "2752d5ec6db2879104c23c6a";
-    public static final String JPUSH_APPKEY = "2752d5ec6db2879104c23c6a";
+    public static final String JPUSH_APPKEY = "efd4e5a4958fbae03bbd8437";
     
     public static final String VERSION = "0.2.3";   
     
