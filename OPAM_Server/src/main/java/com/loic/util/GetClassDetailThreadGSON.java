@@ -16,14 +16,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
-import com.loic.model.ClassInfo;
+import com.loic.clientModel.ClassInfoClient;
 
 public class GetClassDetailThreadGSON implements Runnable {
-	private ClassInfo classInfo = null;
+	private ClassInfoClient classInfo = null;
 	private String host;
 	private HttpClient client;
 	
-	public GetClassDetailThreadGSON(ClassInfo c, String host, HttpClient client){
+	public GetClassDetailThreadGSON(ClassInfoClient c, String host, HttpClient client){
 		classInfo = c;
 		this.host = host;
 		this.client = client;
@@ -41,7 +41,7 @@ public class GetClassDetailThreadGSON implements Runnable {
 		
 	}
 	
-	private String getCoursDetail(ClassInfo c) throws FailException{
+	private String getCoursDetail(ClassInfoClient c) throws FailException{
 		HttpGet httpGet = new HttpGet(host+"Eplug/Agenda/Eve-Det.asp?NumEve="+c.NumEve+"&DatSrc="+c.dateSrc);
 		try {
 			HttpResponse response = client.execute(httpGet);		
@@ -67,7 +67,7 @@ public class GetClassDetailThreadGSON implements Runnable {
 		
 	}
 	
-	private void chargerCours(ClassInfo c, String rspHtml) throws FailException{			
+	private void chargerCours(ClassInfoClient c, String rspHtml) throws FailException{			
 		String page = rspHtml.replaceAll("<[^>]+>", "__");
 		page = sansAccent(page);
 		page = page.replace(" ", " ");
@@ -142,7 +142,7 @@ public class GetClassDetailThreadGSON implements Runnable {
 		}	
 	}
 	
-	private void setNumWeekDay(ClassInfo c , String sdata) throws FailException{
+	private void setNumWeekDay(ClassInfoClient c , String sdata) throws FailException{
 		SimpleDateFormat sdf=new  SimpleDateFormat("yyyyMMdd HH:mm");
 		Date date;
 		try {

@@ -44,7 +44,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.loic.model.ClassInfo;
+import com.loic.clientModel.ClassInfoClient;
 
 public class NetAntMutiThreadsGSON {
 	String lt;
@@ -56,8 +56,8 @@ public class NetAntMutiThreadsGSON {
 	HttpEntity entity;
 	HttpGet httpGet;
 	HttpPost httpPost;
-	List<ClassInfo> classInfos = new ArrayList<ClassInfo>();
-	ClassInfo c;
+	List<ClassInfoClient> classInfos = new ArrayList<ClassInfoClient>();
+	ClassInfoClient c;
 	public String userName="";
 
 	public NetAntMutiThreadsGSON(){ 
@@ -79,14 +79,14 @@ public class NetAntMutiThreadsGSON {
 			ClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
 		    client = new DefaultHttpClient(cm);
 		    //client = new DefaultHttpClient();
-			c = new ClassInfo("E", "E");
+			c = new ClassInfoClient("E", "E");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
-	public List<ClassInfo> start(String id,String mdp) {
+	public List<ClassInfoClient> start(String id,String mdp) {
 		Boolean flag = true;
 		try {
 			GoToAgenda();
@@ -118,8 +118,7 @@ public class NetAntMutiThreadsGSON {
 		} catch (Exception e) {
 			//we put the error message to the cours
 			c.name="FailException";
-			c.students=e.toString();
-			c.students=c.students.replace("com.loic.agenda.outil.FailException:", "");
+			c.students=e.getMessage();
 			classInfos.clear();
 			classInfos.add(c);
 			return classInfos;
@@ -306,7 +305,7 @@ public class NetAntMutiThreadsGSON {
 		Pattern pattern = Pattern.compile("onmouseover=\"DetEve\\(\'([0-9]+)\',\'([^']+)\',\'([0-9]+)\'\\)");
 		Matcher matcher = pattern.matcher(rspHtml);
 		while(matcher.find()){
-			 ClassInfo c = new ClassInfo(matcher.group(1), matcher.group(3));
+			 ClassInfoClient c = new ClassInfoClient(matcher.group(1), matcher.group(3));
 			 classInfos.add(c);
 		}
 		

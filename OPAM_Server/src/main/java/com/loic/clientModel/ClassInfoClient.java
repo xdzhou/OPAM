@@ -1,13 +1,13 @@
-package com.loic.model;
+package com.loic.clientModel;
 
-public class ClassInfo{
+public class ClassInfoClient{
 	public transient String NumEve = "";
 	public transient String dateSrc = "";
 			
 	public long id;
 	public String login;
 	public String name;
-	public ClassType classType = new ClassType();
+	public ClassTypeClient classType = new ClassTypeClient();
 	public int weekOfYear;
 	public int dayOfWeek;
 	public String startTime;
@@ -16,15 +16,15 @@ public class ClassInfo{
 	public String teacher;
 	public String students;
 	public String groupe;
-	public Room room = new Room();
+	public RoomClient room = new RoomClient();
 	public String color;
 	public long eventId = 0;
 
-	public ClassInfo() {
+	public ClassInfoClient() {
 		login=name=auteur=teacher=students=groupe="";
 	}
 	
-	public ClassInfo(String NumEve, String dateSrc){
+	public ClassInfoClient(String NumEve, String dateSrc){
 		this.NumEve = NumEve;
 		this.dateSrc = dateSrc;
 	}

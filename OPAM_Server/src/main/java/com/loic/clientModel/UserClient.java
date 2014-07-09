@@ -1,4 +1,4 @@
-package com.loic.model;
+package com.loic.clientModel;
 
 public class UserClient {
 	private String login = "";
