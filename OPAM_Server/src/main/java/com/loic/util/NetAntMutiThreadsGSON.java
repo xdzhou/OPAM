@@ -108,7 +108,7 @@ public class NetAntMutiThreadsGSON {
  			
  			Thread[] threads = new Thread[classInfos.size()];
  			for(int i=0; i<threads.length; i++){
-	 			threads[i] = new Thread(new GetClassDetailThreadGSON(classInfos.get(i), host, client));
+	 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), host, client));
 	 			threads[i].start();
  			}
  			for(int i = 0; i < threads.length; i++){

@@ -15,7 +15,7 @@ public class ClassInfoClient{
 	public String auteur;
 	public String teacher;
 	public String students;
-	public String groupe;
+	public String groupe="";
 	public RoomClient room = new RoomClient();
 	public String color;
 	public long eventId = 0;
@@ -33,11 +33,11 @@ public class ClassInfoClient{
 	public String toString() {
 		return "ClassInfoClient [NumEve=" + NumEve + ", dateSrc=" + dateSrc
 				+ ", login=" + login + ", name=" + name + ", classType="
-				+ classType + ", weekOfYear=" + weekOfYear + ", dayOfWeek="
+				+ classType.name + ", weekOfYear=" + weekOfYear + ", dayOfWeek="
 				+ dayOfWeek + ", startTime=" + startTime + ", endTime="
 				+ endTime + ", auteur=" + auteur + ", teacher=" + teacher
 				+ ", students=" + students + ", groupe=" + groupe + ", room="
-				+ room + "]";
+				+ room.name + "]";
 	}
 	
 	

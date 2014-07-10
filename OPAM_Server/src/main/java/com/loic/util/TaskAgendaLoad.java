@@ -31,7 +31,7 @@ import org.jsoup.select.Elements;
 import com.loic.clientModel.ClassInfoClient;
 import com.loic.config.Config;
 
-public class NetAntAgendaLoad {
+public class TaskAgendaLoad {
 	private HttpClient client;
 	private ClassInfoClient error_class_info; // a error msg saved to this object
 	private List<ClassInfoClient> classInfos = new ArrayList<ClassInfoClient>();
@@ -41,7 +41,7 @@ public class NetAntAgendaLoad {
 	public String rspHtml;
 	HttpResponse response;
 
-	public NetAntAgendaLoad(){ 
+	public TaskAgendaLoad(){ 
 		error_class_info = new ClassInfoClient("E", "E");
 		try {
 			client = HtmlUtil.getHTTPSclient();
@@ -53,17 +53,24 @@ public class NetAntAgendaLoad {
 		}
 	}
 	
-	public void Test(String id,String mdp) throws FailException{
+	public void Test(String id,String mdp) throws FailException, InterruptedException{
 		Boolean flag = true;
 		GoToAgenda();
 		fillLoginInfo(id,mdp);
 		redirection();
 		getAgendaHtml();	
 		redirection();
-		getTWCoursPara();
+		//getTWCoursPara();
 		getNWCoursPara();
 		//System.out.println(rspHtml);
-		new Thread(new GetClassDetailThreadGSON(classInfos.get(0), Config.SI_ETUDIENT_HOST, client)).start();
+		Thread[] threads = new Thread[classInfos.size()];
+			for(int i=0; i<threads.length; i++){
+ 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
+ 			threads[i].start();
+			}
+			for(int i = 0; i < threads.length; i++){
+				threads[i].join();
+			}
 	}
 	
 	public List<ClassInfoClient> start(String id,String mdp) {
@@ -89,7 +96,7 @@ public class NetAntAgendaLoad {
  			
  			Thread[] threads = new Thread[classInfos.size()];
  			for(int i=0; i<threads.length; i++){
-	 			threads[i] = new Thread(new GetClassDetailThreadGSON(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
+	 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
 	 			threads[i].start();
  			}
  			for(int i = 0; i < threads.length; i++){
@@ -267,7 +274,7 @@ public class NetAntAgendaLoad {
 //			c.add(Calendar.WEEK_OF_YEAR, 1);
 //			DateFormat df = new SimpleDateFormat("yyyyMMdd");
 //			String NumDat = df.format(c.getTime());
-			String NumDat = "20140616";
+			String NumDat = "20140606";
 			
 			HttpPost httpPost = new HttpPost(Config.SI_ETUDIENT_HOST+"/Eplug/Agenda/Agenda.asp");
 			List<NameValuePair> data = new ArrayList<NameValuePair>();

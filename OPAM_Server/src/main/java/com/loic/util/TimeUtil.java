@@ -29,16 +29,6 @@ public class TimeUtil {
         return c.get(Calendar.WEEK_OF_YEAR);
 	}
 	
-	public static int getNumWeek(String dateStr) {
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd");
-		try {
-			Date date = dateFormatter.parse(dateStr);
-			return getNumWeek(date);
-		} catch (ParseException e) {
-			return -1;
-		}
-	}
-	
 	/**
      * 得到日期（月/日）
      * 
@@ -70,6 +60,13 @@ public class TimeUtil {
      */
 	public static int getDayOfWeek() {
 		Calendar c = getCalendarParis();
+		int xq = c.get(Calendar.DAY_OF_WEEK);
+		return xq;
+	}
+	
+	public static int getDayOfWeek(Date date) {
+		Calendar c = getCalendarParis();
+		c.setTime(date);
 		int xq = c.get(Calendar.DAY_OF_WEEK);
 		return xq;
 	}
