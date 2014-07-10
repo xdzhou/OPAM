@@ -31,10 +31,14 @@ public class ClassInfoClient{
 
 	@Override
 	public String toString() {
-		return "ClassInfo [id=" + id + ", login=" + login + ", name=" + name
-				+ ", weekOfYear=" + weekOfYear + ", dayOfWeek=" + dayOfWeek
-				+ ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", eventId=" + eventId + "]";
-	}	
+		return "ClassInfoClient [NumEve=" + NumEve + ", dateSrc=" + dateSrc
+				+ ", login=" + login + ", name=" + name + ", classType="
+				+ classType + ", weekOfYear=" + weekOfYear + ", dayOfWeek="
+				+ dayOfWeek + ", startTime=" + startTime + ", endTime="
+				+ endTime + ", auteur=" + auteur + ", teacher=" + teacher
+				+ ", students=" + students + ", groupe=" + groupe + ", room="
+				+ room + "]";
+	}
+	
 	
 }

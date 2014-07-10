@@ -15,6 +15,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 import com.loic.clientModel.ClassInfoClient;
 
@@ -34,7 +35,8 @@ public class GetClassDetailThreadGSON implements Runnable {
 		String html;
 		try {
 			html = getCoursDetail(classInfo);
-			chargerCours(classInfo, html);
+			System.out.println(html);
+			//chargerCours(classInfo, html);
 		} catch (FailException e) {
 			System.out.println("GetClassDetailThread cause exception:");
 		}
@@ -48,21 +50,14 @@ public class GetClassDetailThreadGSON implements Runnable {
 			int status = response.getStatusLine().getStatusCode();
 			if(status==200){
 				HttpEntity entity = response.getEntity();
-				//rspHtml = EntityUtils.toString(entity);
-				InputStream stream = entity.getContent();
-				BufferedReader br =  new BufferedReader(new InputStreamReader(stream, "utf-8"));
-				String rspHtml="";
-				for(String temp = br.readLine(); temp != null; rspHtml += temp ,temp = br.readLine()); 
-				stream.close();				
-				httpGet.abort();
-				return rspHtml;
+				return EntityUtils.toString(entity);
 			}else{
 				System.out.println("GetCoursDetail failed: status "+status);
 				throw new FailException("GetCoursDetail failed: status "+status);
 			}		
 		} catch (Exception e) {
 			System.out.println("getCoursDetail cause exception:");
-			throw new FailException("getCoursDetail cause exception:"+e.toString());
+			throw new FailException("getCoursDetail cause exception:"+e.getMessage());
 		}
 		
 	}

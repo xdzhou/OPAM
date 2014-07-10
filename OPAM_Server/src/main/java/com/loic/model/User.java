@@ -16,6 +16,7 @@ public class User {
 	private String login;
 	@Column(length=50)
     private String name;
+	private String email;
     private int numWeekUpdated;
     
 	public String getLogin() {
