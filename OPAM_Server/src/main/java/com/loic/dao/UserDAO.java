@@ -26,4 +26,13 @@ public class UserDAO extends GenericDAO<User>{
 		if(resultaList==null || resultaList.size()==0) return null;
 		else return resultaList.get(0);
 	}
+	
+	public User findByName(String name){
+		Transaction tr = session.beginTransaction();	
+		List<User> resultaList = session.createQuery("from User where name = ?")
+		.setString(0, name).list();
+		tr.commit();
+		if(resultaList==null || resultaList.size()==0) return null;
+		else return resultaList.get(0);
+	}
 }

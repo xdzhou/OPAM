@@ -17,16 +17,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.loic.clientModel.ClassInfoClient;
+import com.loic.config.Config;
 
 public class TaskClassDetailLoad implements Runnable {
 	private ClassInfoClient classInfo = null;
-	private String host;
 	private HttpClient client;
 	private String specialString;
 	
-	public TaskClassDetailLoad(ClassInfoClient c, String host, HttpClient client){
+	public TaskClassDetailLoad(ClassInfoClient c, HttpClient client){
 		classInfo = c;
-		this.host = host;
 		this.client = client;
 		byte[] bytes = {-62, -96};
 		try {
@@ -50,7 +49,7 @@ public class TaskClassDetailLoad implements Runnable {
 	}
 	
 	private String getCoursDetail(ClassInfoClient c) throws FailException{
-		HttpGet httpGet = new HttpGet(host+"Eplug/Agenda/Eve-Det.asp?NumEve="+c.NumEve+"&DatSrc="+c.dateSrc);
+		HttpGet httpGet = new HttpGet(Config.SI_ETUDIENT_HOST+"Eplug/Agenda/Eve-Det.asp?NumEve="+c.NumEve+"&DatSrc="+c.dateSrc);
 		try {
 			HttpResponse response = client.execute(httpGet);		
 			int status = response.getStatusLine().getStatusCode();

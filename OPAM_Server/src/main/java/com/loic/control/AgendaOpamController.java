@@ -19,6 +19,7 @@ import com.loic.dao.UserDAO;
 import com.loic.model.User;
 import com.loic.util.Chiffrement;
 import com.loic.util.NetAntMutiThreadsGSON;
+import com.loic.util.TaskAgendaLoad;
 
 @Controller
 @RequestMapping("/agendaopam")
@@ -45,17 +46,19 @@ public class AgendaOpamController {
 	    		//TODO
 	    		password = psw;
 	    	}
-	    		NetAntMutiThreadsGSON es = new NetAntMutiThreadsGSON();    		
+	    		//NetAntMutiThreadsGSON es = new NetAntMutiThreadsGSON(); 
+	    		TaskAgendaLoad es = new TaskAgendaLoad(userDAO);
 	    		mypackage.setClassInfos(es.start(login, password));
-	    	    mypackage.getUser().setName(es.userName);
+	    		String userName = es.getUserName();
+	    	    mypackage.getUser().setName(userName);
 	    	    mypackage.getUser().setLogin(login);
 	    	    mypackage.getUser().setNumWeekUpdated(getNumWeek());
 	    	    
 	    	    User user = userDAO.findByLogin(login);
-	    	    if(user == null && !es.userName.equals("")){
+	    	    if(user == null && !userName.equals("")){
 	    	    	user = new User();
 	    	    	user.setLogin(login);
-		    	    user.setName(es.userName);
+		    	    user.setName(userName);
 		    	    user.setNumWeekUpdated(getNumWeek());
 		    	    userDAO.save(user);
 	    	    }else {

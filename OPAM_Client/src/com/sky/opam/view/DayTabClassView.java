@@ -277,7 +277,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 				float startP = getTimeDistance(c.startTime);
 				float endP = getTimeDistance(c.endTime);
 				if (startP < e.getY() && e.getY() < endP) {
-					myClcLis.onTouchEvent(this, e, c);
+					myClcLis.onTouchEvent(this, e, c.id);
 					break;
 				}
 			}
@@ -291,7 +291,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	
 	// 2 listener
 	public interface ClassInfoClickListener {
-		public void onTouchEvent(View v, MotionEvent e, ClassInfo c);
+		public void onTouchEvent(View v, MotionEvent e, long classId);
 	}
 	
 	public interface DayViewLongPressListener {

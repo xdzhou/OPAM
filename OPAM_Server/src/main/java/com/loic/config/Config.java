@@ -3,6 +3,7 @@ package com.loic.config;
 public class Config {
 	public static final String SI_ETUDIENT_HOST = "http://si-etudiants.tem-tsp.eu/";
 	public static final String CAS_HOST = "https://cas.tem-tsp.eu";
+	public static final String TROMBI_HOST = "http://trombi.it-sudparis.eu/etudiants.php";
 	
     public static final String JPUSH_MASTER_SECRET = "2752d5ec6db2879104c23c6a";
     public static final String JPUSH_APPKEY = "efd4e5a4958fbae03bbd8437";

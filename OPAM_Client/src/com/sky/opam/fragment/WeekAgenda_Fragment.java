@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import com.sky.opam.ClassInfoDetailActivity;
 import com.sky.opam.ClassInfoEditActivity;
 import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
@@ -149,8 +150,14 @@ public class WeekAgenda_Fragment extends Fragment{
 	
 	ClassInfoClickListener classInfoClickListener = new ClassInfoClickListener() {		
 		@Override
-		public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
-			showClassInfo(c);
+		public void onTouchEvent(View v, MotionEvent e, long classId ) {
+			//showClassInfo(c);
+			Intent intent = new Intent();
+            intent.setClass(getActivity(), ClassInfoDetailActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putLong("classId", classId);
+            intent.putExtras(bundle);
+            startActivity(intent);
 		}
 	};
 	

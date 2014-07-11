@@ -18,6 +18,4 @@ public class UserClassPackage {
 	public void setClassInfos(List<ClassInfo> classInfos) {
 		this.classInfos = classInfos;
 	}
-	
-	
 }

@@ -30,18 +30,21 @@ import org.jsoup.select.Elements;
 
 import com.loic.clientModel.ClassInfoClient;
 import com.loic.config.Config;
+import com.loic.dao.UserDAO;
+import com.loic.model.User;
 
 public class TaskAgendaLoad {
 	private HttpClient client;
 	private ClassInfoClient error_class_info; // a error msg saved to this object
 	private List<ClassInfoClient> classInfos = new ArrayList<ClassInfoClient>();
 	private String userName ;
+	private UserDAO userDAO;
 	
-	String lt;
-	public String rspHtml;
-	HttpResponse response;
+	private String rspHtml;
+	private HttpResponse response;
 
-	public TaskAgendaLoad(){ 
+	public TaskAgendaLoad(UserDAO userDAO){ 
+		this.userDAO = userDAO;
 		error_class_info = new ClassInfoClient("E", "E");
 		try {
 			client = HtmlUtil.getHTTPSclient();
@@ -60,17 +63,18 @@ public class TaskAgendaLoad {
 		redirection();
 		getAgendaHtml();	
 		redirection();
-		//getTWCoursPara();
-		getNWCoursPara();
-		//System.out.println(rspHtml);
-		Thread[] threads = new Thread[classInfos.size()];
-			for(int i=0; i<threads.length; i++){
- 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
- 			threads[i].start();
-			}
-			for(int i = 0; i < threads.length; i++){
-				threads[i].join();
-			}
+//		//getTWCoursPara();
+//		getNWCoursPara();
+//		//System.out.println(rspHtml);
+//		Thread[] threads = new Thread[classInfos.size()];
+//			for(int i=0; i<threads.length; i++){
+// 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
+// 			threads[i].start();
+//			}
+//			for(int i = 0; i < threads.length; i++){
+//				threads[i].join();
+//			}
+		
 	}
 	
 	public List<ClassInfoClient> start(String id,String mdp) {
@@ -91,18 +95,19 @@ public class TaskAgendaLoad {
 			} 		
  			getAgendaHtml();	
  			redirection();
- 			getTWCoursPara();
- 			getNWCoursPara();
+ 			loadClassInfoPara();
  			
  			Thread[] threads = new Thread[classInfos.size()];
  			for(int i=0; i<threads.length; i++){
-	 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), Config.SI_ETUDIENT_HOST, client));
+	 			threads[i] = new Thread(new TaskClassDetailLoad(classInfos.get(i), client));
 	 			threads[i].start();
  			}
  			for(int i = 0; i < threads.length; i++){
  				threads[i].join();
  			}
- 				  
+ 			Thread addUserThread = new Thread(new TaskUserAdd(classInfos, userDAO, client));
+ 			addUserThread.start();
+ 			addUserThread.join();
 		} catch (Exception e) {
 			//we put the error message to the cours
 			error_class_info.name="FailException";
@@ -119,11 +124,9 @@ public class TaskAgendaLoad {
 	private void GoToAgenda() throws FailException{
 		try {
 			HttpGet httpGet = new HttpGet(Config.SI_ETUDIENT_HOST);
-			response = client.execute(httpGet);
-			
+			response = client.execute(httpGet);		
 			HttpEntity entity = response.getEntity();
-			int status = response.getStatusLine().getStatusCode();
-			
+			int status = response.getStatusLine().getStatusCode();			
 			if(status==200){
 				rspHtml = EntityUtils.toString(entity);
 				httpGet.abort();
@@ -157,13 +160,8 @@ public class TaskAgendaLoad {
 			
 			if(status==302){
 				HttpEntity entity = response.getEntity();
-				//rspHtml = EntityUtils.toString(entity);
-				InputStream stream = entity.getContent();
-				BufferedReader br =  new BufferedReader(new InputStreamReader(stream, "utf-8"));
-				rspHtml="";
-				for(String temp = br.readLine(); temp != null; rspHtml += temp ,temp = br.readLine()); 
-				stream.close();
-				
+				rspHtml = EntityUtils.toString(entity);
+
 				httpPost.abort();
 				String url = response.getFirstHeader("Location").getValue();
 				//userid=User.insert(id, mdp);
@@ -228,7 +226,7 @@ public class TaskAgendaLoad {
 			String session_Utilisateur = HtmlUtil.findAttributValueByID(rspHtml, "session_Utilisateur", "value");
 			String[] temp = session_Utilisateur.split("-");
 			userName = temp[temp.length-1];
-			userName.replace("Titre:", "");
+			userName = userName.replace("Titre:", "");
 			userName = userName.trim();
 			data.add(new BasicNameValuePair("session_Utilisateur", session_Utilisateur));
 			data.add(new BasicNameValuePair("session_FeuilleCss", HtmlUtil.findAttributValueByID(rspHtml, "session_FeuilleCss", "value")));
@@ -250,7 +248,7 @@ public class TaskAgendaLoad {
 		}
 	}
 	
-	private void getTWCoursPara(){
+	private void getCurrentClassInfoPara(){
 		Document doc = Jsoup.parse(rspHtml);
 		Elements elements = doc.getElementsByAttribute("onmouseover");
 		Pattern pattern = Pattern.compile("[0-9]+");
@@ -264,22 +262,15 @@ public class TaskAgendaLoad {
 				c.dateSrc = matcher.group();
 			}
 			classInfos.add(c);
-		}
-		
+		}		
 	}
 	
-	private void getNWCoursPara() throws FailException{
+	//NumDat like 20140125 (yyyyMMdd)
+	private void refreshAgendaByDate(String NumDat) throws FailException{
 		try {
-//			Calendar c = TimeUtil.getCalendarParis();
-//			c.add(Calendar.WEEK_OF_YEAR, 1);
-//			DateFormat df = new SimpleDateFormat("yyyyMMdd");
-//			String NumDat = df.format(c.getTime());
-			String NumDat = "20140606";
-			
 			HttpPost httpPost = new HttpPost(Config.SI_ETUDIENT_HOST+"/Eplug/Agenda/Agenda.asp");
 			List<NameValuePair> data = new ArrayList<NameValuePair>();
-			data.add(new BasicNameValuePair("NumDat", NumDat));	
-			
+			data.add(new BasicNameValuePair("NumDat", NumDat));		
 			data.add(new BasicNameValuePair("DebHor", HtmlUtil.findInputValue(rspHtml, "DebHor")));
 			data.add(new BasicNameValuePair("FinHor", HtmlUtil.findInputValue(rspHtml, "FinHor")));
 			data.add(new BasicNameValuePair("ValGra", HtmlUtil.findInputValue(rspHtml, "ValGra")));			
@@ -305,7 +296,32 @@ public class TaskAgendaLoad {
 			System.out.println("cause exception:");
 			throw new FailException("cause exception:"+e.toString());
 		}
-		//redirection();
-		getTWCoursPara();
+	}
+	
+	//加载四周的课程 parametre
+	private void loadClassInfoPara() throws FailException{
+		//get classInfo of this week
+		getCurrentClassInfoPara();
+		//get classInfo of this week -1
+		Calendar c = TimeUtil.getCalendarParis();
+		c.add(Calendar.WEEK_OF_YEAR, -1);
+		DateFormat df = new SimpleDateFormat("yyyyMMdd");
+		String NumDat = df.format(c.getTime());
+		refreshAgendaByDate(NumDat);
+		getCurrentClassInfoPara();
+		//get classInfo of this week +1
+		c.add(Calendar.WEEK_OF_YEAR, 2);
+		NumDat = df.format(c.getTime());
+		refreshAgendaByDate(NumDat);
+		getCurrentClassInfoPara();
+		//get classInfo of this week +2
+		c.add(Calendar.WEEK_OF_YEAR, 1);
+		NumDat = df.format(c.getTime());
+		refreshAgendaByDate(NumDat);
+		getCurrentClassInfoPara();
+	}
+	
+	public String getUserName(){
+		return userName;
 	}
 }

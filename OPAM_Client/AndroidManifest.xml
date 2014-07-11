@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme"
         android:label="@string/app_name">
         
-        <activity android:name="com.sky.opam.TestActivity"
+        <activity android:name="com.sky.opam.ClassInfoDetailActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>

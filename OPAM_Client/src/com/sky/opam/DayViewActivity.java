@@ -9,6 +9,7 @@ import com.sky.opam.view.DayClassView;
 import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -42,8 +43,14 @@ public class DayViewActivity extends ActionBarActivity{
 		dayClassView.setCours(worker.getClassInfo(login, numWeek, dayOfWeek));
 		dayClassView.setClickListener(new ClassInfoClickListener() {
 			@Override
-			public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
-				showClassInfo(c);
+			public void onTouchEvent(View v, MotionEvent e, long classId) {
+				//showClassInfo(c);
+				Intent intent = new Intent();
+	            intent.setClass(DayViewActivity.this, ClassInfoDetailActivity.class);
+	            Bundle bundle = new Bundle();
+	            bundle.putLong("classId", classId);
+	            intent.putExtras(bundle);
+	            startActivity(intent);
 			}
 		});
 		ScrollView scrollView = new ScrollView(this);

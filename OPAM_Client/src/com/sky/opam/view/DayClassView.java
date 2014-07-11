@@ -261,7 +261,7 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 			for (int i = 0; i < flag.size(); i++) {
 				float[] f = flag.get(i);
 				if (f[0] < e.getY() && e.getY() < f[1]) {
-					myClcLis.onTouchEvent(this, e, cours.get(i));
+					myClcLis.onTouchEvent(this, e, cours.get(i).id);
 				}
 			}
 		}
