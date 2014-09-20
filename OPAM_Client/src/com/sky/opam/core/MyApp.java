@@ -1,4 +1,4 @@
-package com.sky.opam.tool;
+package com.sky.opam.core;
 
 import cn.jpush.android.api.JPushInterface;
 import android.app.Application;

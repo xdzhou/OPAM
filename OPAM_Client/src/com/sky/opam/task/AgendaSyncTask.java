@@ -2,10 +2,10 @@ package com.sky.opam.task;
 
 import java.util.List;
 
+import com.sky.opam.core.DBworker;
+import com.sky.opam.core.MyApp;
 import com.sky.opam.model.ClassInfo;
-import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.GoogleCalendarAPI;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.AndroidUtil;
 
 import android.content.Context;

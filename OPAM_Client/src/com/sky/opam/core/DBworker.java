@@ -1,4 +1,4 @@
-package com.sky.opam.tool;
+package com.sky.opam.core;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,6 +9,8 @@ import com.sky.opam.model.ClassType;
 import com.sky.opam.model.Config;
 import com.sky.opam.model.Room;
 import com.sky.opam.model.User;
+import com.sky.opam.tool.GoogleCalendarAPI;
+import com.sky.opam.tool.TimeUtil;
 
 import android.content.ContentValues;
 import android.content.Context;

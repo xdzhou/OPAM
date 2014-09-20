@@ -1,17 +1,25 @@
 package com.sky.opam.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable
 public class User {
-	private String login = "";
-	private String passwoed = "";
-	private String name = "";
+	@DatabaseField(id = true)
+	private String login;
+	@DatabaseField
+	private String cryptePW;
+	@DatabaseField
+	private String name;
+	@DatabaseField
 	private int numWeekUpdated;
 
 	public User() {
 	}
 
-	public User(String login, String passwoed, String name, int numWeekUpdated) {
+	public User(String login, String cryptePW, String name, int numWeekUpdated) {
 		this.login = login;
-		this.passwoed = passwoed;
+		this.cryptePW = cryptePW;
 		this.name = name;
 		this.numWeekUpdated = numWeekUpdated;
 	}
@@ -23,13 +31,14 @@ public class User {
 	public void setLogin(String login) {
 		this.login = login;
 	}
+	
 
-	public String getPasswoed() {
-		return passwoed;
+	public String getCryptePW() {
+		return cryptePW;
 	}
 
-	public void setPasswoed(String passwoed) {
-		this.passwoed = passwoed;
+	public void setCryptePW(String cryptePW) {
+		this.cryptePW = cryptePW;
 	}
 
 	public String getName() {
@@ -47,7 +56,4 @@ public class User {
 	public void setNumWeekUpdated(int numWeekUpdated) {
 		this.numWeekUpdated = numWeekUpdated;
 	}
-	
-	
-
 }

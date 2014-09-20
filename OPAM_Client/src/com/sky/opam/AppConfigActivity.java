@@ -1,8 +1,8 @@
 package com.sky.opam;
 
+import com.sky.opam.core.DBworker;
+import com.sky.opam.core.MyApp;
 import com.sky.opam.model.Config;
-import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.AndroidUtil;
 import com.sky.opam.tool.OpamUtil;
 import com.sky.opam.tool.TimeUtil;

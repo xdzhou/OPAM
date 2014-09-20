@@ -2,12 +2,12 @@ package com.sky.opam;
 
 import com.google.gson.Gson;
 import com.sky.opam.R;
+import com.sky.opam.core.Chiffrement;
+import com.sky.opam.core.DBworker;
+import com.sky.opam.core.MyApp;
 import com.sky.opam.model.User;
 import com.sky.opam.model.VersionInfo;
 import com.sky.opam.task.AgendaDownloadTask;
-import com.sky.opam.tool.Chiffrement;
-import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.AndroidUtil;
 import com.sky.opam.tool.OpamUtil;
 import com.sky.opam.tool.TimeUtil;

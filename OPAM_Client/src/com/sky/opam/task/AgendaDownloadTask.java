@@ -18,12 +18,12 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.sky.opam.R;
+import com.sky.opam.core.Chiffrement;
+import com.sky.opam.core.DBworker;
+import com.sky.opam.core.FailException;
 import com.sky.opam.model.ClassInfo;
 import com.sky.opam.model.User;
 import com.sky.opam.model.UserClassPackage;
-import com.sky.opam.tool.Chiffrement;
-import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.FailException;
 import com.sky.opam.tool.GoogleCalendarAPI;
 
 import android.app.ProgressDialog;

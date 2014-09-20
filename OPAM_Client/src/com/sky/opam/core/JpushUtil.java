@@ -1,4 +1,4 @@
-package com.sky.opam.tool;
+package com.sky.opam.core;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

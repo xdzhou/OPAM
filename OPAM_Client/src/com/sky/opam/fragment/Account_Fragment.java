@@ -3,11 +3,11 @@ package com.sky.opam.fragment;
 import java.util.List;
 
 import com.sky.opam.R;
+import com.sky.opam.core.DBworker;
+import com.sky.opam.core.MyApp;
 import com.sky.opam.model.User;
 import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.task.DownloadImageTask;
-import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.AndroidUtil;
 
 import android.annotation.SuppressLint;

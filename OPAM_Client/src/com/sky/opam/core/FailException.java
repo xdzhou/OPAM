@@ -1,4 +1,4 @@
-package com.sky.opam.tool;
+package com.sky.opam.core;
 
 public class FailException extends Exception {
 
