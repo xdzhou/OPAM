@@ -5,6 +5,7 @@ import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.model.VersionInfo;
 import com.sky.opam.task.AgendaDownloadTask;
+import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.Chiffrement;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
@@ -16,8 +17,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,7 +27,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 public class LoginActivity extends Activity {
     private AutoCompleteTextView tfID = null;
@@ -42,7 +40,8 @@ public class LoginActivity extends Activity {
     private User currentUser;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+    {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.login_activity);
@@ -54,9 +53,10 @@ public class LoginActivity extends Activity {
         //First Use App, show Version Info
         boolean oldAutoLoginFlag = worker.getAutoLogin(context);
         boolean isFirstUse = Tool.isFirstUseApp(context);
-        if(isFirstUse){
+        if(isFirstUse)
+        {
         	worker.setAutoLogin(context, false);
-            VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_10_info), VersionInfo.class);
+            VersionInfo versionInfo = (VersionInfo) new Gson().fromJson(getResources().getString(R.string.version_11_info), VersionInfo.class);
             getSharedPreferences("share", 0).edit().putBoolean("isFirstIn", false).commit(); 
             AlertDialog.Builder builder = Tool.showVersionInfo(context, versionInfo);
             builder.show();
@@ -66,7 +66,8 @@ public class LoginActivity extends Activity {
         monBtn.getBackground().setAlpha(150);
         tfID = (AutoCompleteTextView) findViewById(R.id.txtID);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line);
-        for(User tempUser : worker.getAllUser()){
+        for(User tempUser : worker.getAllUser())
+        {
         	adapter.add(tempUser.getLogin());
         }
         tfID.setThreshold(1);
@@ -75,21 +76,27 @@ public class LoginActivity extends Activity {
         tfMDP.getBackground().setAlpha(150);
 
         User fUser = worker.getDefaultUser();
-        if (fUser != null) {
+        if (fUser != null) 
+        {
             currentUser = fUser;
             login = fUser.getLogin();
             myApp.setLogin(login);  
             tfID.setText(fUser.getLogin());
             //tfMDP.setText(Chiffrement.decrypt(fUser.getPasswoed(), "OPAM"));         
-            if(worker.getAutoLogin(context)){
-            	if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) WeekAgendaShow(myApp.getCurrentWeekNum());
-            	else askForUpdate();
+            if(worker.getAutoLogin(context))
+            {
+            	if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) 
+            		WeekAgendaShow(myApp.getCurrentWeekNum());
+            	else 
+            		askForUpdate();
             }
         }
         if(isFirstUse) worker.setAutoLogin(context, oldAutoLoginFlag);
 
-        monBtn.setOnClickListener(new android.view.View.OnClickListener() {
-            public void onClick(View v) {
+        monBtn.setOnClickListener(new android.view.View.OnClickListener() 
+        {
+            public void onClick(View v) 
+            {
                 login = tfID.getText().toString();
                 password = tfMDP.getText().toString();
 
@@ -97,22 +104,29 @@ public class LoginActivity extends Activity {
                     Tool.showInfo(context,getResources().getString(R.string.login_null_alert));
                 else if (password.length() == 0)
                 	Tool.showInfo(context,getResources().getString(R.string.pw_null_alert));
-                else {
+                else 
+                {
                     currentUser = worker.getUser(login);
                     myApp.setLogin(login);
-                    if (currentUser == null) {
-                            downloadCharge();
-                    } else {
+                    if (currentUser == null) 
+                    {
+                    	downloadCharge();
+                    } 
+                    else 
+                    {
                         worker.setDefaultUser(currentUser.getLogin());
                         String mdp = Chiffrement.decrypt(currentUser.getPasswoed(),"OPAM");
-                        if (!mdp.equals(password)) {
-                            Tool.showInfo(context,"Password incorrect.");
-                        } else {
-                            if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) {
+                        if (!mdp.equals(password)) 
+                        {
+                            //Tool.showInfo(context,"Password incorrect.")
+                            passwordResetAlart();
+                        } 
+                        else 
+                        {
+                            if (myApp.getCurrentWeekNum() == currentUser.getNumWeekUpdated()) 
                                 WeekAgendaShow(myApp.getCurrentWeekNum());
-                            } else {
+                            else
                                 askForUpdate();
-                            }
                         }
                     }
                 }
@@ -120,39 +134,70 @@ public class LoginActivity extends Activity {
         });
 
     }
+    
+    private void passwordResetAlart(){
+    	new AlertDialog.Builder(this)
+        .setTitle("Password Error")
+        .setMessage("Password incorrect. If you have modified your password online these days, Please click retry!")
+        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) { 
+                worker.delUser(currentUser.getLogin(), false);
+            }
+         })
+        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) { 
+                dialog.dismiss();
+            }
+         })
+        .setIcon(android.R.drawable.ic_dialog_alert)
+        .show();
+    }
 
     // reponse au le update request
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == MyApp.Update) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+    {
+        if (resultCode == MyApp.Update) 
+        {
             finishActivity(requestCode);
             downloadCharge();
-        } else if (resultCode == MyApp.Exit || resultCode == 0) {
+        } 
+        else if (resultCode == MyApp.Exit || resultCode == 0) 
+        {
             finish();
         }
     }
 
     // download the course
-    private void downloadCharge() {
-        if (Tool.isNetworkAvailable(context)) {
+    private void downloadCharge() 
+    {
+        if (Tool.isNetworkAvailable(context)) 
+        {
         	login = tfID.getText().toString();
-        	if(login.equals(myApp.getLogin())){
+        	if(login.equals(myApp.getLogin()))
+        	{
         		password = tfMDP.getText().toString();
         		//从weekViewActivity的更新命令 需要设置密码
-        		if(password.equals("")) password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
-        	}else {
+        		if(password.equals("")) 
+        			password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
+        	}
+        	else 
+        	{
 				login = myApp.getLogin();
 				password = Chiffrement.decrypt(worker.getUser(login).getPasswoed(), "OPAM");
 			}         
             AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(context, new AgendaHandler());
             agendaDownloadTask.execute(login,password);
-        } else {
+        } 
+        else 
+        {
             Tool.showInfo(context, getResources().getString(R.string.network_unavailable));
         }
     }
 
     // ask for update the base de donnée if it's too old
-    private void askForUpdate() {
+    private void askForUpdate() 
+    {
         new AlertDialog.Builder(this)
             .setTitle("update")
             .setMessage(R.string.update_classInfo_msg)
@@ -160,10 +205,13 @@ public class LoginActivity extends Activity {
             .setNegativeButton(R.string.no, onclick).show();
     }
 
-    DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() {
+    DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() 
+    {
         @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
+        public void onClick(DialogInterface dialog, int which) 
+        {
+            switch (which) 
+            {
             case Dialog.BUTTON_NEGATIVE:
                 WeekAgendaShow(currentUser.getNumWeekUpdated());
                 break;
@@ -177,8 +225,11 @@ public class LoginActivity extends Activity {
         }
     };
 
-    private void WeekAgendaShow(int numWeek) {
+    private void WeekAgendaShow(int numWeek) 
+    {
     	worker.setDefaultUser(currentUser.getLogin());
+    	DownloadImageTask downloadImageTask = new DownloadImageTask(myApp, myApp.getLogin());
+        downloadImageTask.execute("http://trombi.it-sudparis.eu/photo.php?uid="+myApp.getLogin()+"&h=80&w=80");
         Intent intent = new Intent();
         intent.setClass(LoginActivity.this, WeekViewActivity.class);
         Bundle bundle = new Bundle();
@@ -189,12 +240,17 @@ public class LoginActivity extends Activity {
 
     long exitTime = 0;
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN) {
-            if ((System.currentTimeMillis() - exitTime) > 2000) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) 
+    {
+        if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN)
+        {
+            if ((System.currentTimeMillis() - exitTime) > 2000) 
+            {
                 Tool.showInfo(context, "on more time to exit");
                 exitTime = System.currentTimeMillis();
-            } else {
+            }
+            else 
+            {
                 finish();
                 System.exit(0);
             }
@@ -203,14 +259,19 @@ public class LoginActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
     
-    private class AgendaHandler extends Handler {
+    private class AgendaHandler extends Handler 
+    {
 		@Override
-		public void handleMessage(Message msg) {
+		public void handleMessage(Message msg) 
+		{
 			super.handleMessage(msg);
-			if(msg.what == R.integer.OK){
+			if(msg.what == R.integer.OK)
+			{
 				currentUser = worker.getUser(login);
 				WeekAgendaShow(currentUser.getNumWeekUpdated());
-			}else {
+			}
+			else 
+			{
 				Bundle b = msg.getData();
 				String errorMsg = b.getString("error");
 				Tool.showInfo(context, errorMsg);

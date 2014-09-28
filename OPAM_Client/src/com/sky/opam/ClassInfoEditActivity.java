@@ -21,7 +21,6 @@ import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -44,7 +43,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class ClassInfoEditActivity extends ActionBarActivity{
+public class ClassInfoEditActivity extends ActionBarActivity
+{
 	private DBworker worker;
 	private MyApp myApp;
 	private String bgColor;
@@ -61,27 +61,37 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 	private SimpleDateFormat  simpleFormat = new SimpleDateFormat("HH:mm");
 	
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.classinfo_edit_activity);
 		init();
 		setActionBar();
 	}
 	
-	private void init(){
+	private void init()
+	{
 		worker = new DBworker(this);
 		myApp = (MyApp)getApplication();
 		
 		long classId = getIntent().getExtras().getLong("classId");
 		String minTime = getIntent().getExtras().getString("minTime");
-		String maxTime = getIntent().getExtras().getString("maxTime");	
+		String maxTime = getIntent().getExtras().getString("maxTime");
 		
-		if(classId == -1){
+		if(classId == -1)
+		{
 			classInfo = ClassInfo.getCustomedClass(myApp.getLogin());
 			classInfo.weekOfYear = getIntent().getExtras().getInt("weekOfYear");
 			classInfo.dayOfWeek = getIntent().getExtras().getInt("dayOfWeek");
-		}else {
+		}
+		else 
+		{
 			classInfo = worker.getClassInfo(classId);
+			if(minTime == null){
+				String[] minMaxTime = Tool.getVocationTime(myApp, classInfo);
+				minTime = minMaxTime[0];
+				maxTime = minMaxTime[1];
+			}
 		}
 		bgColor = classInfo.bgColor;
 		nameEditText = (EditText)findViewById(R.id.NameEditText);
@@ -103,29 +113,37 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		
 		//rangeSeekBar
 		LinearLayout classEditLayout = (LinearLayout)findViewById(R.id.classEditLayout);
-		try {
+		try 
+		{
 			Date minDate = simpleFormat.parse(minTime);
 			Date maxDate = simpleFormat.parse(maxTime);
 			rangeSeekBar = new RangeSeekBar<Long>(minDate.getTime(), maxDate.getTime(), this);
-		} catch (ParseException e) {
+		} 
+		catch (ParseException e) 
+		{
 			e.printStackTrace();
 		}
 		classEditLayout.addView(rangeSeekBar, 2);
 		
-		if(classInfo.id != -1){
-			try {
+		if(classInfo.id != -1)
+		{
+			try 
+			{
 				rangeSeekBar.setSelectedMinValue(simpleFormat.parse(classInfo.startTime).getTime());
 				rangeSeekBar.setSelectedMaxValue(simpleFormat.parse(classInfo.endTime).getTime());
 				startTimeTV.setText(classInfo.startTime);
 				endTimeTV.setText(classInfo.endTime);
-			} catch (ParseException e) {
+			} 
+			catch (ParseException e) 
+			{
 				e.printStackTrace();
 			}		
 		}
 		rangeSeekBar.setNotifyWhileDragging(true);
 		rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Long>() {
 			@Override
-			public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,Long minValue, Long maxValue) {
+			public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,Long minValue, Long maxValue) 
+			{
 				Date date1 = new Date(minValue);
 				Date date2 = new Date(maxValue);
 				startTimeTV.setText(simpleFormat.format(date1));
@@ -137,7 +155,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		AddAdapter typeAdapter = new AddAdapter(this);
 		int typeSelecteID = 0;
 		List<ClassType> type_list  = worker.getAllClassType();
-		for(int i=0; i<type_list.size(); i++){
+		for(int i=0; i<type_list.size(); i++)
+		{
 			ClassType type = type_list.get(i);
 			if(type.name.equals(classInfo.classType.name)) typeSelecteID = i;
 			typeAdapter.add(type.name);
@@ -147,7 +166,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		typeSpinner.setSelection(typeSelecteID);
 		typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {			
+			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) 
+			{			
 				if(parent.getAdapter().getCount()-1 == position){
 					getTextEntreBuilder((AddAdapter)parent.getAdapter(), 0).show();
 				}
@@ -161,7 +181,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		AddAdapter roomAdapter = new AddAdapter(this);
 		int roomSelecteID = 0;
 		List<Room> room_list = worker.getAllRoom();
-		for(int i=0; i<room_list.size(); i++){
+		for(int i=0; i<room_list.size(); i++)
+		{
 			Room room = room_list.get(i);
 			if(classInfo.room!=null && room.name.equals(classInfo.room.name)) roomSelecteID = i;
 			roomAdapter.add(room.name);
@@ -171,7 +192,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		roomSpinner.setSelection(roomSelecteID);
 		roomSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {			
+			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) 
+			{			
 				if(parent.getAdapter().getCount()-1 == position){
 					getTextEntreBuilder((AddAdapter)parent.getAdapter(), 1).show();
 				}
@@ -194,7 +216,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		});
 	}
 	
-	private void setActionBar(){
+	private void setActionBar()
+	{
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         //actionBar.setDisplayHomeAsUpEnabled(true);
@@ -202,8 +225,10 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 	}
 	
 	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{
+		if (keyCode == KeyEvent.KEYCODE_BACK) 
+		{
 			setResult(MyApp.Refresh);
 			finish();
 			return true;
@@ -213,21 +238,28 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 	}
 	
 	@Override  
-    public boolean onCreateOptionsMenu(Menu menu) { 
+    public boolean onCreateOptionsMenu(Menu menu) 
+	{ 
         MenuItemCompat.setShowAsAction(menu.add("cancel").setIcon(android.R.drawable.ic_menu_close_clear_cancel), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         MenuItemCompat.setShowAsAction(menu.add("save").setIcon(android.R.drawable.ic_menu_save), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return true;  
     }
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem menu) {
-		if(menu.getTitle().equals("cancel")){
+    public boolean onOptionsItemSelected(MenuItem menu) 
+	{
+		if(menu.getTitle().equals("cancel"))
+		{
 			setResult(MyApp.Refresh);
 			finish();
-		}else if (menu.getTitle().equals("save")) {
+		}
+		else if (menu.getTitle().equals("save")) 
+		{
 			String name = nameEditText.getText().toString();
-			if(name==null || name.equals("")) Tool.showInfo(this, "input the class name, please!");
-			else {
+			if(name==null || name.equals("")) 
+				Tool.showInfo(this, "input the class name, please!");
+			else 
+			{
 				classInfo.name = nameEditText.getText().toString();
 				classInfo.startTime = startTimeTV.getText().toString();
 				classInfo.endTime = endTimeTV.getText().toString();
@@ -246,17 +278,21 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		return super.onOptionsItemSelected(menu);
 	}
 	
-	class AddAdapter extends ArrayAdapter<String>{
-		public AddAdapter(Context context) {
+	class AddAdapter extends ArrayAdapter<String>
+	{
+		public AddAdapter(Context context) 
+		{
 			super(context, R.layout.date_dropdown_spinner_layout);
 		}
 		@Override
-		public View getDropDownView(int position, View convertView, ViewGroup parent) {
+		public View getDropDownView(int position, View convertView, ViewGroup parent) 
+		{
 			convertView = LayoutInflater.from(getContext()).inflate(R.layout.date_dropdown_spinner_layout, null);
 			TextView tv = (TextView)convertView.findViewById(R.id.text1);
 			String itemString = getItem(position);
 			tv.setText(itemString);
-			if(position == getCount()-1 ){
+			if(position == getCount()-1 )
+			{
 				//tv.setBackgroundColor(Color.GRAY);
 				tv.setBackgroundResource(R.drawable.important_bg);
 			}
@@ -264,7 +300,8 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		}
 	}
 	
-	private AlertDialog.Builder getTextEntreBuilder(final AddAdapter adapter, final int flag){
+	private AlertDialog.Builder getTextEntreBuilder(final AddAdapter adapter, final int flag)
+	{
 		final View viewDia = LayoutInflater.from(ClassInfoEditActivity.this).inflate(R.layout.alert_dialog_text_entry, null);
 		final EditText newInfoET = (EditText) viewDia.findViewById(R.id.et);
 		TextView tView = (TextView)viewDia.findViewById(R.id.new_info);
@@ -277,27 +314,34 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		builder.setView(viewDia);
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(DialogInterface dialog, int which) 
+			{
 				if(flag == 0) typeSpinner.setSelection(0);
 				else roomSpinner.setSelection(0);	
 			}			
 		});
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(DialogInterface dialog, int which) 
+			{
 				String info = newInfoET.getText().toString();
-				if(info.equals("")) {
+				if(info.equals("")) 
+				{
 					Tool.showInfo(ClassInfoEditActivity.this, " NULL ");
 					if(flag == 0) typeSpinner.setSelection(0);
 					else roomSpinner.setSelection(0);
 				}
-				else {							
+				else 
+				{							
 					adapter.insert(info, 0);
 					adapter.notifyDataSetChanged();
-					if(flag == 0) {
+					if(flag == 0) 
+					{
 						worker.addGetClassType(info);
 						typeSpinner.setSelection(0);
-					}else {
+					}
+					else 
+					{
 						worker.addGetRoom(info);
 						roomSpinner.setSelection(0);
 					}
@@ -308,26 +352,35 @@ public class ClassInfoEditActivity extends ActionBarActivity{
 		return builder;
 	}
 	
-	private View.OnClickListener timePickListener = new View.OnClickListener() {		
+	private View.OnClickListener timePickListener = new View.OnClickListener() 
+	{		
 		@Override
-		public void onClick(View v) {
+		public void onClick(View v) 
+		{
 			final TextView tView = (TextView) v;
 			String[] hm = tView.getText().toString().split(":");
 			int hour = Integer.parseInt(hm[0]);
 			int min = Integer.parseInt(hm[1]);
 			TimePickerDialog timePickerDialog = new TimePickerDialog(ClassInfoEditActivity.this, new OnTimeSetListener(){
 				@Override
-				public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+				public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+				{
 					String timeSelect = hourOfDay+":"+minute;
-					try {
-						if(tView.getId() == 0){
+					try 
+					{
+						if(tView.getId() == 0)
+						{
 							rangeSeekBar.setSelectedMinValue(simpleFormat.parse(timeSelect).getTime());
 							startTimeTV.setText(simpleFormat.format(rangeSeekBar.getSelectedMinValue()));
-						}else {
+						}
+						else 
+						{
 							rangeSeekBar.setSelectedMaxValue(simpleFormat.parse(timeSelect).getTime());
 							endTimeTV.setText(simpleFormat.format(rangeSeekBar.getSelectedMaxValue()));
 						}
-					} catch (Exception e) {
+					} 
+					catch (Exception e) 
+					{
 						e.printStackTrace();
 					}			
 				}

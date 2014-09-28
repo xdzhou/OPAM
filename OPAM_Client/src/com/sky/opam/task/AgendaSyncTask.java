@@ -17,7 +17,8 @@ public class AgendaSyncTask extends AsyncTask<Void, Void, Integer>{
 	private MyApp myApp;
 	private GoogleCalendarAPI googleCalendarAPI;
 	
-	public AgendaSyncTask(Context context) {
+	public AgendaSyncTask(Context context) 
+	{
 		this.context = context;
 		worker = new DBworker(context);
 		myApp = (MyApp) context.getApplicationContext();
@@ -27,9 +28,17 @@ public class AgendaSyncTask extends AsyncTask<Void, Void, Integer>{
 	@Override
 	protected Integer doInBackground(Void... params) {
 		List<ClassInfo> list = worker.getUnsyncClassInfo(myApp.getLogin());
-		for(ClassInfo c : list){
-			long eventId = googleCalendarAPI.addCourse2Calendar(c);
-			worker.setClassSynced(c.id, eventId);
+		for(ClassInfo c : list)
+		{
+			try 
+			{
+				long eventId = googleCalendarAPI.addCourse2Calendar(c);
+				worker.setClassSynced(c.id, eventId);
+			} 
+			catch (Exception e) 
+			{
+				// TODO: handle exception
+			}	
 		}
 		return list.size();
 	}

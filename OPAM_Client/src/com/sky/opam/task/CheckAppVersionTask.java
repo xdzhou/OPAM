@@ -20,18 +20,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
+public class CheckAppVersionTask extends AsyncTask<Void, Void, String>
+{
 	private Context context;
 	private Handler handler;
 	
-	public CheckAppVersionTask(Context context, Handler handler) {
+	public CheckAppVersionTask(Context context, Handler handler) 
+	{
 		this.context = context;
 		this.handler = handler;
 	}
 
 	@Override
-	protected String doInBackground(Void... params) {
-		try {
+	protected String doInBackground(Void... params) 
+	{
+		try 
+		{
 			int lastVersionCode = getLastVersionCode();
 			if(lastVersionCode > Tool.getVersionCode(context)){
 				return getVersionInfo();
@@ -43,8 +47,10 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
 	}
 	
 	@Override
-    protected void onPostExecute(String result) {
-        if (result != null) {
+    protected void onPostExecute(String result) 
+	{
+        if (result != null) 
+        {
         	Message msg = new Message();
         	Bundle b = new Bundle();// 存放数据
         	b.putString("versionInfo", result);
@@ -53,19 +59,24 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
         }
     }
 	
-	private int getLastVersionCode() throws FailException{
+	private int getLastVersionCode() throws FailException
+	{
 		int versionCode = 0;
 		HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para=code");
-        try {
+        try 
+        {
             HttpResponse response = client.execute(httpGet);
             int status = response.getStatusLine().getStatusCode();
-            if (status == 200) {
+            if (status == 200) 
+            {
                 HttpEntity entity = response.getEntity();
                 versionCode = Integer.parseInt(EntityUtils.toString(entity));
                 httpGet.abort();
                 return versionCode;
-            } else {
+            } 
+            else 
+            {
             	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
             }
         } catch (UnsupportedEncodingException e) {
@@ -79,19 +90,24 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>{
         }
 	}
 	
-	private String getVersionInfo() throws FailException{
+	private String getVersionInfo() throws FailException
+	{
 		String localLanguage = Tool.getLocalLanguage();
 		HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet( "http://openopam-loic.rhcloud.com/agendaopamjson?para="+localLanguage);
-        try {
+        try 
+        {
             HttpResponse response = client.execute(httpGet);
             int status = response.getStatusLine().getStatusCode();
-            if (status == 200) {
+            if (status == 200) 
+            {
                 HttpEntity entity = response.getEntity();
                 String resulta = EntityUtils.toString(entity);
                 httpGet.abort();
                 return resulta;
-            } else {
+            } 
+            else 
+            {
             	throw new FailException("Can't connect to the server, status:" + status+ " recevied.");
             }
         } catch (UnsupportedEncodingException e) {

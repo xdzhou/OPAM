@@ -8,6 +8,7 @@ import com.sky.opam.view.DayClassView;
 import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -60,7 +61,7 @@ public class DayViewActivity extends ActionBarActivity{
 		setContentView(scrollView);
 	}
 	
-	private void showClassInfo(ClassInfo c) {
+	private void showClassInfo(final ClassInfo c) {
 		final Dialog dlg = new Dialog(this, R.style.MyDialog);
 		dlg.show();
 		Window win = dlg.getWindow();
@@ -73,11 +74,24 @@ public class DayViewActivity extends ActionBarActivity{
 		if(c.room.name!=null || !c.room.name.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
 		if(c.teacher!=null || !c.teacher.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
 
-		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
-		button.setOnClickListener(new View.OnClickListener() {
+		Button cancelButton = (Button) win.findViewById(R.id.dialog_button_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlg.cancel();
+			}
+		});
+		
+		Button editButton = (Button) win.findViewById(R.id.dialog_button_edit);
+		editButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+		        intent.setClass(DayViewActivity.this, ClassInfoEditActivity.class);
+		        Bundle bundle = new Bundle();
+		        bundle.putLong("classId", c.id);
+		        intent.putExtras(bundle);
+		        startActivityForResult(intent, MyApp.rsqCode);
 			}
 		});
 	}

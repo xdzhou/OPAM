@@ -18,31 +18,36 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class DBworker {
     private DBHelper helper;
-    private SQLiteDatabase db;
 
     public DBworker(Context context) {
         helper = new DBHelper(context);
     }
 
-    public void addUser(User user) {
-        db = helper.getWritableDatabase();
+    public void addUser(User user) 
+    {
+    	SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("insert into USER (login,password,name,numWeekUpdated) values (?,?,?,?)",
         		new Object[] { user.getLogin(), user.getPasswoed(),user.getName(),user.getNumWeekUpdated()});
-        db.execSQL("insert into CONFIG values (?,?,?,?,?)",
-            new Object[] { user.getLogin(), 8, 19, 1, 0});
+        if(getConfig(user.getLogin()) == null)
+        {
+        	if(!db.isOpen())
+        		db = helper.getWritableDatabase();
+        	db.execSQL("insert into CONFIG values (?,?,?,?,?)", new Object[] { user.getLogin(), 8, 19, 1, 0});
+        }	        
         db.close();
     }
     
     public void updateUser(User user) {
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("update USER set password = ?,name =?, numWeekUpdated=? where login = ?",
             new Object[] { user.getPasswoed(), user.getName(),user.getNumWeekUpdated(), user.getLogin() });
         db.close();
     }
     
     public User getUser(String login) {
-    	if(login==null) return null;
-        db = helper.getReadableDatabase();
+    	if(login==null) 
+    		return null;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from USER where login='" + login + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -61,7 +66,7 @@ public class DBworker {
     }
     
     public List<User> getAllUser() {
-        db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select login,name from USER", null);
         List<User> users = new ArrayList<User>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -76,20 +81,21 @@ public class DBworker {
 	}
     
     public void delAllUsers() {
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("delete from USER;");
         db.close();
     }
     
-    public void delUser(String login){
-    	db = helper.getWritableDatabase();
+    public void delUser(String login, boolean deleConfig){
+    	SQLiteDatabase db = helper.getWritableDatabase();
     	db.execSQL("delete from USER where login ='" + login + "' ;");
-    	db.execSQL("delete from CONFIG where login ='" + login + "' ;");
+    	if(deleConfig)
+    		db.execSQL("delete from CONFIG where login ='" + login + "' ;");
         db.close();
     }
 
     public User getDefaultUser() {
-        db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select login from CONFIG where isDefaultUser=1 ",null);
         String login = null;
         if (cursor.getCount() == 1){
@@ -108,15 +114,16 @@ public class DBworker {
     }
     
     public void setDefaultUser(String login) {
-    	db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
     	db.execSQL("update CONFIG set isDefaultUser = 0 where isDefaultUser = 1");
     	db.execSQL("update CONFIG set isDefaultUser = ? where login = ?",new Object[] { 1, login });
     	db.close();
     }
     
     public boolean isLoginExist(String login){
-    	if(login==null) return false;
-        db = helper.getReadableDatabase();
+    	if(login==null) 
+    		return false;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from USER where login='" + login + "';", null);
         return cursor.getCount() == 1;
     }
@@ -139,7 +146,7 @@ public class DBworker {
     }
     
     public List<Room> getAllRoom(){
-    	db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select id,name from ROOM", null);
         List<Room> rooms = new ArrayList<Room>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -160,8 +167,9 @@ public class DBworker {
     }
     
     public Room getRoom(long id){
-    	if(id == -1) return null;
-        db = helper.getReadableDatabase();
+    	if(id == -1) 
+    		return null;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from ROOM where id='" + id + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -179,7 +187,7 @@ public class DBworker {
     }
     public Room getRoom(String name){
     	if(name == null || name.equals("")) return null;
-        db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from ROOM where name='" + name + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -215,7 +223,7 @@ public class DBworker {
     }
     
     public List<ClassType> getAllClassType(){
-    	db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select id,name from CLASSTYPE", null);
         List<ClassType> list = new ArrayList<ClassType>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -235,8 +243,9 @@ public class DBworker {
 	    return list;
     }
     public ClassType getClassType(long id){
-    	if(id == -1) return null;
-        db = helper.getReadableDatabase();
+    	if(id == -1) 
+    		return null;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CLASSTYPE where id='" + id + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -253,8 +262,9 @@ public class DBworker {
         }
     }
     public ClassType getClassType(String name){
-    	if(name==null || name.equals("")) return null;
-        db = helper.getReadableDatabase();
+    	if(name==null || name.equals("")) 
+    		return null;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CLASSTYPE where name='" + name + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -294,7 +304,7 @@ public class DBworker {
     public void updateClassInfo(ClassInfo c, GoogleCalendarAPI googleCalendarAPI) {
     	googleCalendarAPI.delEvent(c.eventId);
     	c.eventId = 0;
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("login", c.login);
         cv.put("name", c.name);
@@ -315,14 +325,14 @@ public class DBworker {
     }
     
     public void delClassInfo(long id){
-    	db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
     	String sql = "delete from CLASSINFO where id ='" + id + "' ;";
     	db.execSQL(sql);
         db.close();
     }
 
     public void delAllClassInfo() {
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("delete from CLASSINFO ;");
         db.close();
     }
@@ -335,7 +345,7 @@ public class DBworker {
     	for(ClassInfo c : list){
     		calendarAPI.delEvent(c.eventId);
     	}
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur!='"+login+"';");
         db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur='"+login+"' AND weekOfYear<"+currentWeekOfYear+" ;");
         db.close();
@@ -352,14 +362,14 @@ public class DBworker {
     }
     
     public void setClassSynced(long classId, long eventId){
-    	db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
     	db.execSQL("update CLASSINFO set eventId=? where id = ?",
                 new Object[] { eventId, classId });
     	db.close();
     }
     
     private List<ClassInfo> getClassInfoViaSql(String sql) {
-    	db = helper.getReadableDatabase();
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery(sql, null);
         List<ClassInfo> cours = new ArrayList<ClassInfo>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -401,8 +411,9 @@ public class DBworker {
     }
     //get config   
     public Config getConfig(String login){
-    	if(login == null || login.equals("")) return null;
-        db = helper.getReadableDatabase();
+    	if(login == null || login.equals("")) 
+    		return null;
+    	SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from CONFIG where login='" + login + "';", null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -423,7 +434,7 @@ public class DBworker {
     }
     
     public void updateConfig(Config config) {
-        db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("startTime", config.startTime);
         cv.put("endTime", config.endTime);
@@ -454,7 +465,7 @@ public class DBworker {
 
     //////////////////////////////////////////////////////////
     private long insertData (String tableName, ContentValues cv){
-    	db = helper.getWritableDatabase();
+    	SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(tableName, null, cv);
         db.close();
         return id;

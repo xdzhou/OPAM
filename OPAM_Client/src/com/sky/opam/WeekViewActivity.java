@@ -15,6 +15,7 @@ import com.sky.opam.model.Config;
 import com.sky.opam.model.VersionInfo;
 import com.sky.opam.task.AgendaSyncTask;
 import com.sky.opam.task.CheckAppVersionTask;
+import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
@@ -41,11 +42,14 @@ import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
-public class WeekViewActivity extends ActionBarActivity{
+public class WeekViewActivity extends ActionBarActivity
+{
 	private SlidingMenu profile_menu;
-	private static Interpolator interp = new Interpolator() {
+	private static Interpolator interp = new Interpolator() 
+	{
 		@Override
-		public float getInterpolation(float t) {
+		public float getInterpolation(float t)
+		{
 			t -= 1.0f;
 			return t * t * t + 1.0f;
 		}		
@@ -55,7 +59,8 @@ public class WeekViewActivity extends ActionBarActivity{
 	private int numWeek;
 	
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.seul_fragment);
 
@@ -74,57 +79,77 @@ public class WeekViewActivity extends ActionBarActivity{
         profile_menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         profile_menu.setFadeDegree(0.35f);
         profile_menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        profile_menu.setBehindCanvasTransformer(new CanvasTransformer() {
+        profile_menu.setBehindCanvasTransformer(new CanvasTransformer() 
+        {
         	@Override
-			public void transformCanvas(Canvas canvas, float percentOpen) {
+			public void transformCanvas(Canvas canvas, float percentOpen) 
+        	{
 				canvas.translate(0, canvas.getHeight()*(1-interp.getInterpolation(percentOpen)));
 			}			
 		});
         profile_menu.setMenu(getMenuView(R.layout.menu_fragment));
         
         //class sync task
-        if(worker.getConfig(myApp.getLogin()).isAutoSync) new AgendaSyncTask(this).execute();
+        if(worker.getConfig(myApp.getLogin()).isAutoSync) 
+        	new AgendaSyncTask(this).execute();
         //check new version Info
-        if(worker.getAutoUpdateNotify(this)) new CheckAppVersionTask(this, new CheckUpdateHandler()).execute();
+        if(worker.getAutoUpdateNotify(this)) 
+        	new CheckAppVersionTask(this, new CheckUpdateHandler()).execute();
+        //download user's image
+        DownloadImageTask downloadImageTask = new DownloadImageTask(myApp, myApp.getLogin());
+        downloadImageTask.execute("http://trombi.it-sudparis.eu/photo.php?uid="+myApp.getLogin()+"&h=80&w=80");
 	}
 	
-	private class CheckUpdateHandler extends Handler {
+	private class CheckUpdateHandler extends Handler 
+	{
 		@Override
-		public void handleMessage(Message msg) {
+		public void handleMessage(Message msg) 
+		{
 			super.handleMessage(msg);
 			Bundle b = msg.getData();
 			String vInfo = b.getString("versionInfo");
-			VersionInfo versionInfo = (VersionInfo)new Gson().fromJson(vInfo, VersionInfo.class);
-			AlertDialog.Builder builder = Tool.showVersionInfoAndUpdate(WeekViewActivity.this, versionInfo);
-			builder.show();
+			try 
+			{
+				VersionInfo versionInfo = (VersionInfo)new Gson().fromJson(vInfo, VersionInfo.class);
+				AlertDialog.Builder builder = Tool.showVersionInfoAndUpdate(WeekViewActivity.this, versionInfo);
+				builder.show();
+			} 
+			catch (Exception e) 
+			{
+			}
 		} 	
     }
 	
-	private void setActionBar(){
+	private void setActionBar()
+	{
 		ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         //actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(this, R.layout.date_dropdown_spinner_layout,getData());
-        actionBar.setListNavigationCallbacks(spinnerAdapter, new  ActionBar.OnNavigationListener() {			
+        actionBar.setListNavigationCallbacks(spinnerAdapter, new  ActionBar.OnNavigationListener() 
+        {			
 			@Override
-			public boolean onNavigationItemSelected(int position, long itemId) {
+			public boolean onNavigationItemSelected(int position, long itemId) 
+			{
 				profile_menu.showContent();
-				setWeekAgenda(numWeek+position);
+				setWeekAgenda(numWeek + position);
 				return true;
 			}
 		});
 	}
 	
-	private List<String> getData(){      
+	private List<String> getData()
+	{      
         List<String> data = new ArrayList<String>();
         data.add(Tool.getDateViaNumWeek(numWeek, Calendar.MONDAY)+" - "+Tool.getDateViaNumWeek(numWeek, Calendar.FRIDAY));
         data.add(Tool.getDateViaNumWeek(numWeek+1, Calendar.MONDAY)+" - "+Tool.getDateViaNumWeek(numWeek+1, Calendar.FRIDAY));        
         return data;
     }
 	
-	private void setWeekAgenda(int weekN){
+	private void setWeekAgenda(int weekN)
+	{
 		Config currentUserConfig = worker.getConfig(myApp.getLogin());
 		WeekAgenda_Fragment fragment = new WeekAgenda_Fragment();
         Bundle b = new Bundle();
@@ -135,7 +160,8 @@ public class WeekViewActivity extends ActionBarActivity{
 		b.putFloat("time_distance", time_distance);
 		fragment.setArguments(b);
 		
-		for(int i=0; i<5; i++) fragment.setData(i+Calendar.MONDAY, worker.getClassInfo(myApp.getLogin(), weekN, i+Calendar.MONDAY));
+		for(int i=0; i<5; i++) 
+			fragment.setData(i+Calendar.MONDAY, worker.getClassInfo(myApp.getLogin(), weekN, i+Calendar.MONDAY));
         
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.seul_fragement,fragment);
@@ -143,39 +169,52 @@ public class WeekViewActivity extends ActionBarActivity{
 	}
 	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == MyApp.Refresh) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+        if (resultCode == MyApp.Refresh) 
+        {
         	finish();
         	startActivityForResult(getIntent(), MyApp.rsqCode);
-        } else if (resultCode == MyApp.Exit) {
+        } 
+        else if (resultCode == MyApp.Exit) 
+        {
         	setResult(MyApp.Exit);
             finish();
         }
     }
 	
 	@Override  
-    public boolean onCreateOptionsMenu(Menu menu) { 
+    public boolean onCreateOptionsMenu(Menu menu) 
+	{ 
         MenuItemCompat.setShowAsAction(menu.add("share").setIcon(android.R.drawable.ic_menu_share), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         MenuItemCompat.setShowAsAction(menu.add("menu").setIcon(android.R.drawable.ic_menu_sort_by_size), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return true;  
     }
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem menu) {
-		if(menu.getTitle().equals("menu")){
-			if (profile_menu.isMenuShowing()) {
+    public boolean onOptionsItemSelected(MenuItem menu) 
+	{
+		if(menu.getTitle().equals("menu"))
+		{
+			if (profile_menu.isMenuShowing()) 
+			{
 				profile_menu.showContent();
-			}else {
+			}
+			else 
+			{
 				profile_menu.showMenu();
 			}
-		}else if (menu.getTitle().equals("share")) {
+		}
+		else if (menu.getTitle().equals("share")) 
+		{
 			shareAgendaView();
 		}
 		return super.onOptionsItemSelected(menu);
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////
-	private View getMenuView(int menu_fragment){
+	private View getMenuView(int menu_fragment)
+	{
 		View view = LayoutInflater.from(this).inflate(menu_fragment, null);
 		Menu_Fragment fragment = new Menu_Fragment();
 		FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
@@ -186,39 +225,55 @@ public class WeekViewActivity extends ActionBarActivity{
 	
 	long exitTime = 0;
 	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
-                if ((System.currentTimeMillis() - exitTime) > 2000) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{
+	    if (keyCode == KeyEvent.KEYCODE_BACK) 
+	    {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) 
+            {
+                if ((System.currentTimeMillis() - exitTime) > 2000) 
+                {
                 	Tool.showInfo(this, "one more time to exit");
                     exitTime = System.currentTimeMillis();
-                } else {
+                } 
+                else 
+                {
                     setResult(MyApp.Exit);
                     finish();
                 }
             }
             return true;
-	    }else if (keyCode == KeyEvent.KEYCODE_MENU) {
-	    	if (profile_menu.isMenuShowing()) {
+	    }
+	    else if (keyCode == KeyEvent.KEYCODE_MENU) 
+	    {
+	    	if (profile_menu.isMenuShowing()) 
+	    	{
 				profile_menu.showContent();
-			}else {
+			}
+	    	else 
+	    	{
 				profile_menu.showMenu();
 			}
 	    	return true;
-		}else {
+		}
+	    else 
+		{
         	return super.onKeyDown(keyCode, event);
 	    }
     }
 
 	@Override
-	protected void onRestart() {
+	protected void onRestart() 
+	{
 		super.onRestart();
 		profile_menu.showContent();
 	}
 	
-	private void shareAgendaView(){
+	private void shareAgendaView()
+	{
 		WeekAgenda_Fragment fragment = (WeekAgenda_Fragment) getSupportFragmentManager().findFragmentById(R.id.seul_fragement);
-		if(fragment.getNumClassInfo() == 0){
+		if(fragment.getNumClassInfo() == 0)
+		{
 			Tool.showInfo(WeekViewActivity.this, getResources().getString(R.string.zero_course));
 			return;
 		}
@@ -229,10 +284,13 @@ public class WeekViewActivity extends ActionBarActivity{
 		String imgPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "opam.jpg";
 		File document = new File(imgPath);
 		if(document.exists()) document.delete();
-        try {  
+        try 
+        {  
             FileOutputStream fos = new FileOutputStream(document);  
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);// 把数据写入文件  
-        } catch (Exception e) {  
+        } 
+        catch (Exception e) 
+        {  
             e.printStackTrace();  
         }
         

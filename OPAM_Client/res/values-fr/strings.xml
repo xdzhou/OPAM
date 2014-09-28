@@ -24,7 +24,10 @@
     <string name="account" >Compte</string>
     <string name="setting" >Paramètre</string>
     <string name="exit" >Quit</string>
-    <string name="edit_class" >Modifier Cours Info</string> 
+    <string name="edit" >Editer</string>
+    <string name="close" >Fermer</string>
+    <string name="retry" >Réessayer</string>
+    <string name="edit_class" >Editer Cours Info</string> 
     <string name="remove_class" >Supprimer Cours Info</string>
     <string name="free_time" >Temps libre</string>
     <string name="class_time" >Horaire du cours</string>
@@ -51,4 +54,5 @@
         \"afficher l\u0027avatar d\u0027utilisateur\",\"partager des cours sur réseaux sociaux\",
         \"faciliter le gestion des paramètres d\u0027app\"]}
 	</string>
+	<string name="version_11_info">{\"vCode\":11,\"vName\":\"1.2.7.1\",\"features\":[\"bug corrigé\",\"merci pour votre utilisation\"]}</string>
 </resources>

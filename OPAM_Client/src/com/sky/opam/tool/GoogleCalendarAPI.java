@@ -14,7 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 
 @SuppressLint("NewApi")
-public class GoogleCalendarAPI {
+public class GoogleCalendarAPI 
+{
 	private static String calanderURL = "";
 	private static String calanderEventURL = "";
 	private static String calanderRemiderURL = "";
@@ -23,26 +24,32 @@ public class GoogleCalendarAPI {
 	private String userName = "";
 
 	static {
-		if (Integer.parseInt(Build.VERSION.SDK) >= 8) {
+		if (Integer.parseInt(Build.VERSION.SDK) >= 8) 
+		{
 			calanderURL = "content://com.android.calendar/calendars";
 			calanderEventURL = "content://com.android.calendar/events";
 			calanderRemiderURL = "content://com.android.calendar/reminders";
 
-		} else {
+		} 
+		else 
+		{
 			calanderURL = "content://calendar/calendars";
 			calanderEventURL = "content://calendar/events";
 			calanderRemiderURL = "content://calendar/reminders";
 		}
 	}
 
-	public GoogleCalendarAPI(Context context){
+	public GoogleCalendarAPI(Context context)
+	{
 		this.context = context;
 
 		Cursor userCursor;
 		userCursor = context.getContentResolver().query(Uri.parse(calanderURL), null, null, null, null);
-		for (userCursor.moveToFirst(); !userCursor.isAfterLast(); userCursor.moveToNext()) {		
+		for (userCursor.moveToFirst(); !userCursor.isAfterLast(); userCursor.moveToNext()) 
+		{		
 			userName = userCursor.getString(userCursor.getColumnIndex("name"));
-			if (userName!=null && userName.contains("@gmail.com")) {
+			if (userName!=null && userName.contains("@gmail.com")) 
+			{
 				calId = userCursor.getString(userCursor.getColumnIndex("_id"));
 				break;
 			}
@@ -51,13 +58,15 @@ public class GoogleCalendarAPI {
 	}
 
 	@SuppressLint("SimpleDateFormat")
-	public long addCourse2Calendar(ClassInfo c) {
-		if(calId.equals("") || userName.equals("")) return 0;
+	public long addCourse2Calendar(ClassInfo c) 
+	{
+		if(calId.equals("") || userName.equals("")) 
+			return 0;
 		
 		ContentValues event = new ContentValues();
 		event.put("calendar_id", calId);
 		event.put("title", c.getCalendarTitle());
-		if (!c.room.name.equals(""))
+		if (c.room.name != null && !c.room.name.equals(""))
 			event.put("eventLocation", "room:" + c.room.name);
 		event.put("eventTimezone", "Europe/Paris");
 		event.put("description", c.getCalendarDescription());
@@ -111,7 +120,8 @@ public class GoogleCalendarAPI {
 		return id;
 	}
 
-	public void delEvent(long eventid){
+	public void delEvent(long eventid)
+	{
 		Uri eventUri = ContentUris.withAppendedId(Uri.parse(calanderEventURL),eventid);
 		context.getContentResolver().delete(eventUri, null, null);
 	}

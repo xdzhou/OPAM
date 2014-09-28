@@ -16,7 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class AppConfigActivity extends ActionBarActivity{
+public class AppConfigActivity extends ActionBarActivity
+{
 	private MyApp myApp;
 	private DBworker worker;
 	private Config config;
@@ -29,7 +30,8 @@ public class AppConfigActivity extends ActionBarActivity{
 	private RangeSeekBar<Integer> rangeSeekBar;
 	
 	@Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) 
+	{
         super.onCreate(savedInstanceState);
         myApp = (MyApp)getApplication();
         worker = new DBworker(this);
@@ -67,14 +69,16 @@ public class AppConfigActivity extends ActionBarActivity{
     }
 	
 	@Override  
-    public boolean onCreateOptionsMenu(Menu menu) { 
+    public boolean onCreateOptionsMenu(Menu menu) 
+	{ 
         MenuItemCompat.setShowAsAction(menu.add("cancel").setIcon(android.R.drawable.ic_menu_close_clear_cancel), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         MenuItemCompat.setShowAsAction(menu.add("save").setIcon(android.R.drawable.ic_menu_save), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return true;  
     }
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem menu) {
+    public boolean onOptionsItemSelected(MenuItem menu) 
+	{
 		if(menu.getTitle().equals("cancel")){
 			finish();
 		}else if (menu.getTitle().equals("save")) {

@@ -1,37 +1,49 @@
 package com.sky.opam.task;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
-public class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
-	ImageView imageView;
+public class DownloadImageTask extends AsyncTask<String, Void, Bitmap>
+{
+	private Context context;
+	private String login;
 
-    public DownloadImageTask(ImageView bmImage) {
-        this.imageView = bmImage;
+    public DownloadImageTask(Context context, String login) 
+    {
+        this.context = context;
+        this.login = login;
     }
     
     @Override
-    protected Bitmap doInBackground(String... urls) {
+    protected Bitmap doInBackground(String... urls) 
+    {
         String urldisplay = urls[0];
         Bitmap mIcon11 = null;
-        try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            mIcon11 = BitmapFactory.decodeStream(in);
-        } catch (Exception e) {
+        try 
+        {
+        	String imgPath = context.getFilesDir() + "/" + login +".jpg";
+    		File document = new File(imgPath);
+    		if(!document.exists())
+    		{
+    			InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+                FileOutputStream fos = new FileOutputStream(document);  
+                mIcon11.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+    		}
+            
+        } 
+        catch (Exception e) 
+        {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
         return mIcon11;
     }
-    
-    @Override
-    protected void onPostExecute(Bitmap result) {
-        imageView.setImageBitmap(result);
-    }
-
 }

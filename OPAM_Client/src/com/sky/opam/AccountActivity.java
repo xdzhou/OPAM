@@ -6,10 +6,11 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
-public class AccountActivity extends FragmentActivity{
-	
+public class AccountActivity extends FragmentActivity
+{	
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+	{
 		System.out.println("AccountActivity created");
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.seul_fragment);

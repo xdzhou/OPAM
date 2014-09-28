@@ -2,10 +2,14 @@ package com.sky.opam.tool;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import com.sky.opam.R;
+import com.sky.opam.model.ClassInfo;
+import com.sky.opam.model.Config;
 import com.sky.opam.model.VersionInfo;
 
 import android.app.Activity;
@@ -265,12 +269,15 @@ public class Tool {
 		return builder;
 	}
 	
-	public static AlertDialog.Builder showVersionInfoAndUpdate(final Context context, VersionInfo versionInfo){	
+	public static AlertDialog.Builder showVersionInfoAndUpdate(final Context context, VersionInfo versionInfo)
+	{	
 		AlertDialog.Builder builder = showVersionInfo(context, versionInfo);
 		builder.setNegativeButton(R.string.no, null);
-		builder.setPositiveButton(R.string.update_app, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.update_app, new DialogInterface.OnClickListener() 
+		{
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(DialogInterface dialog, int which) 
+			{
 				String appPackageName = context.getPackageName(); // getPackageName() from Context or Activity object
 				try {
 					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -282,10 +289,39 @@ public class Tool {
 		return builder;
 	}
 	
-	public static boolean isFirstUseApp(Context context){
+	public static boolean isFirstUseApp(Context context)
+	{
 		Boolean isFirstIn = false;  
 		SharedPreferences pref = context.getSharedPreferences("share", 0); 
 		isFirstIn = pref.getBoolean("isFirstIn", true);
 		return isFirstIn;
+	}
+	
+	public static String[] getVocationTime(MyApp myApp, ClassInfo classInfo) 
+	{
+		DBworker worker = new DBworker(myApp);
+		Config config = worker.getConfig(myApp.getLogin());
+		List<ClassInfo> todayClasses = worker.getClassInfo(myApp.getLogin(), classInfo.weekOfYear, classInfo.dayOfWeek);
+		Collections.sort(todayClasses, ClassInfo.timeComparator);
+		int index = 0;
+		for(int i = 0; i < todayClasses.size(); i++)
+		{
+			if(todayClasses.get(i).startTime.equals(classInfo.startTime)){
+				index = i;
+				break;
+			}
+		}
+		String[] retVal = new String[2];
+		if(index - 1 >= 0)
+			retVal[0] = todayClasses.get(index - 1).endTime;
+		else
+			retVal[0] = getTime(config.startTime);
+		
+		if(index + 1 < todayClasses.size())
+			retVal[1] = todayClasses.get(index + 1).startTime;
+		else
+			retVal[1] = getTime(config.endTime);
+		todayClasses.clear();
+		return retVal;
 	}
 }

@@ -1,5 +1,6 @@
 package com.sky.opam.fragment;
 
+import java.io.File;
 import java.util.List;
 
 import com.sky.opam.R;
@@ -14,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -81,10 +84,21 @@ public class Account_Fragment extends ListFragment{
 			ImageView icon = (ImageView) convertView.findViewById(R.id.icon_view);
 			icon.getLayoutParams().height = icon.getLayoutParams().width = imageSize;
 			TextView title = (TextView) convertView.findViewById(R.id.name_view);
-			if(position == users.size()){
+			if(position == users.size())
+			{
 				icon.setImageResource(android.R.drawable.ic_menu_add);		
-			}else {
-				new DownloadImageTask(icon).execute("http://trombi.it-sudparis.eu/photo.php?uid="+getItem(position).login+"&h=55&w=55");
+			}
+			else
+			{
+				//new DownloadImageTask(icon).execute("http://trombi.it-sudparis.eu/photo.php?uid="+getItem(position).login+"&h=55&w=55");
+				String imgPath = getActivity().getFilesDir() + "/" + getItem(position).login +".jpg";
+				if(new File(imgPath).exists())
+				{
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+					Bitmap bitmap = BitmapFactory.decodeFile(imgPath, options);
+					icon.setImageBitmap(bitmap);
+				}
 				if(!users.get(position).getLogin().equals(myApp.getLogin())){
 					ImageView del_icon = (ImageView) convertView.findViewById(R.id.del_view);
 					del_icon.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
@@ -167,7 +181,7 @@ public class Account_Fragment extends ListFragment{
 			del_dialog.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener(){
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					worker.delUser(users.get(position).getLogin());
+					worker.delUser(users.get(position).getLogin(), true);
 					users.remove(position);
 					LastLoginPosition--;
 					adapter.clear();

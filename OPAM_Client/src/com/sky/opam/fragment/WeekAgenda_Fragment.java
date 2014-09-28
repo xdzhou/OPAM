@@ -37,7 +37,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class WeekAgenda_Fragment extends Fragment{
+public class WeekAgenda_Fragment extends Fragment
+{
 	private int numWeek;
 	private int numClassInfo = 0;
 	private int startTime = 8;
@@ -52,7 +53,8 @@ public class WeekAgenda_Fragment extends Fragment{
 	private HashMap<Integer, List<ClassInfo>> dateMap = new HashMap<Integer, List<ClassInfo>>();
 	
 	@Override
-	public void onCreate(Bundle bundle) {
+	public void onCreate(Bundle bundle) 
+	{
 		super.onCreate(bundle);
 		Bundle b = bundle;
 		if ((bundle == null)) b = getArguments();
@@ -73,7 +75,8 @@ public class WeekAgenda_Fragment extends Fragment{
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	{
 		Context context = getActivity();
 		LinearLayout group_view = new LinearLayout(context);
 		group_view.setOrientation(LinearLayout.VERTICAL);
@@ -91,7 +94,8 @@ public class WeekAgenda_Fragment extends Fragment{
 		tv.setWidth((int)tiView_width);
 		tv.setHeight(title_hight);
 		tabLayout.addView(tv);
-		for(int i=0; i<5; i++){
+		for(int i=0; i<5; i++)
+		{
 			tv = new TextView(context);
 			tv.setWidth((int)day_view_width);
 			tv.setHeight(title_hight);
@@ -106,7 +110,8 @@ public class WeekAgenda_Fragment extends Fragment{
 		agendaLayout.addView(innerLayout);
 		innerLayout.setOrientation(LinearLayout.HORIZONTAL);
 		innerLayout.addView(tiView);
-		for(int i=0; i<5; i++){
+		for(int i=0; i<5; i++)
+		{
 			DayTabClassView dView = new DayTabClassView(context);
 			dView.setId(i+Calendar.MONDAY);
         	dView.setViewWidth(day_view_width);
@@ -127,7 +132,8 @@ public class WeekAgenda_Fragment extends Fragment{
 	}
 	
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onSaveInstanceState(Bundle outState) 
+	{
 		super.onSaveInstanceState(outState);
 		outState.putInt("startTime", startTime);
 		outState.putInt("endTime", endTime);
@@ -135,7 +141,8 @@ public class WeekAgenda_Fragment extends Fragment{
 		outState.putFloat("time_distance", time_distance);
 	}
 	
-	DayViewLongPressListener dayViewLongPressListener = new DayViewLongPressListener() {		
+	DayViewLongPressListener dayViewLongPressListener = new DayViewLongPressListener() 
+	{		
 		@Override
 		public void onLongPressEvent(DayTabClassView v, ClassInfo c, String vocationStartTime,String vocationEndTime) {
 			if(c == null){
@@ -146,17 +153,21 @@ public class WeekAgenda_Fragment extends Fragment{
 		}
 	};
 	
-	ClassInfoClickListener classInfoClickListener = new ClassInfoClickListener() {		
+	ClassInfoClickListener classInfoClickListener = new ClassInfoClickListener() 
+	{		
 		@Override
 		public void onTouchEvent(View v, MotionEvent e, ClassInfo c) {
 			showClassInfo(c);
 		}
 	};
 	
-	View.OnClickListener tabClickListener = new View.OnClickListener() {	
+	View.OnClickListener tabClickListener = new View.OnClickListener() 
+	{	
 		@Override
-		public void onClick(View v) {
-			if(v instanceof TextView){
+		public void onClick(View v) 
+		{
+			if(v instanceof TextView)
+			{
 				TextView tv = (TextView) v;
 				Intent intent = new Intent();
 	            intent.setClass(getActivity(), DayViewActivity.class);
@@ -181,9 +192,10 @@ public class WeekAgenda_Fragment extends Fragment{
 		}
 	};
 	
-	private void showClassInfo(ClassInfo c) {
+	private void showClassInfo(final ClassInfo c) 
+	{
 		final Dialog dlg = new Dialog(getActivity(), R.style.MyDialog);
-		dlg.show();
+		
 		Window win = dlg.getWindow();
 		win.setContentView(R.layout.cours_detail_dialog);
 
@@ -191,16 +203,33 @@ public class WeekAgenda_Fragment extends Fragment{
 		((TextView) win.findViewById(R.id.classType)).setText(c.classType.name);
 		((TextView) win.findViewById(R.id.classTime)).setText(c.startTime + "--" + c.endTime);
 		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe.replace("__", "\n"));
-		if(c.room.name!=null || !c.room.name.equals("")) ((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
-		if(c.teacher!=null || !c.teacher.equals("")) ((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
+		if(c.room.name!=null || !c.room.name.equals("")) 
+			((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
+		if(c.teacher!=null || !c.teacher.equals("")) 
+			((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
 
-		Button button = (Button) win.findViewById(R.id.dialog_button_cancel);
-		button.setOnClickListener(new View.OnClickListener() {
+		Button cancelButton = (Button) win.findViewById(R.id.dialog_button_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlg.cancel();
 			}
 		});
+		
+		Button editButton = (Button) win.findViewById(R.id.dialog_button_edit);
+		editButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+		        intent.setClass(getActivity(), ClassInfoEditActivity.class);
+		        Bundle bundle = new Bundle();
+		        bundle.putLong("classId", c.id);
+		        intent.putExtras(bundle);
+		        getActivity().startActivityForResult(intent, MyApp.rsqCode);
+			}
+		});
+		
+		dlg.show();
 	}
 	
 	public void setData(int position, List<ClassInfo> data){
@@ -241,7 +270,8 @@ public class WeekAgenda_Fragment extends Fragment{
 		builder.create().show();
 	}
 	
-	private void EventEditDialog(final DayTabClassView v, final ClassInfo c, final String vocationStartTime, final String vocationEndTime){
+	private void EventEditDialog(final DayTabClassView v, final ClassInfo c, final String vocationStartTime, final String vocationEndTime)
+	{
 		String[] mItems = {getResources().getString(R.string.edit_class), getResources().getString(R.string.remove_class)};
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setIcon(android.R.drawable.ic_menu_info_details);

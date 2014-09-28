@@ -23,7 +23,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class DayTabClassView extends View implements GestureDetector.OnGestureListener{
+public class DayTabClassView extends View implements GestureDetector.OnGestureListener
+{
 	private int startTime ;
 	private int endTime ;
 	private float view_width ;
@@ -74,7 +75,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		this.time_distance = time_distance;
 	}
 
-	private void initia(Context context){
+	private void initia(Context context)
+	{
 		mGestureDetector = new GestureDetector(getContext(), this);
 		//outLinePaint.setColor(Color.BLUE);
 		outLinePaint.setColor(Color.argb(500, 0x33, 0xb5, 0xe5));
@@ -92,29 +94,35 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	}
 	
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) 
+	{
 		super.onDraw(canvas);
 		//draw the out line
 		canvas.drawLine(0, 0, 0, (endTime-startTime)*time_distance, outLinePaint);
 		canvas.drawLine(view_width, 0, view_width, (endTime-startTime)*time_distance, outLinePaint);
 		//canvas.drawLine(0, 0, view_width, 0, outLinePaint);
-		for(int i=0; i<endTime-startTime+1; i++){
+		for(int i=0; i<endTime-startTime+1; i++)
+		{
 			canvas.drawLine(0, i*time_distance, view_width, i*time_distance, outLinePaint);
 		}
 		//draw class info
-		for(ClassInfo c : class_list){
+		for(ClassInfo c : class_list)
+		{
 			drawClassInfo(canvas, c);
 		}
 		//draw selected region
-		if(isRegionSelected) canvas.drawRect(0, startSelectP, view_width, endSelectP, selectePaint);
+		if(isRegionSelected) 
+			canvas.drawRect(0, startSelectP, view_width, endSelectP, selectePaint);
 	}
 	
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) 
+	{
 		setMeasuredDimension((int)(view_width), (int)((endTime-startTime)*time_distance));
 	}
 	
-	private void drawClassInfo(Canvas canvas, ClassInfo c) {
+	private void drawClassInfo(Canvas canvas, ClassInfo c) 
+	{
 		float startP = getTimeDistance(c.startTime);
 		float endP = getTimeDistance(c.endTime);
 		backgroundPaint.setColor(Color.parseColor(c.bgColor));
@@ -122,7 +130,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		canvas.save();
 		StaticLayout sl= new StaticLayout(c.name, textPaint, (int)(view_width-2*d), Alignment.ALIGN_CENTER, 1f, 0f, false);
 		float MaxLine = (endP-startP-2*d)/getTextHeight(textPaint);
-		if(MaxLine < sl.getLineCount()){
+		if(MaxLine < sl.getLineCount())
+		{
 			float taux = MaxLine / sl.getLineCount();
 			int numText = (int) (c.name.length() * taux);
 			sl= new StaticLayout(c.name.substring(0, numText), textPaint, (int)view_width, Alignment.ALIGN_CENTER, 1f, 0f, false);
@@ -132,7 +141,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		canvas.restore();
 	}
 	
-	private float getTimeDistance(String time) {
+	private float getTimeDistance(String time) 
+	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
 		String FinDuMonde = "20121221";
 		String timeString = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
@@ -194,7 +204,8 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	@Override
 	public void onLongPress(MotionEvent e) {	
 		//enableSelectDraw(0,(endTime-startTime)*time_distance);
-		if(myLongPressListener != null){
+		if(myLongPressListener != null)
+		{
 			String vocationStartTime, vocationEndTime;
 			if(class_list.size()==0) {
 				enableSelectDraw(0,(endTime-startTime)*time_distance);

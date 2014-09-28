@@ -3,42 +3,60 @@ package com.sky.opam.model;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 
 public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 	private static final long serialVersionUID = 1L;
 	
 	public long id;
-	public String login;
-	public String name;
+	public String login = "";
+	public String name = "";
 	public ClassType classType = new ClassType();
 	public int weekOfYear;
 	public int dayOfWeek;
-	public String startTime;
-	public String endTime;
-	public String auteur;
-	public String teacher;
-	public String students;
-	public String groupe;
+	public String startTime = "";
+	public String endTime = "";
+	public String auteur = "";
+	public String teacher = "";
+	public String students = "";
+	public String groupe = "";
 	public Room room = new Room();
-	public String bgColor;
+	public String bgColor = "#999999";
 	public long eventId ;
-
-	public ClassInfo() {
-		login=name=auteur=teacher=students=groupe="";
-	}
-
 	
+	public static Comparator<ClassInfo> timeComparator = new Comparator<ClassInfo>() 
+	{
+		@Override
+		public int compare(ClassInfo first, ClassInfo second) 
+		{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
+			String FinDuMonde = "20121221";
+			Date t2 = null, t1 = null;
+			try 
+			{
+				t1 = sdf.parse(FinDuMonde + " " + first.startTime);
+				t2 = sdf.parse(FinDuMonde + " " + second.startTime);
+			} 
+			catch (ParseException e) 
+			{
+				e.printStackTrace();
+			}		
+			return (int) ((t1.getTime() - t2.getTime())/1000);
+		}
+	};
 
 	@Override
-	public String toString() {
+	public String toString() 
+	{
 		return "ClassInfo [id=" + id + ", login=" + login + ", name=" + name
 				+ ", weekOfYear=" + weekOfYear + ", dayOfWeek=" + dayOfWeek
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", eventId=" + eventId + "]";
 	}
 
-	public static ClassInfo getCustomedClass(String login){
+	public static ClassInfo getCustomedClass(String login)
+	{
 		ClassInfo c = new ClassInfo();
 		c.id = -1;
 		c.login = c.auteur = login;
@@ -46,23 +64,28 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		return c;
 	}
 
-	public String getCalendarTitle() {
-		if (name.contains("Point de Rencontre"))
+	public String getCalendarTitle() 
+	{
+		if (name != null && name.contains("Point de Rencontre"))
 			return name;
-		else {
+		else if(classType.name != null && name != null)
 			return classType.name + " - " + name;
-		}
+		else
+			return name;
 	}
 
-	public String getCalendarDescription() {
+	public String getCalendarDescription() 
+	{
 		StringBuilder s = new StringBuilder();
-		if (!teacher.equals("")) s.append("Teacher : ").append(teacher).append(" ");
+		if (!teacher.equals("")) 
+			s.append("Teacher : ").append(teacher).append(" ");
 		s.append("\nStudent : ").append(students);
 		return s.toString();
 	}
 
 	@Override
-	public int compareTo(ClassInfo another) {
+	public int compareTo(ClassInfo another) 
+	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
 		String FinDuMonde = "20121221";
 		Date t2 = null, t1 = null;
@@ -98,6 +121,5 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 			return false;
 		return true;
 	}
-	
 	
 }

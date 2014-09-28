@@ -26,6 +26,9 @@
     <string name="account" >Account</string>
     <string name="setting" >Setting</string> 
     <string name="exit" >Exit</string>
+    <string name="edit" >Edit</string>
+    <string name="close" >Close</string>
+    <string name="retry" >Retry</string>
     <string name="edit_class" >Edit Class Info</string> 
     <string name="remove_class" >Remove Class Info</string>
     <string name="free_time" >Free time</string> 
@@ -52,4 +55,5 @@
         allowing multiple users to switch\",\"New courses modify / delete / add functions (long press on the agenda to trigger this function)\",\"New feature to display user\u0027s photo\",
         \"New feature to share a week\u0027s courses\",\"New settings interface, adjust the calendar time\"]}
 	</string>
+	<string name="version_11_info">{\"vCode\":11,\"vName\":\"1.2.7.1\",\"features\":[\"bugs fixed\",\"thank you for your use\"]}</string>
 </resources>

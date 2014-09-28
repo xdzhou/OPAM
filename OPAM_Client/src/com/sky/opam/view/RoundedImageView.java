@@ -14,8 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-public class RoundedImageView extends ImageView {
-
+public class RoundedImageView extends ImageView 
+{
 	public RoundedImageView(Context context) {
 	    super(context);
 	}
@@ -29,29 +29,26 @@ public class RoundedImageView extends ImageView {
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
-	
-	    Drawable drawable = getDrawable();
-	
-	    if (drawable == null) {
+	protected void onDraw(Canvas canvas) 
+	{
+	    Drawable drawable = getDrawable();	
+	    if (drawable == null || getWidth() == 0 || getHeight() == 0)
 	        return;
-	    }
-	
-	    if (getWidth() == 0 || getHeight() == 0) {
-	        return; 
-	    }
+
 	    Bitmap b =  ((BitmapDrawable)drawable).getBitmap() ;
+	    if(b == null)
+	    	return;
+	    
 	    Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
 	
 	    int w = getWidth();
-	
-	
+
 	    Bitmap roundBitmap =  getCroppedBitmap(bitmap, w);
 	    canvas.drawBitmap(roundBitmap, 0,0, null);
-	
 	}
 
-	public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
+	public static Bitmap getCroppedBitmap(Bitmap bmp, int radius)
+	{
 	    Bitmap sbmp;
 	    if(bmp.getWidth() != radius || bmp.getHeight() != radius)
 	        sbmp = Bitmap.createScaledBitmap(bmp, radius, radius, false);
