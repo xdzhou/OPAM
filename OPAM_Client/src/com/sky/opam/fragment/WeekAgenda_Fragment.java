@@ -203,9 +203,9 @@ public class WeekAgenda_Fragment extends Fragment
 		((TextView) win.findViewById(R.id.classType)).setText(c.classType.name);
 		((TextView) win.findViewById(R.id.classTime)).setText(c.startTime + "--" + c.endTime);
 		((TextView) win.findViewById(R.id.classGroup)).setText(c.groupe.replace("__", "\n"));
-		if(c.room.name!=null || !c.room.name.equals("")) 
+		if(c.room != null && c.room.name != null && !c.room.name.equals("")) 
 			((TextView) win.findViewById(R.id.classRoom)).setText(c.room.name.replace("__", "\n"));
-		if(c.teacher!=null || !c.teacher.equals("")) 
+		if(c.teacher != null && !c.teacher.equals("")) 
 			((TextView) win.findViewById(R.id.classTeacher)).setText(c.teacher.replace("__", "\n"));
 
 		Button cancelButton = (Button) win.findViewById(R.id.dialog_button_cancel);
