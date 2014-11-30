@@ -1,11 +1,11 @@
 package com.sky.opam;
 
+import com.loic.common.graphic.RangeSeekBar;
+import com.loic.common.graphic.RangeSeekBar.OnRangeSeekBarChangeListener;
 import com.sky.opam.model.Config;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
-import com.sky.opam.view.RangeSeekBar;
-import com.sky.opam.view.RangeSeekBar.OnRangeSeekBarChangeListener;
 
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;

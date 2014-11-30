@@ -39,7 +39,9 @@ public class Account_Fragment extends ListFragment{
 	private String newLogin;
 	private int LastLoginPosition = 0;
 	
-	public Account_Fragment() {	
+	public Account_Fragment() 
+	{
+		
 	}
 
 	@Override
