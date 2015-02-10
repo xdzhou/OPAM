@@ -1,428 +1,133 @@
 package com.sky.opam.tool;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import com.sky.opam.model.ClassInfo;
-import com.sky.opam.model.ClassType;
-import com.sky.opam.model.Config;
-import com.sky.opam.model.Room;
+import com.loic.common.LibApplication;
+import com.loic.common.sqliteTool.SqliteWorker;
+import com.sky.opam.model.ClassEvent;
+import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 
-import android.content.ContentValues;
+import android.R.integer;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class DBworker 
+public class DBworker extends SqliteWorker
 {
-    private DBHelper helper;
+	private static final String TAG = DBworker.class.getSimpleName();
+	private static DBworker singleton;
+    //private DBHelper helper;
+    private Object lock = new Object();
 
-    public DBworker(Context context) 
+    public static synchronized DBworker getInstance()
     {
-        helper = new DBHelper(context);
-    }
-
-    public void addUser(User user) 
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("insert into USER (login,password,name,numWeekUpdated) values (?,?,?,?)",
-        		new Object[] { user.getLogin(), user.getPasswoed(),user.getName(),user.getNumWeekUpdated()});
-        if(getConfig(user.getLogin()) == null)
-        {
-        	if(!db.isOpen())
-        		db = helper.getWritableDatabase();
-        	db.execSQL("insert into CONFIG values (?,?,?,?,?)", new Object[] { user.getLogin(), 8, 19, 1, 0});
-        }	        
-        db.close();
+    	if(singleton == null)
+    		singleton = new DBworker(LibApplication.getAppContext());
+    	
+    	return singleton;
     }
     
-    public void updateUser(User user) 
+    private DBworker(Context context) 
     {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("update USER set password = ?,name =?, numWeekUpdated=? where login = ?",
-            new Object[] { user.getPasswoed(), user.getName(),user.getNumWeekUpdated(), user.getLogin() });
-        db.close();
+    	super(new DBHelper(context));
     }
     
-    public User getUser(String login) 
+    public User getDefaultUser()
     {
-    	if(login==null) 
-    		return null;
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from USER where login='" + login + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            String password = cursor.getString(1);
-            String name = cursor.getString(2);
-            int numWeekUpdated = cursor.getInt(3);
-            User user = new User(login, password, name, numWeekUpdated);
-            cursor.close();
-            db.close();
-            return user;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    
-    public List<User> getAllUser() 
-    {
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select login,name from USER", null);
-        List<User> users = new ArrayList<User>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) 
-        {
-            User u = new User();
-            u.setLogin(cursor.getString(0));
-            u.setName(cursor.getString(1));
-            users.add(u);
-	    }     
-	    cursor.close();
-	    db.close();
-	    return users;
-	}
-    
-    public void delAllUsers() 
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("delete from USER;");
-        db.close();
-    }
-    
-    public void delUser(String login, boolean deleConfig)
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-    	db.execSQL("delete from USER where login ='" + login + "' ;");
-    	if(deleConfig)
-    		db.execSQL("delete from CONFIG where login ='" + login + "' ;");
-        db.close();
-    }
-
-    public User getDefaultUser() 
-    {
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select login from CONFIG where isDefaultUser=1 ",null);
-        String login = null;
-        if (cursor.getCount() == 1)
-        {
-        	cursor.moveToFirst();
-        	login = cursor.getString(0);
-        }
-        cursor.close();
-        db.close();
-        if(login==null)
-        {
-        	List<User> list = getAllUser();
-        	if(list.size()>1) return list.get(0);
-        	else return null; 
-        }
-        else 
-        {
-        	return getUser(login);
-		}      
+    	Object object = retrieveAData(User.class, "isDefaultUser = 1");
+    	if(object != null && object instanceof User)
+    	{
+    		return (User) object;
+    	}
+    	return null;
     }
     
     public void setDefaultUser(String login) 
     {
     	SQLiteDatabase db = helper.getWritableDatabase();
-    	db.execSQL("update CONFIG set isDefaultUser = 0 where isDefaultUser = 1");
-    	db.execSQL("update CONFIG set isDefaultUser = ? where login = ?",new Object[] { 1, login });
+    	db.execSQL("update User set isDefaultUser = 0 where isDefaultUser = 1");
+    	db.execSQL("update User set isDefaultUser = ? where login = ?",new Object[] { 1, login });
     	db.close();
     }
     
-    public boolean isLoginExist(String login)
+    public User getUser(String login)
     {
-    	if(login==null) 
-    		return false;
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from USER where login='" + login + "';", null);
-        return cursor.getCount() == 1;
-    }
-    
-    // Room
-    public long addGetRoom(Room room)
-    {
-    	return addGetRoom(room.name);
-    }
-    
-    public long addGetRoom(String name)
-    {
-    	if(name==null || name.equals("")) return -1;
-    	Room r = getRoom(name);
-    	if(r == null)
+    	Object object = retrieveAData(User.class, "login = '"+login+"'");
+    	if(object != null && object instanceof User)
     	{
-    		ContentValues cv = new ContentValues();
-            cv.put("name", name);
-            return insertData("ROOM", cv);
+    		return (User) object;
     	}
-    	else 
-    	{
-			return r.id;
-		}
-        
-    }
-    
-    public List<Room> getAllRoom()
-    {
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select id,name from ROOM", null);
-        List<Room> rooms = new ArrayList<Room>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) 
-        {
-            Room room = new Room();
-            room.id = cursor.getInt(0);
-            room.name = cursor.getString(1);
-            rooms.add(room);
-	    }
-	    cursor.close();
-	    db.close();
-	    if(rooms.size()==0) 
-	    {
-	    	Room r = new Room();
-	    	r.name = "E001";
-	    	r.id = addGetRoom(r);
-	    	rooms.add(r);
-	    }
-	    return rooms;
-    }
-    
-    public Room getRoom(long id)
-    {
-    	if(id == -1) 
-    		return null;
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from ROOM where id='" + id + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            Room room = new Room();
-            room.id = id;
-            room.name = cursor.getString(1);
-            cursor.close();
-            db.close();
-            return room;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    public Room getRoom(String name)
-    {
-    	if(name == null || name.equals("")) 
-    		return null;
-    	name = sqliteEscape(name);
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from ROOM where name='" + name + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            Room room = new Room();
-            room.id = cursor.getLong(0);
-            room.name = name;
-            cursor.close();
-            db.close();
-            return room;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    
- // ClassType
-    public long addGetClassType(ClassType classType)
-    {
-    	return addGetClassType(classType.name);
-    }
-    
-    public long addGetClassType(String name)
-    {
-    	if(name==null || name.equals("")) 
-    		return -1;
-    	ClassType classType = getClassType(name);
-    	if(classType==null)
-    	{
-    		ContentValues cv = new ContentValues();
-            cv.put("name", name);
-            return insertData("CLASSTYPE", cv);
-    	}
-    	else 
-    	{
-			return classType.id;
-		}
-    	
-    }
-    
-    public List<ClassType> getAllClassType()
-    {
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select id,name from CLASSTYPE", null);
-        List<ClassType> list = new ArrayList<ClassType>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) 
-        {
-        	ClassType classType = new ClassType();
-        	classType.id = cursor.getInt(0);
-        	classType.name = cursor.getString(1);
-            list.add(classType);
-	    }
-	    cursor.close();
-	    db.close();
-	    if(list.size()==0) 
-	    {
-	    	ClassType ct = new ClassType();
-	    	ct.name = "Examen";
-	    	ct.id = addGetClassType(ct);
-	    	list.add(ct);
-	    }
-	    return list;
-    }
-    public ClassType getClassType(long id)
-    {
-    	if(id == -1) 
-    		return null;
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from CLASSTYPE where id='" + id + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            ClassType classType = new ClassType();
-            classType.id = id;
-            classType.name = cursor.getString(1);
-            cursor.close();
-            db.close();
-            return classType;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    public ClassType getClassType(String name)
-    {
-    	if(name==null || name.equals("")) 
-    		return null;
-    	name = sqliteEscape(name);
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from CLASSTYPE where name='" + name + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            ClassType classType = new ClassType();
-            classType.id = cursor.getLong(0);
-            classType.name = name;
-            cursor.close();
-            db.close();
-            return classType;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    
-    //class info  
-    public long addClassInfo(ClassInfo c) 
-    {       
-        ContentValues cv = new ContentValues();
-        cv.put("login", c.login);
-        cv.put("name", c.name);
-        cv.put("weekOfYear", c.weekOfYear);
-        cv.put("dayOfWeek", c.dayOfWeek);
-        cv.put("startTime", c.startTime);
-        cv.put("endTime", c.endTime);
-        cv.put("auteur", c.auteur);
-        cv.put("teacher", c.teacher);
-        cv.put("students", c.students);
-        cv.put("groupe", c.groupe);
-        if(c.classType != null) cv.put("typeId", c.classType.id);       
-        if(c.room != null) cv.put("roomId", c.room.id);
-        cv.put("bgColor", c.bgColor);
-        cv.put("eventId", c.eventId);
-        return insertData("CLASSINFO", cv);
-    }
-    
-    public void updateClassInfo(ClassInfo c, GoogleCalendarAPI googleCalendarAPI) 
-    {
-    	googleCalendarAPI.delEvent(c.eventId);
-    	c.eventId = 0;
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("login", c.login);
-        cv.put("name", c.name);
-        cv.put("weekOfYear", c.weekOfYear);
-        cv.put("dayOfWeek", c.dayOfWeek);
-        cv.put("startTime", c.startTime);
-        cv.put("endTime", c.endTime);
-        cv.put("auteur", c.auteur);
-        cv.put("teacher", c.teacher);
-        cv.put("students", c.students);
-        cv.put("groupe", c.groupe);
-        if(c.classType != null) cv.put("typeId", c.classType.id);
-        if(c.room != null) cv.put("roomId", c.room.id);
-        cv.put("bgColor", c.bgColor);
-        cv.put("eventId", c.eventId);
-        db.update("CLASSINFO", cv, "id = ?", new String[]{c.id+""});
-        db.close();
-    }
-    
-    public void delClassInfo(long id)
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-    	String sql = "delete from CLASSINFO where id ='" + id + "' ;";
-    	db.execSQL(sql);
-        db.close();
+    	return null;
     }
 
-    public void delAllClassInfo() 
+    public void delUser(String login)
     {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("delete from CLASSINFO ;");
-        db.close();
-    }
-
-    public void delDownloadClassInfo(String login, GoogleCalendarAPI calendarAPI) 
-    {
-    	int currentWeekOfYear = Tool.getNumWeek();
-    	String sql = "select * from CLASSINFO where login='"+ login + 
-    			"' AND weekOfYear>=" + currentWeekOfYear +" AND eventId>0" +" AND auteur!='"+login+"';";
-    	List<ClassInfo> list = getClassInfoViaSql(sql);
-    	for(ClassInfo c : list)
-    	{
-    		calendarAPI.delEvent(c.eventId);
-    	}
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur!='"+login+"';");
-        db.execSQL("delete from CLASSINFO where login ='" + login +"' AND auteur='"+login+"' AND weekOfYear<"+currentWeekOfYear+" ;");
-        db.close();
-    }
-
-    public List<ClassInfo> getClassInfo(String login, int weekOfYear, int dayOfWeek) 
-    {
-    	String sql = "select * from CLASSINFO where login='"
-                + login + "' AND weekOfYear=" + weekOfYear +" AND dayOfWeek="+dayOfWeek+ ";";
-    	return getClassInfoViaSql(sql);
+    	if(login != null && !login.isEmpty())
+    		deleteData(User.class, "login = '"+login+"'");
     }
     
-    public List<ClassInfo> getUnsyncClassInfo(String login) 
+    
+    
+    
+    public ClassUpdateInfo getUpdateInfo(String login, Date date)
     {
-        return getClassInfoViaSql("select * from CLASSINFO where login='"+ login + "' AND eventId = 0 ;");
+    	if(date != null)
+    	{
+    	    Calendar cal = Calendar.getInstance();
+    	    cal.setTime(date);
+    	    int year = cal.get(Calendar.YEAR);
+    	    int month = cal.get(Calendar.MONTH);
+    	    
+    	    return getUpdateInfo(login, year, month);
+    	}
+    	return null;
     }
+    
+    public ClassUpdateInfo getUpdateInfo(String login, int year, int month)
+    {
+    	if(login != null && !login.isEmpty() && year > 0 && month >= Calendar.JANUARY && month <= Calendar.DECEMBER)
+    	{
+    		Object object = retrieveAData(ClassUpdateInfo.class, "login = '"+login+"' AND year = "+year+" AND month = "+month);
+        	if(object != null && object instanceof ClassUpdateInfo)
+        		return (ClassUpdateInfo) object;
+    	}
+    	return null;
+    }
+    
+    
+    
+    
+    private DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss", Locale.US);
+    public List<ClassEvent> getClassEvents(String login, int year, int month)
+    {
+    	if(login != null && !login.isEmpty() && year > 0 && month >= Calendar.JANUARY && month <= Calendar.DECEMBER)
+    	{
+    		long startTime, endTime;
+    		try 
+    		{
+				Date date = df.parse(year+(month-Calendar.JANUARY+1)+"01 00:00:00");
+			} 
+    		catch (ParseException e)
+    		{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		Calendar cal = Calendar.getInstance();
+    		cal.set(Calendar.YEAR, year);
+    		cal.set(Calendar.MONTH, month);
+    		cal.set(Calendar.DAY_OF_MONTH, 1);
+    	}
+    	return null;
+    }
+    
+    
     
     public void setClassSynced(long classId, long eventId)
     {
@@ -430,92 +135,6 @@ public class DBworker
     	db.execSQL("update CLASSINFO set eventId=? where id = ?",
                 new Object[] { eventId, classId });
     	db.close();
-    }
-    
-    private List<ClassInfo> getClassInfoViaSql(String sql)
-    {
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(sql, null);
-        List<ClassInfo> cours = new ArrayList<ClassInfo>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) 
-        {
-            ClassInfo c = new ClassInfo();
-            c.id = cursor.getLong(0);
-            c.login = cursor.getString(1);
-            c.name = cursor.getString(2);
-            c.classType = getClassType(cursor.getLong(3));
-            c.weekOfYear = cursor.getInt(4);
-            c.dayOfWeek = cursor.getInt(5);
-            c.startTime = cursor.getString(6);
-            c.endTime = cursor.getString(7);
-            c.auteur = cursor.getString(8);
-            c.teacher = cursor.getString(9);
-            c.students = cursor.getString(10);
-            c.groupe = cursor.getString(11);
-            c.room = getRoom(cursor.getLong(12));
-            c.bgColor = cursor.getString(13);
-            c.eventId = cursor.getLong(14);
-            cours.add(c);
-        }
-        cursor.close();
-        db.close();
-        return cours;
-    }
-
-    public List<ClassInfo> getClassInfo(String login, int weekOfYear) 
-    {
-        List<ClassInfo> cours = new ArrayList<ClassInfo>();
-        for(int i=0; i<5; i++)
-        {
-        	cours.addAll(getClassInfo(login, weekOfYear, i+Calendar.MONDAY));
-        }
-        return cours;
-    }
-
-    public ClassInfo getClassInfo(long id) 
-    {
-    	String sql = "select * from CLASSINFO where id = "+id+" ;";
-        List<ClassInfo> cours = getClassInfoViaSql(sql);
-        return cours.get(0);
-    }
-    //get config   
-    public Config getConfig(String login)
-    {
-    	if(login == null || login.equals("")) 
-    		return null;
-    	SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from CONFIG where login='" + login + "';", null);
-        if (cursor.getCount() == 1) 
-        {
-            cursor.moveToFirst();
-            Config config = new Config();
-            config.login = login;
-            config.startTime = cursor.getInt(1);
-            config.endTime = cursor.getInt(2);
-            config.isAutoSync = cursor.getInt(3)==1;
-            config.isDefaultUser = cursor.getInt(4)==1;
-            cursor.close();
-            db.close();
-            return config;
-        } 
-        else 
-        {
-            cursor.close();
-            db.close();
-            return null;
-        }
-    }
-    
-    public void updateConfig(Config config) 
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("startTime", config.startTime);
-        cv.put("endTime", config.endTime);
-        cv.put("isAutoSync", config.isAutoSync);
-        cv.put("isDefaultUser", config.isDefaultUser);       
-        db.update("CONFIG", cv, "login = ?", new String[]{config.login});
-        db.close();
     }
     
     //指示App配置 自动登录  自动提示升级信息
@@ -539,28 +158,5 @@ public class DBworker
     {
     	SharedPreferences pref = context.getSharedPreferences("share", 0); 
 		return pref.getBoolean("autoUpdateNotify", true);
-    }   
-
-    //////////////////////////////////////////////////////////
-    private long insertData (String tableName, ContentValues cv)
-    {
-    	SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(tableName, null, cv);
-        db.close();
-        return id;
-    }
-
-    public static String sqliteEscape(String keyWord)
-    {  
-        keyWord = keyWord.replace("/", "//");  
-        keyWord = keyWord.replace("'", "''");  
-        keyWord = keyWord.replace("[", "/[");  
-        keyWord = keyWord.replace("]", "/]");  
-        keyWord = keyWord.replace("%", "/%");  
-        keyWord = keyWord.replace("&","/&");  
-        keyWord = keyWord.replace("_", "/_");  
-        keyWord = keyWord.replace("(", "/(");  
-        keyWord = keyWord.replace(")", "/)");  
-        return keyWord;  
     }
 }

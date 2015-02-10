@@ -4,11 +4,9 @@ import java.io.File;
 
 import com.sky.opam.AccountActivity;
 import com.sky.opam.AppConfigActivity;
-import com.sky.opam.DayViewActivity;
 import com.sky.opam.R;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
 import android.annotation.SuppressLint;
@@ -40,9 +38,7 @@ public class Menu_Fragment extends ListFragment
 	public void onActivityCreated(Bundle savedInstanceState) 
 	{
 		super.onActivityCreated(savedInstanceState);
-		MyApp myApp = (MyApp)getActivity().getApplication();
-		login = myApp.getLogin();
-		user_name = new DBworker(getActivity()).getUser(login).getName();
+		//user_name = DBworker.getInstance().getUser(login).getName();
 		
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuItemContent(user_name, android.R.drawable.sym_def_app_icon));
@@ -105,28 +101,28 @@ public class Menu_Fragment extends ListFragment
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		if(position == 1){
-			Intent intent = new Intent();
-	        intent.setClass(getActivity(), DayViewActivity.class);
-	        Bundle bundle = new Bundle();
-	        bundle.putInt("numWeek", Tool.getNumWeek());
-	        bundle.putInt("dayOfWeek", Tool.getDayOfWeek());
-	        intent.putExtras(bundle);      
-	        startActivityForResult(intent, MyApp.rsqCode);
-		}else if (position == 2) {
-			getActivity().setResult(MyApp.Update);
-			getActivity().finish();
-		}else if (position == 3) {
-			Intent intent = new Intent();
-			intent.setClass(getActivity(), AccountActivity.class);
-			getActivity().startActivityForResult(intent, MyApp.rsqCode);
-		}else if (position == 4) {
-			Intent intent = new Intent();
-			intent.setClass(getActivity(), AppConfigActivity.class);
-			getActivity().startActivityForResult(intent, MyApp.rsqCode);
-		}else if (position == 5){
-			getActivity().setResult(MyApp.Exit);
-			getActivity().finish();
-		}
+//		if(position == 1){
+//			Intent intent = new Intent();
+//	        intent.setClass(getActivity(), DayViewActivity.class);
+//	        Bundle bundle = new Bundle();
+//	        bundle.putInt("numWeek", Tool.getNumWeek());
+//	        bundle.putInt("dayOfWeek", Tool.getDayOfWeek());
+//	        intent.putExtras(bundle);      
+//	        startActivityForResult(intent, MyApp.rsqCode);
+//		}else if (position == 2) {
+//			getActivity().setResult(MyApp.Update);
+//			getActivity().finish();
+//		}else if (position == 3) {
+//			Intent intent = new Intent();
+//			intent.setClass(getActivity(), AccountActivity.class);
+//			getActivity().startActivityForResult(intent, MyApp.rsqCode);
+//		}else if (position == 4) {
+//			Intent intent = new Intent();
+//			intent.setClass(getActivity(), AppConfigActivity.class);
+//			getActivity().startActivityForResult(intent, MyApp.rsqCode);
+//		}else if (position == 5){
+//			getActivity().setResult(MyApp.Exit);
+//			getActivity().finish();
+//		}
 	}
 }

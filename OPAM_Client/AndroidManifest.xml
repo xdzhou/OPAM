@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.sky.opam"
-      android:versionCode="11"
-      android:versionName="1.2.7.1">
-    <uses-sdk android:minSdkVersion="8"
+      android:versionCode="12"
+      android:versionName="1.2.8">
+      
+    <uses-sdk android:minSdkVersion="14"
         	  android:targetSdkVersion="19" />
 
-    <application android:name="com.sky.opam.tool.MyApp"
+    <application 
+        android:name="com.loic.common.LibApplication"
+        android:backupAgent=".MyBackupAgent"
         android:icon="@drawable/logo"
         android:theme="@style/AppTheme"
         android:label="@string/app_name">
         
-        <activity android:name="com.sky.opam.LoginActivity"
+        <activity 
+            android:name="com.sky.opam.MainActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
@@ -20,30 +24,8 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="com.sky.opam.WeekViewActivity"
-            android:screenOrientation="portrait"
-        	android:label="@string/app_name">
-        </activity>
+        <service android:enabled="true" android:name="com.sky.opam.service.IntHttpService" />
         
-        <activity android:name="com.sky.opam.DayViewActivity"
-            android:screenOrientation="portrait"
-        	android:label="@string/app_name">
-        </activity>
-        
-        <activity android:name="com.sky.opam.AccountActivity"
-            android:screenOrientation="portrait"
-        	android:label="@string/app_name">
-        </activity>
-        
-        <activity android:name="com.sky.opam.ClassInfoEditActivity"
-            android:screenOrientation="portrait"
-        	android:label="@string/app_name">
-        </activity> 
-        
-        <activity android:name="com.sky.opam.AppConfigActivity"
-            android:screenOrientation="portrait"
-        	android:label="@string/app_name">
-        </activity>
     </application>
     
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" ></uses-permission>

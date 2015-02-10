@@ -1,34 +1,51 @@
 package com.sky.opam.model;
 
-import java.io.Serializable;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class ClassInfo implements Serializable, Comparable<ClassInfo>{
-	private static final long serialVersionUID = 1L;
+import com.loic.common.sqliteTool.Column;
+import com.loic.common.sqliteTool.ID;
+import com.loic.common.sqliteTool.Model;
+
+@Model
+public class ClassEvent implements Comparable<ClassEvent>
+{
+	public static final  DateFormat dtf = new SimpleDateFormat("yyyyMMddHH:mm");
 	
-	public long id;
-	public String login = "";
-	public String name = "";
-	public ClassType classType = new ClassType();
-	public int weekOfYear;
-	public int dayOfWeek;
-	public String startTime = "";
-	public String endTime = "";
-	public String auteur = "";
-	public String teacher = "";
-	public String students = "";
-	public String groupe = "";
-	public Room room = new Room();
-	public String bgColor = "#999999";
-	public long eventId ;
+	@ID
+	public long NumEve; //event id in INT server, used as ID
+	@Column(length = 10)
+	public String login;
+	@Column(length = 30)
+	public String name;
+	@Column(length = 30)
+	public String type;
+	public Date startTime;
+	public Date endTime;
+	@Column(length = 30)
+	public String auteur;
+	@Column(length = 50)
+	public String teacher;
+	@Column(length = 255)
+	public String students;
+	@Column(length = 50)
+	public String groupe;
+	@Column(length = 30)
+	public String room;
+	public int bgColor;
+	public long eventId;
 	
-	public static Comparator<ClassInfo> timeComparator = new Comparator<ClassInfo>() 
+	public ClassEvent()
+	{
+	}
+	
+	public static Comparator<ClassEvent> timeComparator = new Comparator<ClassEvent>() 
 	{
 		@Override
-		public int compare(ClassInfo first, ClassInfo second) 
+		public int compare(ClassEvent first, ClassEvent second) 
 		{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
 			String FinDuMonde = "20121221";
@@ -46,21 +63,20 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		}
 	};
 
+
 	@Override
 	public String toString() 
 	{
-		return "ClassInfo [id=" + id + ", login=" + login + ", name=" + name
-				+ ", weekOfYear=" + weekOfYear + ", dayOfWeek=" + dayOfWeek
-				+ ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", eventId=" + eventId + "]";
+		return "ClassInfo [name=" + name + ", type=" + type + ", startTime="
+				+ startTime + ", endTime=" + endTime + ", auteur=" + auteur
+				+ ", teacher=" + teacher + ", groupe=" + groupe + ", room="
+				+ room + "]";
 	}
 
-	public static ClassInfo getCustomedClass(String login)
+	public static ClassEvent getCustomedClass(String login)
 	{
-		ClassInfo c = new ClassInfo();
-		c.id = -1;
-		c.login = c.auteur = login;
-		c.bgColor = "#999999";
+		ClassEvent c = new ClassEvent();
+		c.auteur = login;
 		return c;
 	}
 
@@ -68,8 +84,8 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 	{
 		if (name != null && name.contains("Point de Rencontre"))
 			return name;
-		else if(classType.name != null && name != null)
-			return classType.name + " - " + name;
+		else if(type != null && name != null)
+			return type + " - " + name;
 		else
 			return name;
 	}
@@ -84,7 +100,7 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 	}
 
 	@Override
-	public int compareTo(ClassInfo another) 
+	public int compareTo(ClassEvent another) 
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
 		String FinDuMonde = "20121221";
@@ -98,28 +114,28 @@ public class ClassInfo implements Serializable, Comparable<ClassInfo>{
 		return (int) ((t1.getTime() - t2.getTime())/1000);
 	}
 
-
-
 	@Override
-	public int hashCode() {
+	public int hashCode() 
+	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + (int) (NumEve ^ (NumEve >>> 32));
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) 
+	{
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ClassInfo other = (ClassInfo) obj;
-		if (id != other.id)
+		ClassEvent other = (ClassEvent) obj;
+		if (NumEve != other.NumEve)
 			return false;
 		return true;
 	}
-	
+
 }

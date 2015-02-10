@@ -2,6 +2,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     
+    <string name="OA0000" >Agenda</string>
+    <string name="OA0001" >Search</string>
+    <string name="OA0002" >Setting</string>
+    <string name="OA0003" >Exit</string>
+    
     <string name="welcome" >Welcome to OPAM</string>
     <string name="app_name" >OPAM</string>
     <string name="class_name" >Class Name</string>

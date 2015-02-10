@@ -2,14 +2,10 @@ package com.sky.opam.tool;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import com.sky.opam.R;
-import com.sky.opam.model.ClassInfo;
-import com.sky.opam.model.Config;
 import com.sky.opam.model.VersionInfo;
 
 import android.app.Activity;
@@ -24,61 +20,25 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.view.Display;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-public class Tool {
-	/**
-     * 检测网络是否可用
-     * 
-     * @param context
-     *          环境，一般为activity
-     */
-	public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager mgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] info = mgr.getAllNetworkInfo();
-        if (info != null) {
-            for (int i = 0; i < info.length; i++) {
-                if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                    return true;
-                }
-            }
-        }
-        return false;
+public class Tool 
+{
+	public static String getTrombiPhotoURL(String login, int size)
+	{
+		return "http://trombi.tem-tsp.eu/photo.php?uid="+login+"&h="+size+"&w="+size;
 	}
 	
-	/**
-     * 在屏幕上层显示一个提示框
-     * 
-     * @param context
-     *          环境，一般为activity
-     * @param title
-     * 			提示框标题
-     * @param msg    
-     * 			提示框内显示的信息 
-     */
-	public static void showInfo(Context context, String title, String msg) {
+	public static void showInfo(Context context, String title, String msg) 
+	{
         new AlertDialog.Builder(context).setTitle(title).setMessage(msg)
             .setPositiveButton(R.string.ok, null).show();
 	}
 	
-	/**
-     * 在屏幕上显示一个稍后自动消失的提示信息
-     * 
-     * @param context
-     *          环境，一般为activity
-     * @param msg    
-     * 			显示的信息 
-     */
-	public static void showInfo(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-	}
 	
 	/**
      * 把一个view转换为Bitmap，可用于屏幕截图
@@ -86,8 +46,10 @@ public class Tool {
      * @param view
      *          需要转换的view
      */
-	public static Bitmap ViewToBitmap(View view){
-		if(view==null) return null;
+	public static Bitmap ViewToBitmap(View view)
+	{
+		if(view==null) 
+			return null;
 		view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), 
                      MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
@@ -108,11 +70,13 @@ public class Tool {
      * 得到当前的周数（一年中的第几周）
      * 
      */
-	public static int getNumWeek() {
+	public static int getNumWeek() 
+	{
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         int xq = c.get(Calendar.DAY_OF_WEEK);
-        if (xq == 1) {
+        if (xq == 1) 
+        {
                 c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
         }
         SimpleDateFormat sdf = new SimpleDateFormat();
@@ -128,7 +92,8 @@ public class Tool {
      * @param dayOfWeek
      * 			星期几
      */
-	public static String getDateViaNumWeek(int numweek, int dayOfWeek) {
+	public static String getDateViaNumWeek(int numweek, int dayOfWeek) 
+	{
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.WEEK_OF_YEAR, numweek);
 		cal.set(Calendar.DAY_OF_WEEK, dayOfWeek);
@@ -146,7 +111,8 @@ public class Tool {
      * 得到公元多少年
      * 
      */
-	public static int getYear() {
+	public static int getYear() 
+	{
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.YEAR);
 	}
@@ -155,7 +121,8 @@ public class Tool {
      * 星期几
      * 
      */
-	public static int getDayOfWeek() {
+	public static int getDayOfWeek() 
+	{
 		Calendar c = Calendar.getInstance();
 		int xq = c.get(Calendar.DAY_OF_WEEK);
 		return xq;
@@ -169,7 +136,8 @@ public class Tool {
      * @param dipValue    
      * 			dip 数值 
      */
-	public static int dip2px(Context context, int dipValue) {
+	public static int dip2px(Context context, int dipValue) 
+	{
 		float scale = context.getResources().getDisplayMetrics().density;
 		return (int) (dipValue * scale + 0.5f);
 	}
@@ -180,7 +148,8 @@ public class Tool {
      * @param activity
      *          环境，为activity
      */
-	public static int getScreenWidth(Activity activity){
+	public static int getScreenWidth(Activity activity)
+	{
 		WindowManager manager = activity.getWindowManager();
 		Display display = manager.getDefaultDisplay();
 		return display.getWidth();
@@ -192,7 +161,8 @@ public class Tool {
      * @param activity
      *          环境，为activity
      */
-	public static int getScreenHeight(Activity activity){
+	public static int getScreenHeight(Activity activity)
+	{
 		WindowManager manager = activity.getWindowManager();
 		Display display = manager.getDefaultDisplay();
 		return display.getHeight();
@@ -204,7 +174,8 @@ public class Tool {
      * @param hour
      *          小时值
      */
-	public static String getTime(int hour){
+	public static String getTime(int hour)
+	{
 		return (hour < 10) ? ("0" + hour + ":00"): (hour + ":00");
 	}
 	
@@ -214,7 +185,8 @@ public class Tool {
      * @param context
      *          环境，一般为activity
      */
-	public static String getVersionName(Context context){
+	public static String getVersionName(Context context)
+	{
 		String version_name = null;
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -231,7 +203,8 @@ public class Tool {
      * @param context
      *          环境，一般为activity
      */
-	public static int getVersionCode(Context context){
+	public static int getVersionCode(Context context)
+	{
 		int version_code = 0;
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -246,16 +219,19 @@ public class Tool {
      * 得到当前的语言
      * 
      */
-	public static String getLocalLanguage(){
+	public static String getLocalLanguage()
+	{
 		//return context.getResources().getConfiguration().locale.getDisplayLanguage();
 		return Locale.getDefault().getLanguage();
 	}
 	
-	public static AlertDialog.Builder showVersionInfo(Context context, VersionInfo versionInfo){
+	public static AlertDialog.Builder showVersionInfo(Context context, VersionInfo versionInfo)
+	{
 		StringBuilder msg = new StringBuilder();
 		msg.append(versionInfo.vName+":\n\n");
 		int num = 1;
-		for(String s: versionInfo.features){
+		for(String s: versionInfo.features)
+		{
 			msg.append(num+": ");
 			msg.append(s+"\n\n");
 			num++;
@@ -295,33 +271,5 @@ public class Tool {
 		SharedPreferences pref = context.getSharedPreferences("share", 0); 
 		isFirstIn = pref.getBoolean("isFirstIn", true);
 		return isFirstIn;
-	}
-	
-	public static String[] getVocationTime(MyApp myApp, ClassInfo classInfo) 
-	{
-		DBworker worker = new DBworker(myApp);
-		Config config = worker.getConfig(myApp.getLogin());
-		List<ClassInfo> todayClasses = worker.getClassInfo(myApp.getLogin(), classInfo.weekOfYear, classInfo.dayOfWeek);
-		Collections.sort(todayClasses, ClassInfo.timeComparator);
-		int index = 0;
-		for(int i = 0; i < todayClasses.size(); i++)
-		{
-			if(todayClasses.get(i).startTime.equals(classInfo.startTime)){
-				index = i;
-				break;
-			}
-		}
-		String[] retVal = new String[2];
-		if(index - 1 >= 0)
-			retVal[0] = todayClasses.get(index - 1).endTime;
-		else
-			retVal[0] = getTime(config.startTime);
-		
-		if(index + 1 < todayClasses.size())
-			retVal[1] = todayClasses.get(index + 1).startTime;
-		else
-			retVal[1] = getTime(config.endTime);
-		todayClasses.clear();
-		return retVal;
 	}
 }

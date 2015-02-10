@@ -5,22 +5,22 @@
     android:layout_width="match_parent"
     android:gravity="center_vertical|center_horizontal"
     android:background="@drawable/important_bg">
-<ImageView 
-  android:id="@+id/bgID"  
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:src="@drawable/logo"
-  />
+    
+	<ImageView 
+	  android:id="@+id/bgID"  
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:src="@drawable/logo"/>
 
-<TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignBottom="@+id/bgID"
-    android:layout_alignParentLeft="true"
-    android:gravity="center_horizontal"
-    android:text="@string/welcome"
-    android:textColor="#2125e2"
-    android:textSize="20sp" />
+	<TextView
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBottom="@+id/bgID"
+	    android:layout_alignParentLeft="true"
+	    android:gravity="center_horizontal"
+	    android:text="@string/welcome"
+	    android:textColor="#2125e2"
+	    android:textSize="20sp" />
 
 <RelativeLayout
     android:id="@+id/login_div"
@@ -41,13 +41,11 @@
 	    android:drawableLeft="@drawable/user_logo"
 	    android:ems="10"
 	    android:hint="@string/login"
-	    android:maxLength="8"
 	    android:shadowColor="#ff0000"
 	    android:singleLine="true"
 	    android:textColor="@color/black"
 	    android:textCursorDrawable="@null"
 	    android:textColorHint="#238745" >
-
 	    <requestFocus />
 	</AutoCompleteTextView>
 

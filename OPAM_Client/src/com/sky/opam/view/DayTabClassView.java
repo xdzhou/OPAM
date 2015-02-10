@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.sky.opam.model.ClassInfo;
+import com.sky.opam.model.ClassEvent;
 import com.sky.opam.tool.Tool;
 
 import android.content.Context;
@@ -25,11 +25,11 @@ import android.view.View;
 
 public class DayTabClassView extends View implements GestureDetector.OnGestureListener
 {
-	private int startTime ;
-	private int endTime ;
+	private int startTime = 7;
+	private int endTime = 19;
 	private float view_width ;
 	private float time_distance ;
-	private List<ClassInfo> class_list = new ArrayList<ClassInfo>();
+	private List<ClassEvent> class_list = new ArrayList<ClassEvent>();
 	private Paint outLinePaint = new Paint();
 	private Paint selectePaint = new Paint();
 	private Paint backgroundPaint = new Paint();
@@ -41,37 +41,44 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	
 	private float d;
 	private GestureDetector mGestureDetector;
-	private ClassInfoClickListener myClcLis;
-	private DayViewLongPressListener myLongPressListener;
+	private OnEventClickListener myClcLis;
+	private OnEventLongPressListener myLongPressListener;
 
-	public DayTabClassView(Context context, AttributeSet attrs, int defStyle) {
+	public DayTabClassView(Context context, AttributeSet attrs, int defStyle) 
+	{
 		super(context, attrs, defStyle);
 		initia(context);
 	}
 
-	public DayTabClassView(Context context, AttributeSet attrs) {
+	public DayTabClassView(Context context, AttributeSet attrs) 
+	{
 		super(context, attrs);
 		initia(context);
 	}
 
-	public DayTabClassView(Context context) {
+	public DayTabClassView(Context context) 
+	{
 		super(context);
 		initia(context);
 	}
 	
-	public void setStartTime(int startTime) {
+	public void setStartTime(int startTime) 
+	{
 		this.startTime = startTime;
 	}
 
-	public void setEndTime(int endTime) {
+	public void setEndTime(int endTime) 
+	{
 		this.endTime = endTime;
 	}
 
-	public void setViewWidth(float view_width) {
+	public void setViewWidth(float view_width) 
+	{
 		this.view_width = view_width;
 	}
 	
-	public void setTimeDistance(float time_distance) {
+	public void setTimeDistance(float time_distance) 
+	{
 		this.time_distance = time_distance;
 	}
 
@@ -106,7 +113,7 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 			canvas.drawLine(0, i*time_distance, view_width, i*time_distance, outLinePaint);
 		}
 		//draw class info
-		for(ClassInfo c : class_list)
+		for(ClassEvent c : class_list)
 		{
 			drawClassInfo(canvas, c);
 		}
@@ -118,14 +125,22 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) 
 	{
-		setMeasuredDimension((int)(view_width), (int)((endTime-startTime)*time_distance));
+		if(MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY)
+		{
+			view_width = MeasureSpec.getSize(widthMeasureSpec);
+			setMeasuredDimension((int)(view_width), (int)((endTime - startTime) * time_distance));
+		}
+		else 
+		{
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		}
 	}
 	
-	private void drawClassInfo(Canvas canvas, ClassInfo c) 
+	private void drawClassInfo(Canvas canvas, ClassEvent c) 
 	{
 		float startP = getTimeDistance(c.startTime);
 		float endP = getTimeDistance(c.endTime);
-		backgroundPaint.setColor(Color.parseColor(c.bgColor));
+		//backgroundPaint.setColor(Color.parseColor(c.bgColor));
 		canvas.drawRect(d, startP+d, view_width-d, endP-d, backgroundPaint);
 		canvas.save();
 		StaticLayout sl= new StaticLayout(c.name, textPaint, (int)(view_width-2*d), Alignment.ALIGN_CENTER, 1f, 0f, false);
@@ -141,117 +156,151 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		canvas.restore();
 	}
 	
-	private float getTimeDistance(String time) 
+	private float getTimeDistance(Date time) 
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
 		String FinDuMonde = "20121221";
 		String timeString = (startTime < 10) ? ("0" + startTime + ":00"): (startTime + ":00");
 		Date t2 = null, t1 = null;
-		try {
+		try 
+		{
 			t2 = sdf.parse(FinDuMonde + " " + time);
 			t1 = sdf.parse(FinDuMonde + " " + timeString);
-		} catch (ParseException e) {
+		} catch (ParseException e) 
+		{
 			e.printStackTrace();
 		}
 		long sed = (t2.getTime() - t1.getTime()) / 1000;
 		return (time_distance * sed / 3600);
 	}
 	
-	public void addClass(ClassInfo c){
+	public void addClass(ClassEvent c)
+	{
 		class_list.add(c);
 		Collections.sort(class_list);
 		invalidate();
 	}
 	
-	public void addClass(List<ClassInfo> list){
-		if(list!=null && list.size()>0){
+	public void addClass(List<ClassEvent> list)
+	{
+		if(list != null && list.size() > 0)
+		{
+			class_list.clear();
 			class_list.addAll(list);
 			Collections.sort(class_list);
 			invalidate();
 		}
 	}
 	
-	public void removeClass(ClassInfo c){
+	public void removeClass(ClassEvent c)
+	{
 		class_list.remove(c);
 		Collections.sort(class_list);
 		invalidate();
 	}
 	
-	private float getTextHeight(TextPaint p) {
+	private float getTextHeight(TextPaint p) 
+	{
 		FontMetrics fm = p.getFontMetrics();
 		return (fm.bottom - fm.top);
 	}	
 
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+	public boolean onTouchEvent(MotionEvent event) 
+	{
 		return mGestureDetector.onTouchEvent(event);
 	}
 
 	@Override
-	public boolean onDown(MotionEvent e) {
+	public boolean onDown(MotionEvent e) 
+	{
 		return true;
 	}
 
 	@Override
-	public void onShowPress(MotionEvent e) {
+	public void onShowPress(MotionEvent e) 
+	{
 	}
 
 	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,float distanceY) {
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,float distanceY) 
+	{
 		return true;
 	}
 
 	@Override
-	public void onLongPress(MotionEvent e) {	
+	public void onLongPress(MotionEvent e) 
+	{	
 		//enableSelectDraw(0,(endTime-startTime)*time_distance);
 		if(myLongPressListener != null)
 		{
 			String vocationStartTime, vocationEndTime;
-			if(class_list.size()==0) {
+			if(class_list.size()==0) 
+			{
 				enableSelectDraw(0,(endTime-startTime)*time_distance);
-				myLongPressListener.onLongPressEvent(this, null, 
+				myLongPressListener.onEventLongPress(this, null, 
 					Tool.getTime(startTime),
 					Tool.getTime(endTime));
 			}
 			
-			for(int i=0; i<class_list.size(); i++){
-				ClassInfo c = class_list.get(i);
+			for(int i=0; i<class_list.size(); i++)
+			{
+				ClassEvent c = class_list.get(i);
 				float startP = getTimeDistance(c.startTime);
 				float endP = getTimeDistance(c.endTime);
-				if(e.getY() < startP){
-					float previousP;
-					if(i-1 == -1) {
+				if(e.getY() < startP)
+				{
+					float previousP =0;
+					if(i-1 == -1) 
+					{
 						previousP = 0f;
 						vocationStartTime = Tool.getTime(startTime);
-					}else {
-						vocationStartTime = class_list.get(i-1).endTime;
-						previousP = getTimeDistance(vocationStartTime);
 					}
-					if(previousP < e.getY()){
+					else 
+					{
+						//vocationStartTime = class_list.get(i-1).endTime;
+						//previousP = getTimeDistance(vocationStartTime);
+					}
+					if(previousP < e.getY())
+					{
 						enableSelectDraw(previousP, startP);
-						myLongPressListener.onLongPressEvent(this, null, vocationStartTime, c.startTime);
+						//myLongPressListener.onEventLongPress(this, null, vocationStartTime, c.startTime);
 						break;
 					}
-				}else if (startP < e.getY() && e.getY() < endP) {
+				}
+				else if (startP < e.getY() && e.getY() < endP) 
+				{
 					enableSelectDraw(startP, endP);
-					if(i-1 < 0) vocationStartTime = Tool.getTime(startTime);
-					else vocationStartTime = class_list.get(i-1).endTime;
-					if(i+1 >= class_list.size()) vocationEndTime = Tool.getTime(endTime);
-					else vocationEndTime = class_list.get(i+1).startTime;
-					myLongPressListener.onLongPressEvent(this, c, vocationStartTime, vocationEndTime);
-					break;
-				}else {
-					float nestP;
-					if(i == class_list.size()-1) {
+					if(i-1 < 0) 
+						vocationStartTime = Tool.getTime(startTime);
+					else 
+						//vocationStartTime = class_list.get(i-1).endTime;
+					if(i+1 >= class_list.size()) 
 						vocationEndTime = Tool.getTime(endTime);
-						nestP = getTimeDistance(vocationEndTime);			
-					}else {
-						vocationEndTime = class_list.get(i+1).startTime;
-						nestP = getTimeDistance(vocationEndTime);				
+					else 
+						//vocationEndTime = class_list.get(i+1).startTime;
+					
+					//myLongPressListener.onEventLongPress(this, c, vocationStartTime, vocationEndTime);
+					
+					break;
+				}
+				else 
+				{
+					float nestP = 0;
+					if(i == class_list.size()-1) 
+					{
+						vocationEndTime = Tool.getTime(endTime);
+						//nestP = getTimeDistance(vocationEndTime);			
 					}
-					if(nestP > e.getY()){
+					else 
+					{
+						//vocationEndTime = class_list.get(i+1).startTime;
+						//nestP = getTimeDistance(vocationEndTime);				
+					}
+					if(nestP > e.getY())
+					{
 						enableSelectDraw(endP, nestP);
-						myLongPressListener.onLongPressEvent(this, null, c.endTime, vocationEndTime);
+						//myLongPressListener.onEventLongPress(this, null, c.endTime, vocationEndTime);
 						break;
 					}
 				}
@@ -259,35 +308,43 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		}
 	}
 	
-	private void enableSelectDraw(float p1, float p2){
+	private void enableSelectDraw(float p1, float p2)
+	{
 		isRegionSelected = true;
 		startSelectP = p1;
 		endSelectP = p2;
 		postInvalidate();
 	}
 	
-	public void cancelSelectDraw(){
+	public void cancelSelectDraw()
+	{
 		isRegionSelected = false;
 		postInvalidate();
 	}
 
-	public void setMyLongPressListener(DayViewLongPressListener myLongPressListener) {
+	public void setMyLongPressListener(OnEventLongPressListener myLongPressListener) 
+	{
 		this.myLongPressListener = myLongPressListener;
 	}
 
 	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) 
+	{
 		return true;
 	}
 	
 	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		if(myClcLis!=null){
-			for (ClassInfo c: class_list) {
+	public boolean onSingleTapUp(MotionEvent e) 
+	{
+		if(myClcLis!=null)
+		{
+			for (ClassEvent c: class_list) 
+			{
 				float startP = getTimeDistance(c.startTime);
 				float endP = getTimeDistance(c.endTime);
-				if (startP < e.getY() && e.getY() < endP) {
-					myClcLis.onTouchEvent(this, e, c);
+				if (startP < e.getY() && e.getY() < endP) 
+				{
+					myClcLis.onEventClicked(this, e, c);
 					break;
 				}
 			}
@@ -295,16 +352,24 @@ public class DayTabClassView extends View implements GestureDetector.OnGestureLi
 		return true;
 	}
 	
-	public void setClickListener(ClassInfoClickListener clickListener) {
+	public void setClickListener(OnEventClickListener clickListener) 
+	{
 		this.myClcLis = clickListener;
 	}
 	
-	// 2 listener
-	public interface ClassInfoClickListener {
-		public void onTouchEvent(View v, MotionEvent e, ClassInfo c);
+	// 3 listener
+	public static interface OnEventClickListener 
+	{
+		public void onEventClicked(View v, MotionEvent e, ClassEvent c);
 	}
 	
-	public interface DayViewLongPressListener {
-		public void onLongPressEvent(DayTabClassView v, ClassInfo c, String vocationStartTime, String vocationEndTime);
+	public static interface OnEventLongPressListener 
+	{
+		public void onEventLongPress(DayTabClassView v, ClassEvent c, String vocationStartTime, String vocationEndTime);
+	}
+	
+	public static interface OnNothingLongPressListener 
+	{
+		public void onNothingLongPress(DayTabClassView v, String vocationStartTime, String vocationEndTime);
 	}
 }

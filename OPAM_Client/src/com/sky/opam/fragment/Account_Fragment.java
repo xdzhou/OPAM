@@ -5,10 +5,8 @@ import java.util.List;
 
 import com.sky.opam.R;
 import com.sky.opam.model.User;
-import com.sky.opam.task.AgendaDownloadTask;
 import com.sky.opam.task.DownloadImageTask;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
 import android.annotation.SuppressLint;
@@ -31,11 +29,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 @SuppressLint("ValidFragment")
-public class Account_Fragment extends ListFragment{
+public class Account_Fragment extends ListFragment
+{
 	private List<User> users;
-	private MyApp myApp;
 	private DBworker worker;
-	AccountAdapter adapter;
 	private String newLogin;
 	private int LastLoginPosition = 0;
 	
@@ -47,19 +44,18 @@ public class Account_Fragment extends ListFragment{
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		myApp = (MyApp)getActivity().getApplication();
-		worker = new DBworker(getActivity());
-		users = worker.getAllUser();
+		worker = DBworker.getInstance();
+		//users = worker.getAllUser();
 		
-		adapter = new AccountAdapter(getActivity());
-		chargeAdaper();
-		setListAdapter(adapter);
+//		adapter = new AccountAdapter(getActivity());
+//		chargeAdaper();
+//		setListAdapter(adapter);
 	}
-	
+	/*
 	private void chargeAdaper(){
 		for(int i=0; i<users.size(); i++){
 			User u = users.get(i);
-			adapter.add(new AccountItemContent(u.getLogin(), u.getName()));
+			//adapter.add(new AccountItemContent(u.getLogin(), u.getName()));
 			LastLoginPosition ++;
 		}
 		adapter.add(new AccountItemContent(null, getResources().getString(R.string.add_new_account)));
@@ -101,7 +97,7 @@ public class Account_Fragment extends ListFragment{
 					Bitmap bitmap = BitmapFactory.decodeFile(imgPath, options);
 					icon.setImageBitmap(bitmap);
 				}
-				if(!users.get(position).getLogin().equals(myApp.getLogin())){
+				if(!users.get(position).getLogin().equals("myApp.getLogin()")){
 					ImageView del_icon = (ImageView) convertView.findViewById(R.id.del_view);
 					del_icon.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
 					del_icon.setOnClickListener(new delAccountListener(position));
@@ -127,25 +123,25 @@ public class Account_Fragment extends ListFragment{
 				public void onClick(DialogInterface dialog, int which) {
 					newLogin = loginET.getText().toString();
 					String password = pwET.getText().toString();
-                    if (newLogin.length() == 0)
-                        Tool.showInfo(getActivity(),getResources().getString(R.string.login_null_alert));
-                    else if (password.length() == 0)
-                    	Tool.showInfo(getActivity(),getResources().getString(R.string.pw_null_alert));
-                    else if (worker.isLoginExist(newLogin))
-                    	Tool.showInfo(getActivity(),"Login Exist !");
-                    else {
-                    	dialog.dismiss();
-    					AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(getActivity(), new AgendaHandler());
-    		            agendaDownloadTask.execute(newLogin,password);
-                    }				
+//                    if (newLogin.length() == 0)
+//                        Tool.showInfo(getActivity(),getResources().getString(R.string.login_null_alert));
+//                    else if (password.length() == 0)
+//                    	Tool.showInfo(getActivity(),getResources().getString(R.string.pw_null_alert));
+//                    else if (worker.isLoginExist(newLogin))
+//                    	Tool.showInfo(getActivity(),"Login Exist !");
+//                    else {
+//                    	dialog.dismiss();
+//    					AgendaDownloadTask agendaDownloadTask = new AgendaDownloadTask(getActivity(), new AgendaHandler());
+//    		            agendaDownloadTask.execute(newLogin,password);
+//                    }				
 				}
 			});
 			login_dialog.show();
 		}else {
 			User selectedUser = users.get(position);
-			myApp.setLogin(selectedUser.getLogin());
+			//myApp.setLogin(selectedUser.getLogin());
 			worker.setDefaultUser(selectedUser.getLogin());
-			getActivity().setResult(MyApp.Refresh);
+			//getActivity().setResult(MyApp.Refresh);
 			getActivity().finish();
 		}
 	}
@@ -163,7 +159,7 @@ public class Account_Fragment extends ListFragment{
 			}else {
 				Bundle b = msg.getData();
 				String errorMsg = b.getString("error");
-				Tool.showInfo(getActivity(), errorMsg);
+				//Tool.showInfo(getActivity(), errorMsg);
 			}		
 		} 	
     }
@@ -194,4 +190,5 @@ public class Account_Fragment extends ListFragment{
 			del_dialog.show();
 		}	
 	}
+	*/
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content" 
+    android:layout_width="match_parent">
+
+    <ImageView
+        android:id="@+id/etudiant_profil"
+        android:layout_width="@dimen/etudiant_search_list_item_height"
+        android:layout_height="@dimen/etudiant_search_list_item_height"
+        android:src="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/etudiant_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/etudiant_profil"
+        android:text="Xiandong ZHOU"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/etudiant_school"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="TSP"
+        android:textColor="@color/darkgray" />
+
+    <TextView
+        android:id="@+id/etudiant_grade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/etudiant_name"
+        android:layout_below="@+id/etudiant_name"
+        android:text="ingenieur of 3 annee"
+        android:textColor="@color/chat_name" />
+
+    <TextView
+        android:id="@+id/etudiant_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/etudiant_grade"
+        android:text="xdzhou@telecom.com"
+        android:textColor="@color/black" />
+
+</RelativeLayout>

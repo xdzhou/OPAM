@@ -7,12 +7,9 @@ import java.util.List;
 
 import com.loic.common.graphic.RangeSeekBar;
 import com.loic.common.graphic.RangeSeekBar.OnRangeSeekBarChangeListener;
-import com.sky.opam.model.ClassInfo;
-import com.sky.opam.model.ClassType;
-import com.sky.opam.model.Room;
+import com.loic.common.utils.GoogleCalendarUtils;
+import com.sky.opam.model.ClassEvent;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.GoogleCalendarAPI;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 import com.sky.opam.view.ColorPickerAdapter;
 
@@ -46,9 +43,8 @@ import android.widget.TimePicker;
 public class ClassInfoEditActivity extends ActionBarActivity
 {
 	private DBworker worker;
-	private MyApp myApp;
 	private String bgColor;
-	private ClassInfo classInfo;
+	private ClassEvent classInfo;
 	private EditText nameEditText;
 	private EditText teacherEditText;
 	private EditText groupEditText;
@@ -59,7 +55,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 	private GridView colorGridView;
 	private RangeSeekBar<Long> rangeSeekBar;
 	private SimpleDateFormat  simpleFormat = new SimpleDateFormat("HH:mm");
-	
+	/*
 	@Override
     public void onCreate(Bundle savedInstanceState) 
 	{
@@ -71,8 +67,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 	
 	private void init()
 	{
-		worker = new DBworker(this);
-		myApp = (MyApp)getApplication();
+		worker = DBworker.getInstance();
 		
 		long classId = getIntent().getExtras().getLong("classId");
 		String minTime = getIntent().getExtras().getString("minTime");
@@ -80,7 +75,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 		
 		if(classId == -1)
 		{
-			classInfo = ClassInfo.getCustomedClass(myApp.getLogin());
+			classInfo = ClassEvent.getCustomedClass("login");
 			classInfo.weekOfYear = getIntent().getExtras().getInt("weekOfYear");
 			classInfo.dayOfWeek = getIntent().getExtras().getInt("dayOfWeek");
 		}
@@ -88,9 +83,9 @@ public class ClassInfoEditActivity extends ActionBarActivity
 		{
 			classInfo = worker.getClassInfo(classId);
 			if(minTime == null){
-				String[] minMaxTime = Tool.getVocationTime(myApp, classInfo);
-				minTime = minMaxTime[0];
-				maxTime = minMaxTime[1];
+				//String[] minMaxTime = Tool.getVocationTime(myApp, classInfo);
+				//minTime = minMaxTime[0];
+				//maxTime = minMaxTime[1];
 			}
 		}
 		bgColor = classInfo.bgColor;
@@ -129,12 +124,12 @@ public class ClassInfoEditActivity extends ActionBarActivity
 		{
 			try 
 			{
-				rangeSeekBar.setSelectedMinValue(simpleFormat.parse(classInfo.startTime).getTime());
-				rangeSeekBar.setSelectedMaxValue(simpleFormat.parse(classInfo.endTime).getTime());
-				startTimeTV.setText(classInfo.startTime);
-				endTimeTV.setText(classInfo.endTime);
+//				rangeSeekBar.setSelectedMinValue(simpleFormat.parse(classInfo.startTime).getTime());
+//				rangeSeekBar.setSelectedMaxValue(simpleFormat.parse(classInfo.endTime).getTime());
+//				startTimeTV.setText(classInfo.startTime);
+//				endTimeTV.setText(classInfo.endTime);
 			} 
-			catch (ParseException e) 
+			catch (Exception e) 
 			{
 				e.printStackTrace();
 			}		
@@ -158,7 +153,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 		for(int i=0; i<type_list.size(); i++)
 		{
 			ClassType type = type_list.get(i);
-			if(type.name.equals(classInfo.classType.name)) typeSelecteID = i;
+			if(type.name.equals(classInfo.type)) typeSelecteID = i;
 			typeAdapter.add(type.name);
 		}
 		typeAdapter.add(getResources().getString(R.string.add)+" "+getResources().getString(R.string.type));
@@ -184,7 +179,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 		for(int i=0; i<room_list.size(); i++)
 		{
 			Room room = room_list.get(i);
-			if(classInfo.room!=null && room.name.equals(classInfo.room.name)) roomSelecteID = i;
+			if(classInfo.room!=null && room.name.equals(classInfo.room)) roomSelecteID = i;
 			roomAdapter.add(room.name);
 		}
 		roomAdapter.add(getResources().getString(R.string.add)+" "+getResources().getString(R.string.room));
@@ -229,7 +224,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 	{
 		if (keyCode == KeyEvent.KEYCODE_BACK) 
 		{
-			setResult(MyApp.Refresh);
+			//setResult(MyApp.Refresh);
 			finish();
 			return true;
 		}else {
@@ -250,28 +245,28 @@ public class ClassInfoEditActivity extends ActionBarActivity
 	{
 		if(menu.getTitle().equals("cancel"))
 		{
-			setResult(MyApp.Refresh);
+			//setResult(MyApp.Refresh);
 			finish();
 		}
 		else if (menu.getTitle().equals("save")) 
 		{
 			String name = nameEditText.getText().toString();
 			if(name==null || name.equals("")) 
-				Tool.showInfo(this, "input the class name, please!");
+				;
 			else 
 			{
 				classInfo.name = nameEditText.getText().toString();
-				classInfo.startTime = startTimeTV.getText().toString();
-				classInfo.endTime = endTimeTV.getText().toString();
+				//classInfo.startTime = startTimeTV.getText().toString();
+				//classInfo.endTime = endTimeTV.getText().toString();
 				classInfo.teacher = teacherEditText.getText().toString();
 				classInfo.groupe = groupEditText.getText().toString();
-				classInfo.classType = worker.getClassType(((AddAdapter)typeSpinner.getAdapter()).getItem((int) typeSpinner.getSelectedItemId()));
-				classInfo.room = worker.getRoom(((AddAdapter)roomSpinner.getAdapter()).getItem((int) roomSpinner.getSelectedItemId()));
+				//classInfo.classType = worker.getClassType(((AddAdapter)typeSpinner.getAdapter()).getItem((int) typeSpinner.getSelectedItemId()));
+				//classInfo.room = worker.getRoom(((AddAdapter)roomSpinner.getAdapter()).getItem((int) roomSpinner.getSelectedItemId()));
 				classInfo.bgColor = bgColor;
-				GoogleCalendarAPI googleCalendarAPI = new GoogleCalendarAPI(ClassInfoEditActivity.this);
+				GoogleCalendarUtils googleCalendarAPI = GoogleCalendarUtils.getInstance();
 				if(classInfo.id == -1) worker.addClassInfo(classInfo);				
 				else worker.updateClassInfo(classInfo, googleCalendarAPI);
-				setResult(MyApp.Refresh);
+				//setResult(MyApp.Refresh);
 				finish();
 			}		
 		}
@@ -327,7 +322,7 @@ public class ClassInfoEditActivity extends ActionBarActivity
 				String info = newInfoET.getText().toString();
 				if(info.equals("")) 
 				{
-					Tool.showInfo(ClassInfoEditActivity.this, " NULL ");
+					;
 					if(flag == 0) typeSpinner.setSelection(0);
 					else roomSpinner.setSelection(0);
 				}
@@ -388,4 +383,5 @@ public class ClassInfoEditActivity extends ActionBarActivity
 			timePickerDialog.show();
 		}
 	};
+	*/
 }

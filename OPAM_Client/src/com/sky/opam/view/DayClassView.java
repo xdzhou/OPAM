@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sky.opam.model.ClassInfo;
-import com.sky.opam.view.DayTabClassView.ClassInfoClickListener;
+import com.sky.opam.model.ClassEvent;
+import com.sky.opam.view.DayTabClassView.OnEventClickListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -34,7 +34,8 @@ import android.view.GestureDetector;
  */
 
 @SuppressLint("SimpleDateFormat")
-public class DayClassView extends View implements GestureDetector.OnGestureListener {
+public class DayClassView extends View implements GestureDetector.OnGestureListener 
+{
 	private float scale; // screen density
 	private float delta;
 	private float timeW;
@@ -43,10 +44,10 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	private int l = 45; // longeur of every 2 circles
 	private String FinDuMonde = "20121221";
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
-	private List<ClassInfo> cours = new ArrayList<ClassInfo>();
+	private List<ClassEvent> cours = new ArrayList<ClassEvent>();
 	private List<float[]> flag = new ArrayList<float[]>();
 	private int SW;
-	private ClassInfoClickListener myClcLis;
+	private OnEventClickListener myClcLis;
 	long d; // the distance of time now
 	private GestureDetector mGestureDetector;
 
@@ -58,22 +59,26 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	Paint classPaint = new Paint();
 	Paint starPaint = new Paint();
 
-	public DayClassView(Context context, AttributeSet attrs, int defStyle) {
+	public DayClassView(Context context, AttributeSet attrs, int defStyle) 
+	{
 		super(context, attrs, defStyle);
 		initia(context);
 	}
 
-	public DayClassView(Context context, AttributeSet attrs) {
+	public DayClassView(Context context, AttributeSet attrs) 
+	{
 		super(context, attrs);
 		initia(context);
 	}
 
-	public DayClassView(Context context) {
+	public DayClassView(Context context) 
+	{
 		super(context);
 		initia(context);
 	}
 
-	private void initia(Context context) {
+	private void initia(Context context) 
+	{
 		mGestureDetector = new GestureDetector(getContext(), this);
 		scale = context.getResources().getDisplayMetrics().density;
 		// initiation the values dip
@@ -107,24 +112,29 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		classPaint.setPathEffect(effects);
 	}
 
-	public void setClickListener(ClassInfoClickListener clickListener) {
+	public void setClickListener(OnEventClickListener clickListener) 
+	{
 		this.myClcLis = clickListener;
 	}
 
-	public void setCours(List<ClassInfo> cours) {
+	public void setCours(List<ClassEvent> cours) 
+	{
 		this.cours = cours;
 	}
 
-	public void setSW(int sW) {
+	public void setSW(int sW) 
+	{
 		SW = sW;
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) 
+	{
 		super.onDraw(canvas);
 		flag.clear();
 		canvas.drawLine(timeW, delta + r, timeW, delta + r + 11 * l, linePaint);
-		for (int i = 0; i < 12; i++) {
+		for (int i = 0; i < 12; i++) 
+		{
 			int temps = i + 8;
 			String time = (temps < 10) ? ("0" + temps + ":00")
 					: ("" + temps + ":00");
@@ -135,11 +145,15 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 					+ r + i * l, linePaint);
 		}
 
-		for (ClassInfo c : cours) {
+		for (ClassEvent c : cours) 
+		{
 			drawCours(canvas, c);
 		}
-		if (cours.size() == 0) {
-			for (int i = 0; i < 4; i++) {
+		
+		if (cours.size() == 0) 
+		{
+			for (int i = 0; i < 4; i++) 
+			{
 				float notificaY = getTextY(r + delta + i * 3 * l
 						+ getTextHeight(NamePaint) / 2, NamePaint);
 				canvas.drawText("no course today", (SW + timeW + r) / 2,
@@ -149,12 +163,14 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 	}
 
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) 
+	{
 		setMeasuredDimension(2 * SW, (int) (2 * r + 11 * l + 2 * delta));
 		// super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
 
-	private long getDistance(String time) {
+	private long getDistance(String time) 
+	{
 		Date t2 = null, t1 = null;
 		try {
 			t2 = sdf.parse(FinDuMonde + " " + time);
@@ -166,25 +182,29 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		return (l * sed / 3600);
 	}
 
-	private float getTextY(float centre, Paint p) {
+	private float getTextY(float centre, Paint p) 
+	{
 		FontMetrics fm = p.getFontMetrics();
 		return centre - (fm.descent + fm.ascent) / 2;
 	}
 
-	private float getTextHeight(Paint p) {
+	private float getTextHeight(Paint p) 
+	{
 		FontMetrics fm = p.getFontMetrics();
 		return (fm.descent - fm.ascent);
 	}
 
-	private void drawCours(Canvas canvas, ClassInfo c) {
-		if (c.classType.name.contains("Examen")) {
+	private void drawCours(Canvas canvas, ClassEvent c) 
+	{
+		if (c.type.contains("Examen")) {
 			NamePaint.setColor(Color.argb(255, 248, 220, 24));
 		} else {
 			NamePaint.setColor(Color.argb(255, 41, 199, 230));
 		}
 		float nameY, timeY, salleY;
-		long d1 = getDistance(c.startTime);
-		long d2 = getDistance(c.endTime);
+		//long d1 = getDistance(c.startTime);
+		//long d2 = getDistance(c.endTime);
+		long d1 = 0,d2=0;
 		float totalHeight = getTextHeight(NamePaint) + 2
 				* getTextHeight(TextPaint) + 2 * offset;
 
@@ -217,51 +237,60 @@ public class DayClassView extends View implements GestureDetector.OnGestureListe
 		canvas.drawText(c.name, (SW + timeW + r) / 2, nameY, NamePaint);
 		canvas.drawText(c.startTime + "--" + c.endTime, (SW + timeW + r) / 2, timeY,
 				TextPaint);
-		canvas.drawText(c.room.name, (SW + timeW + r) / 2, salleY, TextPaint);
+		canvas.drawText(c.room, (SW + timeW + r) / 2, salleY, TextPaint);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////
-	public int dip2px(int dipValue) {
+	public int dip2px(int dipValue) 
+	{
 		return (int) (dipValue * scale + 0.5f);
 	}
 
 	@Override
-	public boolean onTouchEvent(MotionEvent e) {
+	public boolean onTouchEvent(MotionEvent e) 
+	{
 		return mGestureDetector.onTouchEvent(e);
 	}
 
 	@Override
-	public boolean onDown(MotionEvent arg0) {
+	public boolean onDown(MotionEvent arg0) 
+	{
 		return true;
 	}
 
 	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) 
+	{
 		return true;
 	}
 
 	@Override
-	public void onLongPress(MotionEvent e) {
+	public void onLongPress(MotionEvent e) 
+	{
 	}
 
 	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,float distanceY) 
+	{
 		return true;
 	}
 
 	@Override
-	public void onShowPress(MotionEvent e) {
+	public void onShowPress(MotionEvent e) 
+	{
 	}
 
 	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		if (e.getX() > timeW) {
-			for (int i = 0; i < flag.size(); i++) {
+	public boolean onSingleTapUp(MotionEvent e) 
+	{
+		if (e.getX() > timeW) 
+		{
+			for (int i = 0; i < flag.size(); i++) 
+			{
 				float[] f = flag.get(i);
-				if (f[0] < e.getY() && e.getY() < f[1]) {
-					myClcLis.onTouchEvent(this, e, cours.get(i));
+				if (f[0] < e.getY() && e.getY() < f[1]) 
+				{
+					myClcLis.onEventClicked(this, e, cours.get(i));
 				}
 			}
 		}

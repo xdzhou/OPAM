@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.sky.opam.tool.FailException;
+import com.loic.common.FailException;
 import com.sky.opam.tool.Tool;
 
 import android.content.Context;

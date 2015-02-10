@@ -13,10 +13,10 @@
 		<item name="android:windowEnterAnimation">@anim/in_lefttoright</item>   
 		<item name="android:windowExitAnimation">@anim/out_righttoleft</item>   
 	</style>
-    
+	
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
     </style>
-
+    
     <style name="AppTheme" parent="AppBaseTheme">
     </style>
     

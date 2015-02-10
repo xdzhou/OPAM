@@ -2,9 +2,7 @@ package com.sky.opam;
 
 import com.loic.common.graphic.RangeSeekBar;
 import com.loic.common.graphic.RangeSeekBar.OnRangeSeekBarChangeListener;
-import com.sky.opam.model.Config;
 import com.sky.opam.tool.DBworker;
-import com.sky.opam.tool.MyApp;
 import com.sky.opam.tool.Tool;
 
 import android.os.Bundle;
@@ -18,9 +16,7 @@ import android.widget.ToggleButton;
 
 public class AppConfigActivity extends ActionBarActivity
 {
-	private MyApp myApp;
 	private DBworker worker;
-	private Config config;
 	
 	private TextView startTimeTV;
 	private TextView endTimeTV;
@@ -28,14 +24,13 @@ public class AppConfigActivity extends ActionBarActivity
 	private ToggleButton autoLoginTB;
 	private ToggleButton autoUpdateNotifyTB;
 	private RangeSeekBar<Integer> rangeSeekBar;
-	
+	/*
 	@Override
     protected void onCreate(Bundle savedInstanceState) 
 	{
         super.onCreate(savedInstanceState);
-        myApp = (MyApp)getApplication();
-        worker = new DBworker(this);
-        config = worker.getConfig(myApp.getLogin());
+        worker = DBworker.getInstance();
+        config = worker.getConfig("login");
         setContentView(R.layout.config_activity);
         
         LinearLayout root = (LinearLayout)findViewById(R.id.root_layout);
@@ -88,9 +83,10 @@ public class AppConfigActivity extends ActionBarActivity
 			worker.updateConfig(config);
 			worker.setAutoLogin(AppConfigActivity.this, autoLoginTB.isChecked());
 			worker.setAutoUpdateNotify(AppConfigActivity.this, autoUpdateNotifyTB.isChecked());
-			setResult(MyApp.Refresh);
+			//setResult(MyApp.Refresh);
 			finish();
 		}
 		return super.onOptionsItemSelected(menu);
 	}
+	*/
 }
