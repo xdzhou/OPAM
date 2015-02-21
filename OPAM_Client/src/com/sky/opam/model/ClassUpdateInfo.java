@@ -13,9 +13,28 @@ public class ClassUpdateInfo
 	public int month;
 	@Column(length = 10)
 	public String login;
-	
-	public Date lastUpdateDate;
+	public Date lastSuccessUpdateDate;
 	public int classNumber;
-	public boolean isSuccess;
+	
+	public Date lastFailUpdateDate;
 	public HttpServiceErrorEnum errorEnum;
+	
+	public ClassUpdateInfo()
+	{
+	}
+	
+	public ClassUpdateInfo(String login) 
+	{
+		this.login = login;
+	}
+
+	@Override
+	public String toString() 
+	{
+		return "ClassUpdateInfo [year=" + year + ", month=" + month
+				+ ", login=" + login + ", lastSuccessUpdateDate="
+				+ lastSuccessUpdateDate + ", classNumber=" + classNumber
+				+ ", lastFailUpdateDate=" + lastFailUpdateDate + ", errorEnum="
+				+ errorEnum + "]";
+	}
 }

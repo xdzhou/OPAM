@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true"
+    android:gravity="center" >
+       
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center"
+           android:showDividers="middle" >
+
+		<TextView
+		    android:id="@+id/month_detail_month_type"
+		    android:layout_width="wrap_content"
+		    android:layout_marginRight="10dp"
+		    android:text="Last Month"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/month_detail_pre_next_month"
+		    android:layout_width="wrap_content"
+		    android:text="2015 january"
+		    android:textColor="#000000" />
+
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_marginRight="10dp"
+		    android:text="Number of class"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/month_detail_class_num"
+		    android:layout_width="wrap_content"
+		    android:text="35"
+		    android:textColor="#000000" />
+
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_marginRight="10dp"
+		    android:text="Local data update date"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/month_detail_successs_update"
+		    android:layout_width="wrap_content"
+		    android:text="2015.02.14 15:32:25"
+		    android:textColor="#000000" />
+
+   		</TableRow>
+
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_marginRight="10dp"
+		    android:text="Last update date (failed)"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/month_detail_failed_update"
+		    android:layout_width="wrap_content"
+		    android:text="2015.02.18 00:00:05"
+		    android:textColor="#000000" />
+
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_marginRight="10dp"
+		    android:text="Failed raison"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/month_detail_failed_reason"
+		    android:layout_width="wrap_content"
+		    android:text="No Internet"
+		    android:textColor="#000000" />
+
+   	</TableRow>
+</TableLayout> 

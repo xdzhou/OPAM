@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 
 import com.loic.common.sqliteTool.Column;
 import com.loic.common.sqliteTool.ID;
@@ -13,7 +14,7 @@ import com.loic.common.sqliteTool.Model;
 @Model
 public class ClassEvent implements Comparable<ClassEvent>
 {
-	public static final  DateFormat dtf = new SimpleDateFormat("yyyyMMddHH:mm");
+	public static final  DateFormat dtf = new SimpleDateFormat("yyyyMMddHH:mm", Locale.US);
 	
 	@ID
 	public long NumEve; //event id in INT server, used as ID

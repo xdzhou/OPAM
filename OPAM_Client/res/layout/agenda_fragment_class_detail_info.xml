@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true"
+    android:gravity="center" >
+       
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:text="@string/type"
+		    android:layout_marginRight="10dp"
+		    android:textColor="#853a82" />
+
+		<TextView
+		    android:id="@+id/classType"
+		    android:layout_width="wrap_content"
+      		android:text="TD"
+      		android:textColor="#000000" />
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+      		android:text="@string/time"
+      		android:layout_marginRight="10dp"
+      		android:textColor="#853a82" />
+		<TextView
+		    android:id="@+id/classTime"
+		    android:layout_width="wrap_content"
+      		android:text="9:45--13:00"
+      		android:textColor="#000000" />
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+      		android:text="@string/group"
+      		android:layout_marginRight="10dp"
+      		android:textColor="#853a82" />
+		<TextView
+		    android:id="@+id/classGroup"
+		    android:layout_width="wrap_content"
+      		android:text="Gp-EI2-TDg7"
+      		android:textColor="#000000" />
+   		</TableRow>
+
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+      		android:text="@string/room"
+      		android:layout_marginRight="10dp"
+      		android:textColor="#853a82" />
+		<TextView
+		    android:id="@+id/classRoom"
+		    android:layout_width="wrap_content"
+      		android:text="\?\?"
+      		android:textColor="#000000" />
+   		</TableRow>
+   	
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center" >
+
+		<TextView
+		    android:layout_width="wrap_content"
+      		android:text="@string/teacher"
+      		android:layout_marginRight="10dp"
+      		android:textColor="#853a82" />
+		<TextView
+		    android:id="@+id/classTeacher"
+		    android:layout_width="wrap_content"
+      		android:text="\?\?"
+      		android:textColor="#000000" />
+   	</TableRow>
+</TableLayout> 

@@ -9,6 +9,7 @@ import java.security.KeyStore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,7 @@ import com.loic.common.Chiffrement;
 import com.loic.common.LibApplication;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
+import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.Student;
 import com.sky.opam.model.Student.SchoolEnum;
 import com.sky.opam.model.User;
@@ -53,6 +55,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.http.AndroidHttpClient;
 import android.os.Binder;
 import android.os.Handler;
@@ -78,6 +81,7 @@ public class IntHttpService extends Service
 	private AndroidHttpClient client;
 	
 	private DateFormat df = new SimpleDateFormat("yyyyMMdd", Locale.US);
+	private DBworker worker;
 	private String login;    // "he_huilo";
 	private String password; // "pancakes";
 	private AgendaWebParams agendaWebParams;
@@ -85,6 +89,7 @@ public class IntHttpService extends Service
 	private HandlerThread workerThread;
 	private Handler workerHandler;
 	private LinkedList<LoadClassTaskParams> loadClassParamsQueue;
+	private Date classLoadingDate;
 	
 	private Object loginPasswordLock = new Object();
 	
@@ -106,6 +111,13 @@ public class IntHttpService extends Service
 		workerThread = new HandlerThread("IntHttpService-workerThread");
 		workerThread.start();
 		workerHandler = new Handler(workerThread.getLooper());
+		
+		worker = DBworker.getInstance();
+		User defautUser = worker.getDefaultUser();
+		if(defautUser != null)
+		{
+			setLoginPassword(defautUser.login, Chiffrement.decrypt(defautUser.password, ENCRPT_KEY));
+		}
 	}
 
 	@Override
@@ -123,7 +135,7 @@ public class IntHttpService extends Service
 		client = AndroidHttpClient.newInstance("Mozilla/5.0 (Linux; Android 5.0; MI 2 Build/LRX21M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36");
 
 		HttpConnectionParams.setConnectionTimeout(client.getParams(), 4000);
-		HttpConnectionParams.setSoTimeout(client.getParams(), 6000);
+		//HttpConnectionParams.setSoTimeout(client.getParams(), 6000);
 		
 		SchemeRegistry schemeRegistry = client.getConnectionManager().getSchemeRegistry();
 		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
@@ -230,18 +242,15 @@ public class IntHttpService extends Service
 		if(isLogin)
 		{
 			executeHttpRequest(new HttpGet("https://ecampus.tem-tsp.eu/uPortal/Logout"), new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError));
-			reset();
 		}
+		reset();
+		setLoginPassword(null, null);
 	}
 	
 	private void requestLogin(String login, String password, WeakReference<asyncLoginReponse> callbackWeakReference)
 	{
-		synchronized (loginPasswordLock)
-		{
-			this.login = login;
-			this.password = password;
-		}
-		reset();
+		requestLogout();
+		setLoginPassword(login, password);
 		HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
 		HttpResponse response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
 		
@@ -267,11 +276,7 @@ public class IntHttpService extends Service
 		
 		if(errorEnumRef.errorEnum != HttpServiceErrorEnum.OkError)
 		{
-			synchronized (loginPasswordLock) 
-			{
-				this.login = null;
-				this.password = null;
-			}
+			requestLogout();
 		}
 		
 		if(callbackWeakReference != null && callbackWeakReference.get() != null)
@@ -327,7 +332,7 @@ public class IntHttpService extends Service
 	{
 		try 
         {
-        	String imgPath = PROFILE_CACHE_FLOLDER + "/" + login +".jpg";
+        	String imgPath = getUserProfileFilePath(login);
     		File document = new File(imgPath);
     		if(!document.exists())
     		{
@@ -352,22 +357,37 @@ public class IntHttpService extends Service
 	 * @param date the date selected
 	 * @param callback 
 	 */
+	public void asyncLoadClassInfo(int year, int month, asyncGetClassInfoReponse callback)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, year);
+		calendar.set(Calendar.MONTH, month);
+		asyncLoadClassInfo(calendar.getTime(), callback);
+	}
 	
 	public void asyncLoadClassInfo(Date date, asyncGetClassInfoReponse callback)
 	{
 		if(date != null && callback != null && login != null && password != null)
 		{
-			WeakReference<asyncGetClassInfoReponse> callbackWeakReference = new WeakReference<asyncGetClassInfoReponse>(callback);
-			synchronized (loadClassParamsQueue) 
+			if(classLoadingDate != null && classLoadingDate.getYear() == date.getYear() && classLoadingDate.getMonth() == date.getMonth())
 			{
-				loadClassParamsQueue.push(new LoadClassTaskParams(date, callbackWeakReference));
+				Log.i(TAG, "classes for this year / month is loading : "+(date.getYear()+1900)+"/"+date.getMonth());
 			}
-			workerHandler.post(LoadClassRunnable);
+			else 
+			{
+				WeakReference<asyncGetClassInfoReponse> callbackWeakReference = new WeakReference<asyncGetClassInfoReponse>(callback);
+				synchronized (loadClassParamsQueue) 
+				{
+					loadClassParamsQueue.push(new LoadClassTaskParams(date, callbackWeakReference));
+				}
+				workerHandler.post(LoadClassRunnable);
+			}
 		}
 	}
 	
 	private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoReponse> callbackWeakReference)
 	{
+		classLoadingDate = date;
 		HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
 		List<ClassEvent> classInfos = null;
 		try 
@@ -437,14 +457,19 @@ public class IntHttpService extends Service
 				Pattern pattern = Pattern.compile("onmouseover=\"DetEve\\(\'([0-9]+)\',\'([^']+)\',\'([0-9]+)\'\\)");
 				Matcher matcher = pattern.matcher(rspHtml);
 				classInfos = new ArrayList<ClassEvent>();
+				
 				while(matcher.find())
 				{
 					HttpServiceErrorEnumReference tempErrorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
 					ClassEvent course = createClassInfo(tempErrorEnumRef, matcher.group(1), matcher.group(3));
 					if(course != null && tempErrorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+					{
 						classInfos.add(course);
+					}
 					else
+					{
 						Log.e(TAG, "Load Class failed, error : " + tempErrorEnumRef.errorEnum.getDescription());
+					}
 				}
 				
 				if(classInfos.isEmpty() && false) // can't find class info
@@ -464,6 +489,40 @@ public class IntHttpService extends Service
 			errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
 			errorEnumRef.errorEnum.setDescription(e.toString());
 		}
+		
+		DBworker worker = DBworker.getInstance();
+		ClassUpdateInfo updateInfo = worker.getUpdateInfo(login, date);
+		boolean needSave = false;
+		if(updateInfo == null)
+		{
+			updateInfo = new ClassUpdateInfo(login);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			updateInfo.year = calendar.get(Calendar.YEAR);
+			updateInfo.month = calendar.get(Calendar.MONTH);
+			needSave = true;
+		}
+		
+		if(errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+		{
+			worker.deleteClassEvents(login, date);
+			for(ClassEvent classEvent : classInfos)
+				worker.insertData(classEvent);
+			updateInfo.lastSuccessUpdateDate = new Date();
+			updateInfo.classNumber = classInfos.size();
+		}
+		else 
+		{
+			updateInfo.lastFailUpdateDate = new Date();
+			updateInfo.errorEnum = errorEnumRef.errorEnum;
+		}
+		
+		if(needSave)
+			worker.insertData(updateInfo);
+		else
+			worker.updateClassUpdateInfro(updateInfo);
+		
+		classLoadingDate = null;
 		
 		if(callbackWeakReference != null && callbackWeakReference.get() != null)
 			callbackWeakReference.get().onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
@@ -766,7 +825,10 @@ public class IntHttpService extends Service
 				if(elements != null && ! elements.isEmpty())
 				{
 					String className = elements.get(0).getElementsByTag("b").get(0).text();
-					classInfo.name = className.split("-")[0].trim();
+					if(className.contains("Cours de Langue"))
+						classInfo.name = className;
+					else
+						classInfo.name = className.split("-")[0].trim();
 					
 					for(int i = 1; i < elements.size(); i++)
 					{
@@ -795,9 +857,12 @@ public class IntHttpService extends Service
 						{
 							String key = TDeles.get(0).text();
 							Matcher m = TimePattern.matcher(key);
-							if(key.toUpperCase().contains("TYPE"))
+							if(key.toUpperCase(Locale.FRANCE).contains("TYPE"))
 							{
-								classInfo.type = getContent(TDeles.get(1));
+								classInfo.type = getContent(TDeles.get(1)).trim();
+								classInfo.type.replace(getSpecailSpace(), "");
+								if(classInfo.type.toUpperCase(Locale.FRANCE).contains("EXAMEN"))
+									classInfo.bgColor = Color.RED;
 							}
 							else if(m.find()) 
 							{
@@ -810,19 +875,19 @@ public class IntHttpService extends Service
 									classInfo.endTime = ClassEvent.dtf.parse(DatSrc + time);
 								}
 							}
-							else if(key.toUpperCase().contains("AUTEUR")) 
+							else if(key.toUpperCase(Locale.FRANCE).contains("AUTEUR")) 
 							{
 								classInfo.auteur = getContent(TDeles.get(1));
 							}
-							else if(key.toUpperCase().contains("FORMATEUR")) 
+							else if(key.toUpperCase(Locale.FRANCE).contains("FORMATEUR")) 
 							{
 								classInfo.teacher = getContent(TDeles.get(1));
 							}
-							else if(key.toUpperCase().contains("APPRENANT")) 
+							else if(key.toUpperCase(Locale.FRANCE).contains("APPRENANT")) 
 							{
 								classInfo.students = getContent(TDeles.get(1));
 							}
-							else if(key.toUpperCase().contains("PERSONNES")) 
+							else if(key.toUpperCase(Locale.FRANCE).contains("PERSONNES")) 
 							{
 								classInfo.groupe = getContent(TDeles.get(1));
 							}
@@ -831,10 +896,27 @@ public class IntHttpService extends Service
 					
 					if(classInfo.room == null)
 					{
-						Pattern pt = Pattern.compile("(salle|en|Amphi) ([^_]+)",Pattern.CASE_INSENSITIVE); //不区分大小写//可能存在关键字salle, en, Amphi
+						// PHY3001 - TP3 - Gpe G2 : salle A308 - Gpe G1 : salle A309
+						Pattern pt = Pattern.compile("(salle|en|Amphi) ([^-]+)",Pattern.CASE_INSENSITIVE); //不区分大小写//可能存在关键字salle, en, Amphi
 						Matcher match_salle = pt.matcher(className);
-						if(match_salle.find())
-							classInfo.room = match_salle.group(2);
+						classInfo.room = "";
+						while(match_salle.find())
+						{
+							if(match_salle.group(1).toLowerCase(Locale.FRANCE).contains("amphi"))
+								classInfo.room += ("Amphi "+match_salle.group(2).trim()+"__");
+							else
+								classInfo.room += (match_salle.group(2).trim()+"__");
+						}
+						
+						if(!classInfo.room.isEmpty())
+						{
+							classInfo.room = classInfo.room.substring(0, classInfo.room.length() - 2);
+							classInfo.room.replace(getSpecailSpace(), "");
+						}
+						else 
+						{
+							classInfo.room = null;
+						}
 					}
 					Log.i(TAG, classInfo.toString());
 				}
@@ -1014,7 +1096,37 @@ public class IntHttpService extends Service
 		byte[] bytes = {-62, -96};
 		return new String(bytes);
 	}
+	/******************************************************
+	 ********************Public function ******************
+	 ******************************************************/
+	public static String getUserProfileFilePath(String login)
+	{
+		if(login != null)
+			return PROFILE_CACHE_FLOLDER + "/" + login +".jpg";
+		else
+			return null;
+	}
 	
+	public void prepareToQuit()
+	{
+		workerHandler.post(new Runnable() 
+		{
+			@Override
+			public void run() 
+			{
+				IntHttpService.this.stopSelf();
+			}
+		});
+	}
+	
+	private void setLoginPassword(String login, String password)
+	{
+		synchronized (loginPasswordLock) 
+		{
+			this.login = login;
+			this.password = password;
+		}
+	}
 	/******************************************************
 	 **********************Inner Class*********************
 	 ******************************************************/
@@ -1030,6 +1142,31 @@ public class IntHttpService extends Service
 		}
 	}
 	
+	private class AgendaWebParams
+	{
+		private String groupID;
+		private String appId;
+		private String lienID;
+		
+		private String ValGra;
+		private String NomCal;
+		
+		public boolean isIdParamsReady()
+		{
+			return groupID != null && appId != null && lienID != null;
+		}
+		
+		public boolean isFormItemsReady()
+		{
+			return ValGra != null && NomCal != null;
+		}
+		
+		public void clear()
+		{
+			groupID = appId = lienID = null;
+			ValGra = NomCal = null;
+		}
+	}
 	/******************************************************
 	 ********************HttpService Enum******************
 	 ******************************************************/
@@ -1078,32 +1215,6 @@ public class IntHttpService extends Service
 			if(retVal == null)
 				retVal = super.toString();
 			return retVal;
-		}
-	}
-	
-	private class AgendaWebParams
-	{
-		private String groupID;
-		private String appId;
-		private String lienID;
-		
-		private String ValGra;
-		private String NomCal;
-		
-		public boolean isIdParamsReady()
-		{
-			return groupID != null && appId != null && lienID != null;
-		}
-		
-		public boolean isFormItemsReady()
-		{
-			return ValGra != null && NomCal != null;
-		}
-		
-		public void clear()
-		{
-			groupID = appId = lienID = null;
-			ValGra = NomCal = null;
 		}
 	}
 	

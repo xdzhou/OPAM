@@ -77,7 +77,7 @@ public class Menu_Fragment extends ListFragment
 			if(position == 0) 
 				convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile_item_view, null);
 			else 
-				convertView = LayoutInflater.from(getContext()).inflate(R.layout.tab_item_view, null);
+				convertView = LayoutInflater.from(getContext()).inflate(R.layout.menu_item_view, null);
 			
 			ImageView icon = (ImageView) convertView.findViewById(R.id.imageview);
 			icon.setImageResource(getItem(position).iconRes);

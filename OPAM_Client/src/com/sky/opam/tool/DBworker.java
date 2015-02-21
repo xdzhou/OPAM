@@ -1,12 +1,9 @@
 package com.sky.opam.tool;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import com.loic.common.LibApplication;
 import com.loic.common.sqliteTool.SqliteWorker;
@@ -23,7 +20,6 @@ public class DBworker extends SqliteWorker
 {
 	private static final String TAG = DBworker.class.getSimpleName();
 	private static DBworker singleton;
-    //private DBHelper helper;
     private Object lock = new Object();
 
     public static synchronized DBworker getInstance()
@@ -39,6 +35,23 @@ public class DBworker extends SqliteWorker
     	super(new DBHelper(context));
     }
     
+    private int[] getYearMonth(Date date)
+    {
+    	if(date != null)
+    	{
+    	    Calendar cal = Calendar.getInstance();
+    	    cal.setTime(date);
+    	    int year = cal.get(Calendar.YEAR);
+    	    int month = cal.get(Calendar.MONTH);
+    	    
+    	    return new int[] {year, month};
+    	}
+    	return null;
+    }
+    
+    /******************************************************
+	 ******************** User Operation ******************
+	 ******************************************************/
     public User getDefaultUser()
     {
     	Object object = retrieveAData(User.class, "isDefaultUser = 1");
@@ -74,18 +87,15 @@ public class DBworker extends SqliteWorker
     }
     
     
-    
-    
+    /******************************************************
+	 ************** ClassUpdateInfo Operation *************
+	 ******************************************************/
     public ClassUpdateInfo getUpdateInfo(String login, Date date)
     {
-    	if(date != null)
+    	int[] values = getYearMonth(date);	
+    	if(values != null)
     	{
-    	    Calendar cal = Calendar.getInstance();
-    	    cal.setTime(date);
-    	    int year = cal.get(Calendar.YEAR);
-    	    int month = cal.get(Calendar.MONTH);
-    	    
-    	    return getUpdateInfo(login, year, month);
+    	    return getUpdateInfo(login, values[0], values[1]);
     	}
     	return null;
     }
@@ -101,31 +111,87 @@ public class DBworker extends SqliteWorker
     	return null;
     }
     
+    public void updateClassUpdateInfro(ClassUpdateInfo updateInfo)
+    {
+    	if(updateInfo != null && updateInfo.login != null)
+    	{
+    		updateData(updateInfo, "login = '"+updateInfo.login+"' AND year = "+updateInfo.year+" AND month = "+updateInfo.month);
+    	}
+    }
     
+    /******************************************************
+	 **************** ClassEvent Operation ****************
+	 ******************************************************/
+    public ClassEvent getClassEvent(String login, long dateNum)
+    {
+    	Object object = retrieveAData(ClassEvent.class, "login = '"+login+"' AND NumEve = "+dateNum);
+    	if(object != null && object instanceof ClassEvent)
+    	{
+    		return (ClassEvent) object;
+    	}
+    	return null;
+    }
     
-    
-    private DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss", Locale.US);
     public List<ClassEvent> getClassEvents(String login, int year, int month)
     {
     	if(login != null && !login.isEmpty() && year > 0 && month >= Calendar.JANUARY && month <= Calendar.DECEMBER)
     	{
-    		long startTime, endTime;
-    		try 
-    		{
-				Date date = df.parse(year+(month-Calendar.JANUARY+1)+"01 00:00:00");
-			} 
-    		catch (ParseException e)
-    		{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		long startestTime, endestTime;
     		Calendar cal = Calendar.getInstance();
     		cal.set(Calendar.YEAR, year);
     		cal.set(Calendar.MONTH, month);
     		cal.set(Calendar.DAY_OF_MONTH, 1);
+    		cal.set(Calendar.HOUR_OF_DAY, 1);
+    		startestTime = cal.getTime().getTime();
+    		
+    		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+    		cal.set(Calendar.HOUR_OF_DAY, 23);
+    		endestTime = cal.getTime().getTime();
+    		
+    		List<Object> objects = retrieveDatas(ClassEvent.class, "login = '"+login+"' AND startTime > "+startestTime+" AND endTime < "+endestTime);
+        	if(objects != null && !objects.isEmpty() && objects.get(0) instanceof ClassEvent)
+        	{
+        		List<ClassEvent> events = new ArrayList<ClassEvent>(objects.size());
+        		for(Object o : objects)
+        		{
+        			events.add((ClassEvent)o);
+        		}
+        		return events;
+        	}
     	}
     	return null;
     }
+    
+    public void deleteClassEvents (String login, Date date)
+    {
+    	int[] values = getYearMonth(date);	
+    	if(values != null)
+    	{
+    	    deleteClassEvents(login, values[0], values[1]);
+    	}
+    }
+    
+    public void deleteClassEvents (String login, int year, int month)
+    {
+    	if(login != null && !login.isEmpty() && year > 0 && month >= Calendar.JANUARY && month <= Calendar.DECEMBER)
+    	{
+    		long startestTime, endestTime;
+    		Calendar cal = Calendar.getInstance();
+    		cal.set(Calendar.YEAR, year);
+    		cal.set(Calendar.MONTH, month);
+    		cal.set(Calendar.DAY_OF_MONTH, 1);
+    		cal.set(Calendar.HOUR_OF_DAY, 1);
+    		startestTime = cal.getTime().getTime();
+    		
+    		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+    		cal.set(Calendar.HOUR_OF_DAY, 23);
+    		endestTime = cal.getTime().getTime();
+    		
+    		deleteData(ClassEvent.class, "login = '"+login+"' AND startTime > "+startestTime+" AND endTime < "+endestTime);
+    	}
+    }
+    
+    
     
     
     

@@ -16,6 +16,8 @@ import com.loic.common.Chiffrement;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
+import com.sky.opam.model.ClassEvent;
+import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
@@ -30,7 +32,15 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
     private EditText passwordEditText;
     private Button enterButton;
     private ProgressDialog progressDialog;
+    private DBworker worker;
     
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		worker = DBworker.getInstance();
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
@@ -39,7 +49,6 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 		passwordEditText = (EditText) rootView.findViewById(R.id.txtMDP);
 		enterButton = (Button) rootView.findViewById(R.id.btnVAD);
 
-		DBworker worker = DBworker.getInstance();
 		User defaultUser = worker.getDefaultUser();
 		if(defaultUser != null)
 			loginTextView.setText(defaultUser.login);
@@ -62,7 +71,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 				}
 				else
 				{
-					User currentUser = DBworker.getInstance().getUser(login);
+					User currentUser = worker.getUser(login);
 					if(currentUser != null)
 					{
 						if(currentUser.password.equals(Chiffrement.encrypt(password, IntHttpService.ENCRPT_KEY)))
@@ -78,13 +87,16 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 				}
 			}
 		});
-		
+		test();
 		return rootView;
 	}
 	
 	private void showAgenda()
 	{
-		getMultiFragmentManager().showGcFragment(AgendaViewFragment.class, true, null);
+		getOpenMFM().setProfileAvatar(loginTextView.getText().toString());
+		Bundle data = new Bundle();
+		data.putString(AgendaViewFragment.BUNDLE_LOGIN_KEY, loginTextView.getText().toString());
+		getMultiFragmentManager().showGcFragment(AgendaViewFragment.class, true, data);
 	}
 	
 	private void passwordResetAlart()
@@ -153,9 +165,9 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 	public void onAsyncLoginReponse(String login, final HttpServiceErrorEnum errorEnum) 
 	{
 		closeProgressDialog();
-		if(errorEnum == HttpServiceErrorEnum.OkError && getActivity() != null)
+		if(errorEnum == HttpServiceErrorEnum.OkError && isAdded())
 		{
-			DBworker.getInstance().setDefaultUser(login);
+			worker.setDefaultUser(login);
 			getActivity().runOnUiThread(new Runnable() 
 			{
 				@Override
@@ -178,6 +190,13 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 			
 			Log.e(TAG, "onAgendaLoaded with error : "+errorEnum.toString());
 		}
+	}
+	
+	private void test()
+	{
+		ClassEvent event = worker.getClassEvent("he_huilo", 111212);
+		if(event != null)
+			System.out.println(event);
 	}
 
 }
