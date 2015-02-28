@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import android.widget.TextView;
 
 public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDownloadImgReadyListener
 {
+	private static final String TAG = EtudiantListAdapter.class.getSimpleName();
+	
 	private LoadImgManager loadImgManager;
 	private HashMap<String, ImageView> loadingImgList;
 	
@@ -96,6 +99,7 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 				}
 			});
 		}
+		viewHolder.profil.setImageBitmap(null);
 		
 		if(etudiant.login != null)
 		{

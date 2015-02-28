@@ -2,7 +2,6 @@ package com.sky.opam.fragment;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import android.R.integer;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.RectF;
@@ -23,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -34,7 +31,6 @@ import com.loic.common.LibApplication;
 import com.loic.common.graphic.AgendaView;
 import com.loic.common.graphic.AgendaView.AgendaEvent;
 import com.loic.common.graphic.AgendaView.AgendaViewEventTouchListener;
-import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
@@ -44,7 +40,7 @@ import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.tool.DBworker;
 
-public class AgendaViewFragment extends OpamFragment implements OnClickListener, IntHttpService.asyncGetClassInfoReponse, AgendaViewEventTouchListener
+public class AgendaViewFragment extends OpamFragment implements IntHttpService.asyncGetClassInfoReponse, AgendaViewEventTouchListener
 {
 	private static final String TAG = AgendaViewFragment.class.getSimpleName();
 	public static final String BUNDLE_LOGIN_KEY = "BUNDLE_LOGIN_KEY";
@@ -57,6 +53,7 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	private View monthDetailInfoView;
 	
 	private DateFormat classDetailTimeFormat;
+	private DateFormat localDateTimeFormat;
 	private DateFormat localDateFormat;
 	private DateFormatSymbols dfs;
 	
@@ -66,9 +63,12 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		worker = DBworker.getInstance();
 		currentUser = worker.getUser(getArguments().getString(BUNDLE_LOGIN_KEY));
+		if(currentUser == null)
+			currentUser = worker.getDefaultUser();
 		
 		classDetailTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
-		localDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		localDateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		localDateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 		dfs = new DateFormatSymbols(Locale.getDefault());
 	}
 
@@ -76,7 +76,6 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
 		super.onCreateView(inflater, container, savedInstanceState);
-		getActivity().setTitle("Test Tile");
 		
 		ViewPager mViewPager = new AgendaViewPage(LibApplication.getAppContext());
 		adapter = new AgendaViewPageAdapter();
@@ -84,6 +83,10 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 		mViewPager.setCurrentItem(1);
 		
 		setHasOptionsMenu(true);
+		
+		Calendar cal = Calendar.getInstance();
+		getActivity().setTitle(cal.get(Calendar.YEAR)+" "+dfs.getMonths()[cal.get(Calendar.MONTH)]);
+		
 		return mViewPager;
 	}
 
@@ -92,36 +95,13 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	{
 		
 	}
-
-	@Override
-	public void onClick(View v) 
-	{
-		if(v.equals(adapter.preMonthView))
-		{
-			DateFormat df = new SimpleDateFormat("yyyyMMdd", Locale.US);	
-			Date date;
-			try 
-			{
-				date = df.parse("20120202");
-				//getHttpService().asyncGetClassInfo(date, this);
-			} 
-			catch (ParseException e) 
-			{
-				e.printStackTrace();
-			}
-		}
-		else if (v.equals(adapter.nextMonthView)) 
-		{
-			
-		}
-	}
 	
-	private void refreshAgendaView(Date date)
+	private void refreshAgendaView(Date date, boolean forceLoad)
 	{
 		if(adapter != null && adapter.agendaView != null && isAdded())
 		{
 			//refresh agenda view
-			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(date, true);
+			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(date, forceLoad);
 			//refresh left month info
 			int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
 			fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
@@ -140,24 +120,24 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 		}
 	}
 	
-	private void refreshAgendaView(int year, int month)
+	private void refreshAgendaView(int year, int month, boolean forceLoad)
 	{
 		if(adapter != null && adapter.agendaView != null && isAdded())
 		{
 			//refresh agenda view
-			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(year, month, true);
-			//refresh left month info
-			int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
-			fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
-			//refresh right month info
-			int [] nextYearMonth = adapter.agendaView.getNextYearMonth();
-			fillMonthDetailInfo(adapter.nextMonthView, nextYearMonth[0], nextYearMonth[1]);
+			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(year, month, forceLoad);
 			
 			getActivity().runOnUiThread(new Runnable() 
 			{
 				@Override
 				public void run() 
 				{
+					//refresh left month info
+					int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
+					fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
+					//refresh right month info
+					int [] nextYearMonth = adapter.agendaView.getNextYearMonth();
+					fillMonthDetailInfo(adapter.nextMonthView, nextYearMonth[0], nextYearMonth[1]);
 					getActivity().setTitle(actionTitle);
 				}
 			});
@@ -297,12 +277,12 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 		
 		text = "?";
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
-			text = localDateFormat.format(updateInfo.lastSuccessUpdateDate);
+			text = localDateTimeFormat.format(updateInfo.lastSuccessUpdateDate);
 		((TextView)monthDetailView.findViewById(R.id.month_detail_successs_update)).setText(text);
 		
 		text = "?";
 		if(updateInfo != null && updateInfo.lastFailUpdateDate != null)
-			text = localDateFormat.format(updateInfo.lastFailUpdateDate);
+			text = localDateTimeFormat.format(updateInfo.lastFailUpdateDate);
 		((TextView)monthDetailView.findViewById(R.id.month_detail_failed_update)).setText(text);
 		
 		text = "?";
@@ -312,18 +292,21 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 		
 		Button updateBtn = ((Button) monthDetailView.findViewById(R.id.month_detail_update));
 		Button chargeBtn = ((Button) monthDetailView.findViewById(R.id.month_detail_charge));
-		chargeBtn.setEnabled(true);
-		if(updateInfo == null || updateInfo.lastSuccessUpdateDate == null)
-			chargeBtn.setEnabled(false);
-		else
-			chargeBtn.setOnClickListener(new View.OnClickListener() 
-			{
-				@Override
-				public void onClick(View v) 
+		if(updateBtn != null && chargeBtn != null)
+		{
+			chargeBtn.setEnabled(true);
+			if(updateInfo == null || updateInfo.lastSuccessUpdateDate == null)
+				chargeBtn.setEnabled(false);
+			else
+				chargeBtn.setOnClickListener(new View.OnClickListener() 
 				{
-					refreshAgendaView(year, month);
-				}
-			});
+					@Override
+					public void onClick(View v) 
+					{
+						refreshAgendaView(year, month, false);
+					}
+				});
+		}
 	}
 	
 	/******************************************************
@@ -351,7 +334,7 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 						cal.set(Calendar.YEAR, year);
 						cal.set(Calendar.MONTH, monthOfYear);
 						cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-						refreshAgendaView(cal.getTime());
+						refreshAgendaView(cal.getTime(), false);
 					}
 				}, year, month, day).show();
 				return false;
@@ -364,7 +347,7 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 			@Override
 			public boolean onMenuItemClick(MenuItem item) 
 			{
-				refreshAgendaView(new Date());
+				refreshAgendaView(new Date(), false);
 				return false;
 			}
 		});
@@ -395,10 +378,10 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	@Override
 	public void onAsyncGetClassInfoReponse(HttpServiceErrorEnum errorEnum, Date searchDate, final List<ClassEvent> results) 
 	{
-		Log.i(TAG, "onAsyncGetClassInfoReponse with result size : "+(results == null ? 0 : results.size()));
+		Log.i(TAG, "onAsyncGetClassInfoReponse with result size : " + (results == null ? 0 : results.size()));
 		if(errorEnum == HttpServiceErrorEnum.OkError)
 		{
-			refreshAgendaView(searchDate);
+			//refreshAgendaView(searchDate, false);
 		}
 		else 
 		{
@@ -413,7 +396,6 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	public List<AgendaEvent> onNeedNewEventList(int year, int month)
 	{
 		List<AgendaEvent> agendaEvents = null;
-		DBworker worker = DBworker.getInstance();
 		ClassUpdateInfo updateInfo = worker.getUpdateInfo(currentUser.login, year, month);
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
 		{
@@ -447,8 +429,7 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	{
 		if(classDetailInfoView == null)
 			classDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_class_detail_info, null);
-		
-		DBworker worker = DBworker.getInstance();
+
 		ClassEvent classEvent = worker.getClassEvent(currentUser.login, event.mId);
 		if(classEvent != null)
 		{
@@ -462,13 +443,11 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 				}
 			};
 
-			((TextView)classDetailInfoView.findViewById(R.id.classType)).setText(classEvent.type == null ? "" : classEvent.type);
-			((TextView)classDetailInfoView.findViewById(R.id.classTime)).setText(classDetailTimeFormat.format(classEvent.startTime).concat(" - ").concat(classDetailTimeFormat.format(classEvent.endTime)));
+			((TextView)classDetailInfoView.findViewById(R.id.classType)).setText(classEvent.type == null ? "" : classEvent.type.replace(IntHttpService.getSpecialSpace(), ""));
+			((TextView)classDetailInfoView.findViewById(R.id.classTime)).setText(classDetailTimeFormat.format(classEvent.startTime).concat(" - ").concat(classDetailTimeFormat.format(classEvent.endTime)).concat(" "+localDateFormat.format(classEvent.endTime)));
 			((TextView)classDetailInfoView.findViewById(R.id.classGroup)).setText(classEvent.groupe == null ? "" : classEvent.groupe.replace("__", "\n"));
 			((TextView)classDetailInfoView.findViewById(R.id.classRoom)).setText(classEvent.room == null ? "" : classEvent.room.replace("__", "\n"));
 			((TextView)classDetailInfoView.findViewById(R.id.classTeacher)).setText(classEvent.teacher == null ? "" : classEvent.teacher.replace("__", "\n"));
-			
-			//hideDialog();
 			
 			createDialogBuilderWithCancel(event.mName, null)
 			.setCustomView(classDetailInfoView)
@@ -483,9 +462,4 @@ public class AgendaViewFragment extends OpamFragment implements OnClickListener,
 	{
 		
 	}
-	
-	/******************************************************
-	 ******************** private function ****************
-	 ******************************************************/
-	
 }

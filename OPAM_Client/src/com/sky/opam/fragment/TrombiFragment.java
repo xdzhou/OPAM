@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.loic.common.LibApplication;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
@@ -20,14 +19,14 @@ import com.sky.opam.model.Student;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.service.IntHttpService.asyncSearchEtudiantByNameReponse;
 
-public class StudentSearchFragment extends OpamFragment
+public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantByNameReponse
 {
-	private static final String TAG = StudentSearchFragment.class.getSimpleName();
+	private static final String TAG = TrombiFragment.class.getSimpleName();
 	
 	private EditText searchEditText;
 	private Button searchButton;
+	
 	private EtudiantListAdapter adapter;
-	private asyncSearchEtudiantByNameReponse searchEtudiantCallback;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -47,10 +46,10 @@ public class StudentSearchFragment extends OpamFragment
 				}
 				else if(getHttpService() != null)
 				{
-					//getHttpService().asyncSearchEtudiantByName(searchText, searchEtudiantCallback);
-					getHttpService().asyncLogin("he_huilo", "pancakes", null);
+					getHttpService().asyncSearchEtudiantByName(searchText, TrombiFragment.this);
 				}
-				else {
+				else 
+				{
 					ToastUtils.show("httpService is null");
 				}
 			}
@@ -59,58 +58,37 @@ public class StudentSearchFragment extends OpamFragment
 		adapter = new EtudiantListAdapter(getActivity());
 		resultListView.setAdapter(adapter);
 		
-		initCallback();
-		
 		return rootView;
-	}
-	
-	private void initCallback()
-	{
-		searchEtudiantCallback = new asyncSearchEtudiantByNameReponse() 
-		{
-			@Override
-			public void onAsyncSearchEtudiantByNameReponse(HttpServiceErrorEnum errorEnum, final List<Student> results) 
-			{
-				if(errorEnum == errorEnum.OkError && results != null && getActivity() != null)
-				{
-					getActivity().runOnUiThread(new Runnable() 
-					{
-						@Override
-						public void run() 
-						{
-							if(adapter != null)
-							{
-								adapter.clear();
-								adapter.addAll(results);
-								adapter.notifyDataSetChanged();
-							}
-						}
-					});
-					
-				}
-				else 
-				{
-					Log.e(TAG, "errorEnum : "+errorEnum.getDescription());
-					ToastUtils.show(errorEnum.getDescription());
-				}
-			}
-		};
-	}
-	
-	private void removeCallback()
-	{
-		searchEtudiantCallback = null;
 	}
 
 	@Override
 	protected void onHttpServiceReady() 
 	{
 	}
-	
+
 	@Override
-	public void onDestroy() 
+	public void onAsyncSearchEtudiantByNameReponse(HttpServiceErrorEnum errorEnum, final List<Student> results) 
 	{
-		super.onDestroy();
-		removeCallback();
+		if(errorEnum == errorEnum.OkError && results != null && getActivity() != null)
+		{
+			getActivity().runOnUiThread(new Runnable() 
+			{
+				@Override
+				public void run() 
+				{
+					if(adapter != null)
+					{
+						adapter.clear();
+						adapter.addAll(results);
+						adapter.notifyDataSetChanged();
+					}
+				}
+			});
+		}
+		else 
+		{
+			Log.e(TAG, "errorEnum : "+errorEnum.getDescription());
+			ToastUtils.show(errorEnum.getDescription());
+		}
 	}
 }

@@ -306,7 +306,7 @@ public class IntHttpService extends Service
 							if(ele.text().contains("Bonjour"))
 							{
 								userName = ele.text().replace("Bonjour", "");
-								userName = userName.replace(getSpecailSpace(), "");
+								userName = userName.replace(getSpecialSpace(), "");
 								break;
 							}
 						}
@@ -698,7 +698,7 @@ public class IntHttpService extends Service
 				try 
 				{
 					post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-					HttpResponse response = client.execute(post, httpContext);
+					HttpResponse response = client.execute(post);
 					int status = response.getStatusLine().getStatusCode();
 					if(status == 200)
 					{
@@ -849,7 +849,7 @@ public class IntHttpService extends Service
 							}
 							else 
 							{
-								classInfo.room = classInfo.room.replace(getSpecailSpace(), "");
+								classInfo.room = classInfo.room.replace(getSpecialSpace(), "");
 								classInfo.room = classInfo.room.substring(0, classInfo.room.length() - 2);
 							}
 						}
@@ -860,7 +860,7 @@ public class IntHttpService extends Service
 							if(key.toUpperCase(Locale.FRANCE).contains("TYPE"))
 							{
 								classInfo.type = getContent(TDeles.get(1)).trim();
-								classInfo.type.replace(getSpecailSpace(), "");
+								classInfo.type.replace(getSpecialSpace(), "");
 								if(classInfo.type.toUpperCase(Locale.FRANCE).contains("EXAMEN"))
 									classInfo.bgColor = Color.RED;
 							}
@@ -911,7 +911,7 @@ public class IntHttpService extends Service
 						if(!classInfo.room.isEmpty())
 						{
 							classInfo.room = classInfo.room.substring(0, classInfo.room.length() - 2);
-							classInfo.room.replace(getSpecailSpace(), "");
+							classInfo.room.replace(getSpecialSpace(), "");
 						}
 						else 
 						{
@@ -970,7 +970,6 @@ public class IntHttpService extends Service
 				if(request.getMethod().equalsIgnoreCase("POST"))
 				{
 					Log.d(TAG, EntityUtils.toString(((HttpPost)request).getEntity()));
-					
 				}
 				
 				if(status == 302)
@@ -1091,7 +1090,7 @@ public class IntHttpService extends Service
 			cookieStore.clear();
 	}
 	
-	private String getSpecailSpace()
+	public static String getSpecialSpace()
 	{
 		byte[] bytes = {-62, -96};
 		return new String(bytes);
