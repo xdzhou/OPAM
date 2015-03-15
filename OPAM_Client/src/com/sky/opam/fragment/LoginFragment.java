@@ -16,7 +16,6 @@ import com.loic.common.Chiffrement;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
-import com.sky.opam.model.ClassEvent;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
@@ -62,11 +61,11 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 				String password = passwordEditText.getText().toString();
 				if(login.length() == 0)
 				{
-					ToastUtils.show(getResources().getString(R.string.login_null_alert));
+					ToastUtils.show(getString(R.string.OA1004));
 				}
 				else if(password.length() == 0)
 				{
-					ToastUtils.show(getResources().getString(R.string.pw_null_alert));
+					ToastUtils.show(getString(R.string.OA1005));
 				}
 				else
 				{
@@ -114,7 +113,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
     	new AlertDialog.Builder(getActivity())
         .setTitle("Password Error")
         .setMessage("Password incorrect. If you have modified your password online these days, Please click retry!")
-        .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() 
+        .setPositiveButton(R.string.OA1008, new DialogInterface.OnClickListener() 
         {
             public void onClick(DialogInterface dialog, int which) 
             { 
@@ -153,8 +152,8 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 	            }
 	        });
 	        progressDialog.setIcon(android.R.drawable.ic_popup_sync);
-	        progressDialog.setTitle(R.string.downloading);
-	        progressDialog.setMessage(getResources().getString(R.string.download_class_msg));
+	        progressDialog.setTitle(R.string.OA1007);
+	        progressDialog.setMessage(getString(R.string.OA1006));
 		}
 		progressDialog.show();
 	}
@@ -201,12 +200,4 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 			Log.e(TAG, "onAgendaLoaded with error : "+errorEnum.toString());
 		}
 	}
-	
-	private void test()
-	{
-		ClassEvent event = worker.getClassEvent("he_huilo", 111212);
-		if(event != null)
-			System.out.println(event);
-	}
-
 }

@@ -51,6 +51,7 @@ import com.sky.opam.model.User;
 import com.sky.opam.tool.AdditionalKeyStoresSSLSocketFactory;
 import com.sky.opam.tool.DBworker;
 
+import android.R.integer;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -1176,39 +1177,34 @@ public class IntHttpService extends Service
 	
 	public static enum HttpServiceErrorEnum
 	{
-		OkError("OK, no error"),
-		UnknowError("unknow error"),
-		ExceptionError("a exception error"),
-		ServerError("server error"),
-		HttpBadStatusError("bad http status error"),
-		HtmlContentError("bad html content error"),
-		LoginFailedError("login or password error"),
-		NoInternetError("no internet error");
+		OkError(R.string.OA2009),
+		UnknowError(R.string.OA2010),
+		ExceptionError(R.string.OA2011),
+		ServerError(R.string.OA2012),
+		HttpBadStatusError(R.string.OA2013),
+		HtmlContentError(R.string.OA2014),
+		LoginFailedError(R.string.OA2015),
+		NoInternetError(R.string.OA0004);
 		
-		private String description;
+		private int descriptionResID;
+		private String customedDescription;
 		
-		private HttpServiceErrorEnum(String description)
+		private HttpServiceErrorEnum(int descriptionResID)
 		{
-			this.description = description;
+			this.descriptionResID = descriptionResID;
 		}
 		
 		public String getDescription() 
 		{
-			return description;
+			if(customedDescription != null)
+				return customedDescription;
+			else
+				return LibApplication.getAppContext().getString(descriptionResID);
 		}
 		
 		public void setDescription(String description) 
 		{
-			this.description = description;
-		}
-		
-		@Override
-		public String toString()
-		{
-			String retVal = description;
-			if(retVal == null)
-				retVal = super.toString();
-			return retVal;
+			this.customedDescription = description;
 		}
 	}
 	

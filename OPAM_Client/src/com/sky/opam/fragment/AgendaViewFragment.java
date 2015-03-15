@@ -307,7 +307,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		((ImageView) monthDetailView.findViewById(R.id.profile_avatar)).setImageDrawable(getOpenMFM().getAvatarRoundDrawable());
 		((TextView) monthDetailView.findViewById(R.id.profile_name)).setText(currentUser.name);
 		if(isForNextMonth)
-			((TextView) monthDetailView.findViewById(R.id.month_detail_month_type)).setText("Next month");
+			((TextView) monthDetailView.findViewById(R.id.month_detail_month_type)).setText(getString(R.string.OA2018));
 		
 		fillMonthDetailInfo(monthDetailView, year, month);
 
@@ -319,24 +319,24 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		((TextView)monthDetailView.findViewById(R.id.month_detail_pre_next_month)).setText(year+" "+dfs.getMonths()[month]);
 		ClassUpdateInfo updateInfo = worker.getUpdateInfo(currentUser.login, year, month);
 		
-		String text = "?";
+		String text = "-";
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
 			text = Integer.toString(updateInfo.classNumber);
 		((TextView)monthDetailView.findViewById(R.id.month_detail_class_num)).setText(text);
 		
-		text = "?";
+		text = "-";
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
 			text = localDateTimeFormat.format(updateInfo.lastSuccessUpdateDate);
 		((TextView)monthDetailView.findViewById(R.id.month_detail_successs_update)).setText(text);
 		
-		text = "?";
+		text = "-";
 		if(updateInfo != null && updateInfo.lastFailUpdateDate != null)
 			text = localDateTimeFormat.format(updateInfo.lastFailUpdateDate);
 		((TextView)monthDetailView.findViewById(R.id.month_detail_failed_update)).setText(text);
 		
-		text = "?";
+		text = "-";
 		if(updateInfo != null && updateInfo.errorEnum != null)
-			text = updateInfo.errorEnum.toString();
+			text = updateInfo.errorEnum.getDescription();
 		((TextView)monthDetailView.findViewById(R.id.month_detail_failed_reason)).setText(text);
 		
 		Button updateBtn = ((Button) monthDetailView.findViewById(R.id.month_detail_update));
@@ -374,11 +374,11 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		boolean success = false;
 		if(getHttpService() == null)
 		{
-			showErrorDialog("Error", "Http Service isn't ready, please try later.");
+			showErrorDialog(getString(R.string.OA2019), "Http Service isn't ready, please try later.");
 		}
 		else if (!NetWorkUtils.isNetworkAvailable()) 
 		{
-			showErrorDialog("Error", "Network NOT available, please try later.");
+			showErrorDialog(getString(R.string.OA2019), getString(R.string.OA0004));
 		}
 		else 
 		{
@@ -421,7 +421,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 							askForLoadCourse(year, monthOfYear);
 					}
 				}, year, month, day);
-	            datePickerDialog.setTitle("Find course for a date");
+	            datePickerDialog.setTitle(getString(R.string.OA2008));
 	            datePickerDialog.show();
 				return false;
 			}
@@ -449,7 +449,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 				int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
 				fillMonthDetailInfo(monthDetailInfoView, yearMonth[0], yearMonth[1]);
 				
-				createDialogBuilderWithCancel(item.getTitle().toString(), null)
+				createDialogBuilderWithCancel(getString(R.string.OA2007), null)
 				.setCustomView(monthDetailInfoView).show();
 				return false;
 			}
@@ -486,7 +486,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 						adapter.tryUpdatePreNextMonthClassInfo(searchDate);
 						if(errorEnum == HttpServiceErrorEnum.OkError)
 						{
-							createDialogBuilderWithCancel("AGENDA", "The course of "+getYearMonthText(searchDate)+"("+classSize+" class) is successful dowloaded. Do you want to charge it?")
+							createDialogBuilderWithCancel(getString(R.string.OA0000), "The course of "+getYearMonthText(searchDate)+"("+classSize+" class) is successful dowloaded. Do you want to charge it?")
 							.withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
 							{
 								@Override
@@ -499,7 +499,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 						}
 						else 
 						{
-							createDialogBuilderWithCancel("AGENDA", "Failed to load course for "+getYearMonthText(searchDate)+" : "+errorEnum.getDescription())
+							createDialogBuilderWithCancel(getString(R.string.OA0000), "Failed to load course for "+getYearMonthText(searchDate)+" : "+errorEnum.getDescription())
 							.withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
 						}
 					}
@@ -513,7 +513,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	 ******************************************************/
 	private void askForLoadCourse(final int year, final int month)
 	{
-		createDialogBuilderWithCancel("Agenda", "Can't find course for "+getYearMonthText(year, month)+". Do you want to download it?")
+		createDialogBuilderWithCancel(getString(R.string.OA0000), "Can't find course for "+getYearMonthText(year, month)+". Do you want to download it?")
 		.withButton1Text(getString(android.R.string.no)).withButton2Text(getString(android.R.string.yes)).setButton2Click(new View.OnClickListener() 
 		{
 			@Override
@@ -582,8 +582,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			
 			createDialogBuilderWithCancel(event.mName, null)
 			.setCustomView(classDetailInfoView)
-			.withButton1Text(getString(R.string.edit))
-			.setButton1Click(editBtnListener).show();;
+			.withButton1Text(getString(R.string.OA2016))
+			.setButton1Click(editBtnListener).show();
 		}
 	}
 

@@ -2,63 +2,58 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     
-    <string name="OA0000" >Agenda</string>
-    <string name="OA0001" >Trombi</string>
-    <string name="OA0002" >Setting</string>
-    <string name="OA0003" >Exit</string>
+    <string name="OA0000">Agenda</string>
+    <string name="OA0001">Trombi</string>
+    <string name="OA0002">Setting</string>
+    <string name="OA0003">Exit</string>
+    <string name="OA0004">Network is not available</string>
     
-    <string name="welcome" >Welcome to OPAM</string>
-    <string name="app_name" >OPAM</string>
-    <string name="class_name" >Class Name</string>
-    <string name="teacher" >Teacher</string>
-    <string name="group" >Group</string>
-    <string name="type" >Type</string>
-    <string name="room" >Room</string>
-    <string name="class_bg_color" >Class Background Color</string>
-    <string name="time_range" >Calendar Time Range</string>
-    <string name="calendar_auto_sync" >Google Calendar Auto Sync</string>
-    <string name="auto_login" >Auto-Login</string>
-    <string name="auto_update_notify" >New Version Notification</string>
-    <string name="app_version" >App version</string>
-    <string name="time" >Time</string>
-    <string name="ok" >OK</string>
-    <string name="yes" >Yes</string>
-    <string name="no" >No</string>
-    <string name="login" >login</string>
-    <string name="pw" >password</string>
-    <string name="today_class" >Today\'s Class</string>
-    <string name="update" >Update</string>
-    <string name="account" >Account</string>
-    <string name="setting" >Setting</string> 
-    <string name="exit" >Exit</string>
-    <string name="edit" >Edit</string>
-    <string name="close" >Close</string>
-    <string name="retry" >Retry</string>
-    <string name="edit_class" >Edit Class Info</string> 
-    <string name="remove_class" >Remove Class Info</string>
-    <string name="free_time" >Free time</string> 
-    <string name="class_time" >Class time</string>
-    <string name="add_class" >Add Class Info</string>
-    <string name="account_del" >Account Delete</string>
-    <string name="add_new_account" >Add New Account</string>
-    <string name="account_del_alert" >Do you really want to delete the account</string>
-    <string name="login_null_alert" >Input your login, please!</string>
-    <string name="pw_null_alert" >Input your password, please!</string>
-    <string name="share_title" >Share Class Info</string>
-    <string name="my_class_from" >My Class Info from </string>
-    <string name="to" > to </string>
-    <string name="come_from" > come from </string>
-    <string name="add" >add</string>
-    <string name="new_version_feature" >new version feature</string>
-    <string name="update_app" >Update APP</string>
-    <string name="update_classInfo_msg" >Courses outdated, do you want to download the new courses ?</string>
-    <string name="network_unavailable" >Network is not available</string>
-    <string name="zero_course" >Sorry, No class Info to share !</string>
-    <string name="downloading" >Downloading</string>
-    <string name="download_class_msg" >Please wait while loading the list of class...</string>
-    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"New week class view\",\"New account management, 
-        allowing multiple users to switch\",\"New courses modify / delete / add functions (long press on the agenda to trigger this function)\",\"New feature to display user\u0027s photo\",
-        \"New feature to share a week\u0027s courses\",\"New settings interface, adjust the calendar time\"]}
-	</string>
-	<string name="version_11_info">{\"vCode\":11,\"vName\":\"1.2.7.1\",\"features\":[\"bugs fixed\",\"thank you for your use\"]}</string>
+    <string name="OA1000">Welcome to OPAM</string>
+    <string name="OA1001">OPAM</string>
+    <string name="OA1002">login</string>
+    <string name="OA1003">password</string>
+    <string name="OA1004">Input your login, please!</string>
+    <string name="OA1005">Input your password, please!</string>
+    <string name="OA1006">Please wait while checking your login and password...</string>
+    <string name="OA1007">Checking</string>
+    <string name="OA1008">Retry</string>
+    
+    <string name="OA2000">Update</string>
+    <string name="OA2001">Charge</string>
+    <string name="OA2002">Last Month</string>
+    <string name="OA2003">Number of courses</string>
+    <string name="OA2004">Local data update time</string>
+    <string name="OA2005">Last failed update time</string>
+    <string name="OA2006">Failed reason</string>
+    <string name="OA2007">Month Info</string>
+    <string name="OA2008">Find course for a date</string>
+    <string name="OA2009">No error</string>
+    <string name="OA2010">Unknown error</string>
+    <string name="OA2011">Exception error</string>
+    <string name="OA2012">INT server error</string>
+    <string name="OA2013">Bad http status error</string>
+    <string name="OA2014">Bad html content error</string>
+    <string name="OA2015">Login failed error</string>
+    <string name="OA2016">Time</string>
+    <string name="OA2017">Edit</string>
+    <string name="OA2018">Next Month</string>
+    <string name="OA2019">Error</string>
+    
+    <string name="OA3000">First name or last name</string>
+    <string name="OA3001">search</string>
+    <string name="OA3002">Result</string>
+    
+    <string name="OA4000">Calendar Time Range</string>
+    <string name="OA4001">Google Calendar Auto Sync</string>
+    <string name="OA4002">Auto-Login</string>
+    <string name="OA4003">New Version Notification</string>
+    <string name="OA4004">App version</string>
+    
+    <string name="OA5000">Class Name</string>
+    <string name="OA5001">Teacher</string>
+    <string name="OA5002">Group</string>
+    <string name="OA5003">Type</string>
+    <string name="OA5004">Room</string>
+    <string name="OA5005">Class Background Color</string>
+
 </resources>

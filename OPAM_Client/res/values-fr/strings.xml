@@ -1,58 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="welcome" >Bienvenu à OPAM</string>
-    <string name="app_name" >OPAM</string>
-    <string name="class_name" >Nom du cours</string>
-    <string name="teacher" >Formateur</string>
-    <string name="group" >Groupe</string>
-    <string name="type" >Type</string>
-    <string name="room" >Salle</string>
-    <string name="class_bg_color" >Couleur de fond</string>
-    <string name="time_range" >Plage horaire d\'agenda</string>
-    <string name="calendar_auto_sync" >Google Agenda Auto Sync</string>
-    <string name="auto_login" >Auto-Login</string>
-    <string name="auto_update_notify" >Nouvelle Version Notification</string>
-    <string name="app_version" >Version d\'application</string>
-    <string name="time" >Horaire</string>
-    <string name="ok" >OK</string>
-    <string name="yes" >Oui</string>
-    <string name="no" >Non</string>
-    <string name="login" >Identifiant</string>
-    <string name="pw" >mot de passe</string>  
-    <string name="today_class" >Cours d\'aujourd\'hui</string>
-    <string name="update" >Mis à jour</string>
-    <string name="account" >Compte</string>
-    <string name="setting" >Paramètre</string>
-    <string name="exit" >Quit</string>
-    <string name="edit" >Editer</string>
-    <string name="close" >Fermer</string>
-    <string name="retry" >Réessayer</string>
-    <string name="edit_class" >Editer Cours Info</string> 
-    <string name="remove_class" >Supprimer Cours Info</string>
-    <string name="free_time" >Temps libre</string>
-    <string name="class_time" >Horaire du cours</string>
-    <string name="add_class" >ajouter Cours Info</string>
-    <string name="account_del" >Suppression du compte</string>
-    <string name="add_new_account" >Nouveau Compte</string>
-    <string name="account_del_alert" >Voulez-vous vraiment suppprimer le compte</string>
-    <string name="login_null_alert" >Tapez votre identifiant, SVP!</string>
-    <string name="pw_null_alert" >Tapez votre mot de passe, SVP!</string>
-    <string name="share_title" >Partager Class Info</string>
-    <string name="my_class_from" >Mes cours du </string>
-    <string name="to" > au </string>
-    <string name="come_from" > en provenance de </string>
-    <string name="add" >ajouter</string>
-    <string name="new_version_feature" >nouvelle version</string>
-    <string name="update_app" >Mis A Jour APP</string>
-    <string name="update_classInfo_msg" >Cours désuets, Télécharger les cours les plus recents?</string>
-    <string name="network_unavailable" >Réseau NON disponible</string>
-    <string name="zero_course" >Pas de cours A Partager !</string>
-    <string name="downloading" >Téléchargement</string>
-    <string name="download_class_msg" >Veuillez patienter pendant le téléchargement des cours...</string>
-    <string name="version_10_info">{\"vCode\":10,\"vName\":\"1.2.7\",\"features\":[\"Afficher les cours d\u0027une semaine\",
-        \"gestion des comptes (multi-compte)\",\"modifier / supprimer / ajouter des cours (appui long sur l\'agenda pour déclencher cette fonction)\",
-        \"afficher l\u0027avatar d\u0027utilisateur\",\"partager des cours sur réseaux sociaux\",
-        \"faciliter le gestion des paramètres d\u0027app\"]}
-	</string>
-	<string name="version_11_info">{\"vCode\":11,\"vName\":\"1.2.7.1\",\"features\":[\"bug corrigé\",\"merci pour votre utilisation\"]}</string>
+    <string name="OA0000">Agenda</string>
+    <string name="OA0001">Trombi</string>
+    <string name="OA0002">Paramètre</string>
+    <string name="OA0003">Quitter</string>
+    <string name="OA0004">Réseau ne est pas disponible</string>
+    
+    <string name="OA1000">Bienvenu à OPAM</string>
+    <string name="OA1001">OPAM</string>
+    <string name="OA1002">login</string>
+    <string name="OA1003">mot de passe</string>
+    <string name="OA1004">Tapez votre identifiant, SVP!</string>
+    <string name="OA1005">Tapez votre mot de passe, SVP!</string>
+    <string name="OA1006">Veuillez patienter pendant la vérification d\'identifiant...</string>
+    <string name="OA1007">Vérification</string>
+    <string name="OA1008">Réessayez</string>
+    
+    <string name="OA2000">Mis à jour</string>
+    <string name="OA2001">Charge</string>
+    <string name="OA2002">Le mois dernier</string>
+    <string name="OA2003">Nombre de cours</string>
+    <string name="OA2004">Date de MAJ des DB</string>
+    <string name="OA2005">Dernière date de MAJ échoué</string>
+    <string name="OA2006">raison échec</string>
+    <string name="OA2007">Info du mois</string>
+    <string name="OA2008">Trouver cours pour une date</string>
+    <string name="OA2009">Aucune erreur</string>
+    <string name="OA2010">Erreur inconnue</string>
+    <string name="OA2011">Erreur d\'exception</string>
+    <string name="OA2012">Erreur du server INT</string>
+    <string name="OA2013">Http code incorrect</string>
+    <string name="OA2014">Contenu de html incorrect</string>
+    <string name="OA2015">échec d\'identification</string>
+    <string name="OA2016">Horaire</string>
+    <string name="OA2017">Edition</string>
+    <string name="OA2018">Mois prochain</string>
+    <string name="OA2019">Erreur</string>
+    
+    <string name="OA3000">Prénom ou nom</string>
+    <string name="OA3001">Recherche</string>
+    <string name="OA3002">Résultat</string>
+    
+    <string name="OA4000">Plage horaire d\'agenda</string>
+    <string name="OA4001">Google Agenda Auto Sync</string>
+    <string name="OA4002">Auto-Login</string>
+    <string name="OA4003">Nouvelle Version Notification</string>
+    <string name="OA4004">Version d\'application</string>
+    
+    <string name="OA5000">Nom du cours</string>
+    <string name="OA5001">Formateur</string>
+    <string name="OA5002">Groupe</string>
+    <string name="OA5003">Type</string>
+    <string name="OA5004">Salle</string>
+    <string name="OA5005">Couleur de fond</string>
+
 </resources>

@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
-            android:text="@string/time_range"
+            android:text="@string/OA4000"
             android:textSize="20sp" />
 		
         <TextView
@@ -60,7 +60,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
         	android:textSize="20sp"
-            android:text="@string/calendar_auto_sync" />
+            android:text="@string/OA4001" />
 
         <ToggleButton
             android:id="@+id/autoSyncTB"
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
-            android:text="@string/auto_login"
+            android:text="@string/OA4002"
             android:textSize="20sp" />
 
         <ToggleButton
@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="4dp"
-            android:text="@string/auto_update_notify"
+            android:text="@string/OA4003"
             android:textSize="20sp" />
 
         <ToggleButton
@@ -139,7 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:textSize="20sp"
-        android:text="@string/app_version" />
+        android:text="@string/OA4004" />
 
     <TextView
         android:id="@+id/versionTV"

@@ -3,18 +3,18 @@
     tools:ignore="MissingTranslation">
     
     <string-array name="school_array">
-        <item>ALL</item>
+        <item>Tous</item>
         <item>TSP</item>
         <item>TEM</item>
     </string-array>
     
     <string-array name="grade_array">
-        <item>ALL</item>
+        <item>Tous</item>
         <item>Bachelor</item>
-		<item>Engineer 1</item>
-		<item>Engineer 2</item>
-		<item>Engineer 3</item>
-		<item>Specialized Master</item>
+		<item>Ingénieur 1ère année</item>
+		<item>Ingénieur 2ème année</item>
+		<item>Ingénieur 3ème année</item>
+		<item>Mastère Spécialisé</item>
 		<item>Master of Science</item>
 		<item>Executive MBA</item>
     </string-array>

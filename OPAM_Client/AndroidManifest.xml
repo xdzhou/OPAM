@@ -11,12 +11,12 @@
         android:name="com.loic.common.LibApplication"
         android:icon="@drawable/logo"
         android:theme="@style/AppTheme"
-        android:label="@string/app_name">
+        android:label="@string/OA1001">
         
         <activity 
             android:name="com.sky.opam.MainActivity"
             android:screenOrientation="portrait"
-            android:label="@string/app_name">
+            android:label="@string/OA1001">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

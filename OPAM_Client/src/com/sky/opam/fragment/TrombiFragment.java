@@ -37,7 +37,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		getActivity().setTitle("Trombi");
+		getActivity().setTitle(getString(R.string.OA0001));
 		View rootView =  inflater.inflate(R.layout.etudiant_search_fragment, container, false);
 		final Spinner schoolSpinner = (Spinner) rootView.findViewById(R.id.spinner_school);
 		ArrayAdapter<CharSequence> schoolAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.school_array, android.R.layout.simple_spinner_item);
@@ -63,7 +63,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 				}
 				else if (! NetWorkUtils.isNetworkAvailable()) 
 				{
-					ToastUtils.show("Sorry, network NOT available, retry later");
+					ToastUtils.show(getString(R.string.OA0004));
 				}
 				else if(getHttpService() != null)
 				{
@@ -106,6 +106,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 				@Override
 				public void run() 
 				{
+					ToastUtils.show(getString(R.string.OA3002)+" : " + results.size());
 					if(listAdapter != null)
 					{
 						listAdapter.clear();

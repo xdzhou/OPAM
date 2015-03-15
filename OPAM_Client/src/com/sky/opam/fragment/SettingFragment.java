@@ -43,7 +43,7 @@ public class SettingFragment extends OpamFragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		getActivity().setTitle(getString(R.string.OA0001));
+		getActivity().setTitle(getString(R.string.OA0002));
 		View rootView =  inflater.inflate(R.layout.config_activity, container, false);
 		
 		final TextView startTimeTV = (TextView) rootView.findViewById(R.id.startTimeTV);
@@ -68,7 +68,8 @@ public class SettingFragment extends OpamFragment
 		});
         
         autoSyncTB = (ToggleButton) rootView.findViewById(R.id.autoSyncTB);
-        autoSyncTB.setChecked(user.isAutoSyncEvent);
+        autoSyncTB.setChecked(false);
+        autoSyncTB.setEnabled(false);
         autoLoginTB = (ToggleButton) rootView.findViewById(R.id.autoLogin);
         autoLoginTB.setChecked(user.isAutoConnect);
         autoUpdateNotifyTB = (ToggleButton) rootView.findViewById(R.id.autoUpdateNotify);
@@ -120,13 +121,6 @@ public class SettingFragment extends OpamFragment
 	{
 		String h = hour < 10 ? "0"+hour : hour+"";
 		return h+":00";
-	}
-
-	@Override
-	public boolean onBackPressed() 
-	{
-		getOpenMFM().gobackToGcFragment(AgendaViewFragment.class);
-		return true;
 	}
 	
 	private boolean isAutoNotifi()

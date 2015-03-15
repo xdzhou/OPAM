@@ -166,45 +166,6 @@ public class Tool
 		return Locale.getDefault().getLanguage();
 	}
 	
-	public static AlertDialog.Builder showVersionInfo(Context context, VersionInfo versionInfo)
-	{
-		StringBuilder msg = new StringBuilder();
-		msg.append(versionInfo.vName+":\n\n");
-		int num = 1;
-		for(String s: versionInfo.features)
-		{
-			msg.append(num+": ");
-			msg.append(s+"\n\n");
-			num++;
-		}
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setIcon(android.R.drawable.ic_menu_info_details);
-		builder.setMessage(msg.toString());
-		builder.setTitle(R.string.new_version_feature);
-		builder.setPositiveButton(R.string.ok, null);
-		return builder;
-	}
-	
-	public static AlertDialog.Builder showVersionInfoAndUpdate(final Context context, VersionInfo versionInfo)
-	{	
-		AlertDialog.Builder builder = showVersionInfo(context, versionInfo);
-		builder.setNegativeButton(R.string.no, null);
-		builder.setPositiveButton(R.string.update_app, new DialogInterface.OnClickListener() 
-		{
-			@Override
-			public void onClick(DialogInterface dialog, int which) 
-			{
-				String appPackageName = context.getPackageName(); // getPackageName() from Context or Activity object
-				try {
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-				} catch (android.content.ActivityNotFoundException anfe) {
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
-				}
-			}		
-		});
-		return builder;
-	}
 	
 	public static boolean isFirstUseApp(Context context)
 	{

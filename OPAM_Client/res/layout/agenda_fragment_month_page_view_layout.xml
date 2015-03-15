@@ -42,13 +42,13 @@
             android:id="@+id/month_detail_update"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Update" />
+            android:text="@string/OA2000" />
 
         <Button
             android:id="@+id/month_detail_charge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Charge" />
+            android:text="@string/OA2001" />
 
     </LinearLayout>
 
