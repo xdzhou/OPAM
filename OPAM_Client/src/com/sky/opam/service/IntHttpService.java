@@ -188,7 +188,7 @@ public class IntHttpService extends Service
 			}
 			if(taskParams != null)
 			{
-				requestAgendaInfo(taskParams.searchDate, taskParams.callbackWeakReference);
+				requestAgendaInfo(taskParams.searchDate, taskParams.callback);
 			}
 		}
 	};
@@ -375,17 +375,16 @@ public class IntHttpService extends Service
 			}
 			else 
 			{
-				WeakReference<asyncGetClassInfoReponse> callbackWeakReference = new WeakReference<asyncGetClassInfoReponse>(callback);
 				synchronized (loadClassParamsQueue) 
 				{
-					loadClassParamsQueue.push(new LoadClassTaskParams(date, callbackWeakReference));
+					loadClassParamsQueue.push(new LoadClassTaskParams(date, callback));
 				}
 				workerHandler.post(LoadClassRunnable);
 			}
 		}
 	}
 	
-	private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoReponse> callbackWeakReference)
+	private void requestAgendaInfo(Date date, asyncGetClassInfoReponse callback)
 	{
 		classLoadingDate = date;
 		HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
@@ -471,17 +470,6 @@ public class IntHttpService extends Service
 						Log.e(TAG, "Load Class failed, error : " + tempErrorEnumRef.errorEnum.getDescription());
 					}
 				}
-				
-				if(classInfos.isEmpty() && false) // can't find class info
-				{
-					//reset all params
-					clearCookies();
-					agendaWebParams.clear();
-					//relance get class info request
-					requestAgendaInfo(date, callbackWeakReference);
-					//remove callback to avoid lance callback for second times
-					callbackWeakReference = null;
-				}
 			}
 		} 
 		catch (Exception e) 
@@ -506,10 +494,15 @@ public class IntHttpService extends Service
 		if(errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 		{
 			worker.deleteClassEvents(login, date);
+			int totalTime = 0; //in second
 			for(ClassEvent classEvent : classInfos)
+			{
 				worker.insertData(classEvent);
+				totalTime += (classEvent.endTime.getTime() - classEvent.startTime.getTime()) / 1000;
+			}
 			updateInfo.lastSuccessUpdateDate = new Date();
 			updateInfo.classNumber = classInfos.size();
+			updateInfo.totalTime = totalTime;
 		}
 		else 
 		{
@@ -524,8 +517,8 @@ public class IntHttpService extends Service
 		
 		classLoadingDate = null;
 		
-		if(callbackWeakReference != null && callbackWeakReference.get() != null)
-			callbackWeakReference.get().onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
+		if(callback != null)
+			callback.onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
 		else
 			Log.e(TAG, "NO callback for asyncGetClassInfo");
 	}
@@ -602,13 +595,13 @@ public class IntHttpService extends Service
 	private HttpPost createGetClassInfoRequest(HttpResponse previousResponse, Date searchDate, HttpServiceErrorEnumReference errorEnumRef)
 	{
 		HttpPost httpPost = null;
-		if(previousResponse != null && searchDate != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+		if(searchDate != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 		{
 			httpPost = new HttpPost(SI_HOST + "/Eplug/Agenda/Agenda.asp");
 			List<NameValuePair> data = new ArrayList<NameValuePair>();
 			try
 			{
-				if(! agendaWebParams.isFormItemsReady())
+				if(! agendaWebParams.isFormItemsReady() && previousResponse != null)
 				{
 					String rspHtml = EntityUtils.toString(previousResponse.getEntity());
 					Document doc = Jsoup.parse(rspHtml);
@@ -677,7 +670,7 @@ public class IntHttpService extends Service
 	 * 
 	 */
 	
-	public void asyncSearchEtudiantByName(final String name, asyncSearchEtudiantByNameReponse callback)
+	public void asyncSearchEtudiantByName(final String name, final String school, final String grade, asyncSearchEtudiantByNameReponse callback)
 	{
 		final WeakReference<asyncSearchEtudiantByNameReponse> callbackWeakReference = new WeakReference<asyncSearchEtudiantByNameReponse>(callback);
 		
@@ -691,8 +684,10 @@ public class IntHttpService extends Service
 				HttpPost post = new HttpPost("http://trombi.tem-tsp.eu/etudiants.php");
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("user", name));
-				//data.add(new BasicNameValuePair("ecole", ""));
-				//data.add(new BasicNameValuePair("annee", ""));
+				if(school != null && !school.isEmpty())
+					params.add(new BasicNameValuePair("ecole", school));
+				if(grade != null && !grade.isEmpty())
+					params.add(new BasicNameValuePair("annee", grade));
 				params.add(new BasicNameValuePair("submit", "Rechercher"));
 				
 				try 
@@ -1132,12 +1127,12 @@ public class IntHttpService extends Service
 	private class LoadClassTaskParams
 	{
 		private Date searchDate;
-		private WeakReference<asyncGetClassInfoReponse> callbackWeakReference;
+		private asyncGetClassInfoReponse callback;
 		
-		public LoadClassTaskParams(Date searchDate, WeakReference<asyncGetClassInfoReponse> callbackWeakReference) 
+		public LoadClassTaskParams(Date searchDate, asyncGetClassInfoReponse callback) 
 		{
 			this.searchDate = searchDate;
-			this.callbackWeakReference = callbackWeakReference;
+			this.callback = callback;
 		}
 	}
 	

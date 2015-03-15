@@ -15,6 +15,7 @@ public class ClassUpdateInfo
 	public String login;
 	public Date lastSuccessUpdateDate;
 	public int classNumber;
+	public int totalTime; //in second
 	
 	public Date lastFailUpdateDate;
 	public HttpServiceErrorEnum errorEnum;

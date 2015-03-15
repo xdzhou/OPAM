@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+    
+    <string-array name="school_array">
+        <item>ALL</item>
+        <item>TSP</item>
+        <item>TEM</item>
+    </string-array>
+    
+    <string-array name="grade_array">
+        <item>ALL</item>
+        <item>Bachelor</item>
+		<item>1ère année</item>
+		<item>2ème année</item>
+		<item>3ème année</item>
+		<item>Mastère Spécialisé</item>
+		<item>Master of Science</item>
+		<item>Executive MBA</item>
+    </string-array>
+    
+</resources>

@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -27,10 +28,13 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.loic.common.LibApplication;
 import com.loic.common.graphic.AgendaView;
 import com.loic.common.graphic.AgendaView.AgendaEvent;
 import com.loic.common.graphic.AgendaView.AgendaViewEventTouchListener;
+import com.loic.common.utils.NetWorkUtils;
+import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
@@ -38,19 +42,25 @@ import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
+import com.sky.opam.service.IntHttpService.asyncGetClassInfoReponse;
 import com.sky.opam.tool.DBworker;
+import com.sky.opam.tool.Tool;
 
-public class AgendaViewFragment extends OpamFragment implements IntHttpService.asyncGetClassInfoReponse, AgendaViewEventTouchListener
+public class AgendaViewFragment extends OpamFragment implements AgendaViewEventTouchListener
 {
 	private static final String TAG = AgendaViewFragment.class.getSimpleName();
 	public static final String BUNDLE_LOGIN_KEY = "BUNDLE_LOGIN_KEY";
+	private static final String BUNDLE_Agenda_Year_KEY = "BUNDLE_Agenda_Year_KEY";
+	private static final String BUNDLE_Agenda_Month_KEY = "BUNDLE_Agenda_Month_KEY";
 	
 	private User currentUser;
 	private AgendaViewPageAdapter adapter;
 	private DBworker worker;
 	
-	private View classDetailInfoView;
-	private View monthDetailInfoView;
+	private ViewPager mViewPager;
+	
+	//private View classDetailInfoView;
+	//private View monthDetailInfoView;
 	
 	private DateFormat classDetailTimeFormat;
 	private DateFormat localDateTimeFormat;
@@ -58,12 +68,28 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	private DateFormatSymbols dfs;
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) 
+	{
+		super.onSaveInstanceState(outState);
+		outState.putString(BUNDLE_LOGIN_KEY, currentUser.login);
+		int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
+		outState.putInt(BUNDLE_Agenda_Year_KEY, yearMonth[0]);
+		outState.putInt(BUNDLE_Agenda_Month_KEY, yearMonth[1]);
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		worker = DBworker.getInstance();
-		currentUser = worker.getUser(getArguments().getString(BUNDLE_LOGIN_KEY));
-		if(currentUser == null)
+		String login = null;
+		if(getArguments() != null)
+			login = getArguments().getString(BUNDLE_LOGIN_KEY);
+		if(login == null && savedInstanceState != null)
+			login = savedInstanceState.getString(BUNDLE_LOGIN_KEY);
+		if(login != null)
+			currentUser = worker.getUser(login);
+		else
 			currentUser = worker.getDefaultUser();
 		
 		classDetailTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
@@ -75,18 +101,32 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		super.onCreateView(inflater, container, savedInstanceState);
+		mViewPager = new AgendaViewPage(LibApplication.getAppContext());
 		
-		ViewPager mViewPager = new AgendaViewPage(LibApplication.getAppContext());
-		adapter = new AgendaViewPageAdapter();
+		int year = 0, month = 0;
+		if(savedInstanceState != null)
+		{
+			year = savedInstanceState.getInt(BUNDLE_Agenda_Year_KEY, -1);
+			month = savedInstanceState.getInt(BUNDLE_Agenda_Month_KEY, -1);
+			if(year != -1 && month != -1)
+				adapter = new AgendaViewPageAdapter(year, month);
+		}
+		
+		if(adapter == null)
+		{
+			int[] yearMonth = Tool.getCurrentYearMonth();
+			year = yearMonth[0];
+			month = yearMonth[1];
+			adapter = new AgendaViewPageAdapter(year, month);
+		}
+		
 		mViewPager.setAdapter(adapter);
 		mViewPager.setCurrentItem(1);
 		
 		setHasOptionsMenu(true);
-		
-		Calendar cal = Calendar.getInstance();
-		getActivity().setTitle(cal.get(Calendar.YEAR)+" "+dfs.getMonths()[cal.get(Calendar.MONTH)]);
-		
+
+		getActivity().setTitle(year + " " + dfs.getMonths()[month]);
+
 		return mViewPager;
 	}
 
@@ -102,18 +142,20 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		{
 			//refresh agenda view
 			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(date, forceLoad);
-			//refresh left month info
-			int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
-			fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
-			//refresh right month info
-			int [] nextYearMonth = adapter.agendaView.getNextYearMonth();
-			fillMonthDetailInfo(adapter.nextMonthView, nextYearMonth[0], nextYearMonth[1]);
-			
+
 			getActivity().runOnUiThread(new Runnable() 
 			{
 				@Override
 				public void run() 
 				{
+					mViewPager.setCurrentItem(1);
+					//refresh left month info
+					int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
+					fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
+					//refresh right month info
+					int [] nextYearMonth = adapter.agendaView.getNextYearMonth();
+					fillMonthDetailInfo(adapter.nextMonthView, nextYearMonth[0], nextYearMonth[1]);
+					
 					getActivity().setTitle(actionTitle);
 				}
 			});
@@ -122,7 +164,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	
 	private void refreshAgendaView(int year, int month, boolean forceLoad)
 	{
-		if(adapter != null && adapter.agendaView != null && isAdded())
+		if(adapter != null && adapter.agendaView != null && !isDetached())
 		{
 			//refresh agenda view
 			final String actionTitle = adapter.agendaView.refreshAgendaWithNewDate(year, month, forceLoad);
@@ -132,6 +174,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 				@Override
 				public void run() 
 				{
+					mViewPager.setCurrentItem(1);
 					//refresh left month info
 					int [] preYearMonth = adapter.agendaView.getPreviousYearMonth();
 					fillMonthDetailInfo(adapter.preMonthView, preYearMonth[0], preYearMonth[1]);
@@ -143,7 +186,6 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 			});
 		}
 	}
-	
 	
 	/******************************************************
 	 ******************* pageView adapter *****************
@@ -172,6 +214,15 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		private View nextMonthView;
 		private AgendaView agendaView;
 		
+		private int year, month;
+		
+		public AgendaViewPageAdapter(int year, int month) 
+		{
+			super();
+			this.year = year;
+			this.month = month;
+		}
+
 		@Override
 		public int getCount() 
 		{
@@ -193,55 +244,35 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 			case 0:
 				if(preMonthView == null)
 				{
-					int year, month;
-					Date date = new Date();
-					if(date.getMonth() == Calendar.JANUARY)
-					{
-						year = date.getYear() + 1900 - 1;
-						month = Calendar.DECEMBER;
-					}
-					else 
-					{
-						year = date.getYear() + 1900;
-						month = date.getMonth() - 1;
-					}
-					
-					preMonthView = createMonthDetailPageView(year, month, false);
+					int[] preMonth = Tool.getPreviousMonth(year, month);
+					preMonthView = createMonthDetailPageView(preMonth[0], preMonth[1], false);
 				}
 				pageView = preMonthView;
 				break;
 			case 1:
 				agendaView = new AgendaView(container.getContext());
+				agendaView.setStartHour(currentUser.agendaStartHour);
+				agendaView.setEndHour(currentUser.agendaEndHour);
+				agendaView.initCalendar(year, month, false);
 				agendaView.setEventTouchListener(AgendaViewFragment.this);
+				agendaView.askForEvents();
 				pageView = agendaView;
 				break;
 			case 2:
 				if(nextMonthView == null)
 				{
-					int year, month;
-					Date date = new Date();
-					if(date.getMonth() == Calendar.DECEMBER)
-					{
-						year = date.getYear() + 1900 + 1;
-						month = Calendar.JANUARY;
-					}
-					else 
-					{
-						year = date.getYear() + 1900;
-						month = date.getMonth() + 1;
-					}
-					
-					nextMonthView = createMonthDetailPageView(year, month, true);
+					int[] nextMonth = Tool.getNextMonth(year, month);
+					nextMonthView = createMonthDetailPageView(nextMonth[0], nextMonth[1], true);
 				}
 				pageView = nextMonthView;
 				break;
 			default:
+				Log.e(TAG, "ERROR, get view for position : "+position);
+				pageView = new View(container.getContext());
 				break;
 			}
 			
-			if(pageView != null)
-				container.addView(pageView);
-			
+			container.addView(pageView);
 			return pageView;
 		}
 		
@@ -249,6 +280,24 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		public void destroyItem(ViewGroup container, int position, Object object) 
 		{
 			container.removeView((View) object);
+		}
+		
+		public void tryUpdatePreNextMonthClassInfo(Date date)
+		{
+			if(date != null)
+			{
+				int[] ym = Tool.getYearMonthForDate(date);
+				int[] preYM = agendaView.getPreviousYearMonth();
+				int[] nextYM = agendaView.getNextYearMonth();
+				if(ym[0] == preYM[0] && ym[1] == preYM[1])
+				{
+					fillMonthDetailInfo(preMonthView, preYM[0], preYM[1]);
+				}
+				else if (ym[0] == nextYM[0] && ym[1] == nextYM[1]) 
+				{
+					fillMonthDetailInfo(nextMonthView, nextYM[0], nextYM[1]);
+				}
+			}
 		}
 	}
 	
@@ -265,7 +314,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		return monthDetailView;
 	}
 	
-	private void fillMonthDetailInfo(View monthDetailView,final int year, final int month)
+	private void fillMonthDetailInfo(View monthDetailView, final int year, final int month)
 	{
 		((TextView)monthDetailView.findViewById(R.id.month_detail_pre_next_month)).setText(year+" "+dfs.getMonths()[month]);
 		ClassUpdateInfo updateInfo = worker.getUpdateInfo(currentUser.login, year, month);
@@ -294,6 +343,17 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		Button chargeBtn = ((Button) monthDetailView.findViewById(R.id.month_detail_charge));
 		if(updateBtn != null && chargeBtn != null)
 		{
+			updateBtn.setEnabled(true);
+			updateBtn.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v) 
+				{
+					if(prepareLoadCourse(year, month))
+						v.setEnabled(false);
+				}
+			});
+			
 			chargeBtn.setEnabled(true);
 			if(updateInfo == null || updateInfo.lastSuccessUpdateDate == null)
 				chargeBtn.setEnabled(false);
@@ -307,6 +367,30 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 					}
 				});
 		}
+	}
+	
+	private boolean prepareLoadCourse(int year, int month)
+	{
+		boolean success = false;
+		if(getHttpService() == null)
+		{
+			showErrorDialog("Error", "Http Service isn't ready, please try later.");
+		}
+		else if (!NetWorkUtils.isNetworkAvailable()) 
+		{
+			showErrorDialog("Error", "Network NOT available, please try later.");
+		}
+		else 
+		{
+			getHttpService().asyncLoadClassInfo(year, month, searchCourseCallback);
+			success = true;
+		}
+		return success;
+	}
+	
+	private void showErrorDialog(String title, String msg)
+	{
+		createDialogBuilderWithCancel(title, msg).withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
 	}
 	
 	/******************************************************
@@ -325,18 +409,20 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	            int year = c.get(Calendar.YEAR);
 	            int month = c.get(Calendar.MONTH);
 	            int day = c.get(Calendar.DAY_OF_MONTH);
-				new DatePickerDialog(AgendaViewFragment.this.getActivity(), new DatePickerDialog.OnDateSetListener() 
+	            DatePickerDialog datePickerDialog = new DatePickerDialog(AgendaViewFragment.this.getActivity(), new DatePickerDialog.OnDateSetListener() 
 				{
 					@Override
 					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) 
 					{
-						Calendar cal = Calendar.getInstance();
-						cal.set(Calendar.YEAR, year);
-						cal.set(Calendar.MONTH, monthOfYear);
-						cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-						refreshAgendaView(cal.getTime(), false);
+						ClassUpdateInfo updateInfo = worker.getUpdateInfo(currentUser.login, year, monthOfYear);
+						if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
+							refreshAgendaView(year, monthOfYear, false);
+						else
+							askForLoadCourse(year, monthOfYear);
 					}
-				}, year, month, day).show();
+				}, year, month, day);
+	            datePickerDialog.setTitle("Find course for a date");
+	            datePickerDialog.show();
 				return false;
 			}
 		});
@@ -358,15 +444,13 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 			@Override
 			public boolean onMenuItemClick(MenuItem item) 
 			{
-				if(monthDetailInfoView == null)
-					monthDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_month_detail_info, null);
+				View monthDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_month_detail_info, null);
 				
 				int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
 				fillMonthDetailInfo(monthDetailInfoView, yearMonth[0], yearMonth[1]);
 				
 				createDialogBuilderWithCancel(item.getTitle().toString(), null)
-				.setCustomView(monthDetailInfoView)
-				.show();
+				.setCustomView(monthDetailInfoView).show();
 				return false;
 			}
 		});
@@ -375,23 +459,72 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	/******************************************************
 	 *************** INT Http Service callback ************
 	 ******************************************************/
-	@Override
-	public void onAsyncGetClassInfoReponse(HttpServiceErrorEnum errorEnum, Date searchDate, final List<ClassEvent> results) 
+	private String getYearMonthText(Date date)
 	{
-		Log.i(TAG, "onAsyncGetClassInfoReponse with result size : " + (results == null ? 0 : results.size()));
-		if(errorEnum == HttpServiceErrorEnum.OkError)
-		{
-			//refreshAgendaView(searchDate, false);
-		}
-		else 
-		{
-			showDialog("Error", errorEnum.getDescription());
-		}
+		int[] yearMonth = Tool.getYearMonthForDate(date);
+		return getYearMonthText(yearMonth[0], yearMonth[1]);
 	}
+	
+	private String getYearMonthText(int year, int month)
+	{
+		return year + " " + dfs.getMonths()[month];
+	}
+	
+	private asyncGetClassInfoReponse searchCourseCallback = new asyncGetClassInfoReponse() 
+	{
+		@Override
+		public void onAsyncGetClassInfoReponse(final HttpServiceErrorEnum errorEnum,final Date searchDate, List<ClassEvent> results) 
+		{
+			if(getActivity() != null)
+			{
+				final int classSize = results == null ? 0 : results.size();
+				getActivity().runOnUiThread(new Runnable() 
+				{
+					@Override
+					public void run() 
+					{
+						adapter.tryUpdatePreNextMonthClassInfo(searchDate);
+						if(errorEnum == HttpServiceErrorEnum.OkError)
+						{
+							createDialogBuilderWithCancel("AGENDA", "The course of "+getYearMonthText(searchDate)+"("+classSize+" class) is successful dowloaded. Do you want to charge it?")
+							.withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
+							{
+								@Override
+								public void onClick(View v) 
+								{
+									hideDialog();
+									refreshAgendaView(searchDate, true);
+								}
+							}).show();
+						}
+						else 
+						{
+							createDialogBuilderWithCancel("AGENDA", "Failed to load course for "+getYearMonthText(searchDate)+" : "+errorEnum.getDescription())
+							.withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
+						}
+					}
+				});
+			}
+		}
+	};
 	
 	/******************************************************
 	 ***************** Agenda Event callback **************
 	 ******************************************************/
+	private void askForLoadCourse(final int year, final int month)
+	{
+		createDialogBuilderWithCancel("Agenda", "Can't find course for "+getYearMonthText(year, month)+". Do you want to download it?")
+		.withButton1Text(getString(android.R.string.no)).withButton2Text(getString(android.R.string.yes)).setButton2Click(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v) 
+			{
+				hideDialog();
+				prepareLoadCourse(year, month);
+			}
+		}).show();
+	}
+	
 	@Override
 	public List<AgendaEvent> onNeedNewEventList(int year, int month)
 	{
@@ -402,7 +535,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 			List<ClassEvent> events = worker.getClassEvents(currentUser.login, year, month);
 			if(events != null)
 			{
-				agendaEvents = new ArrayList<AgendaView.AgendaEvent>();
+				agendaEvents = new ArrayList<AgendaView.AgendaEvent>(events.size());
 				for(ClassEvent classEvent : events)
 				{
 					AgendaEvent agendaEvent = new AgendaEvent();
@@ -418,8 +551,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 		else
 		{
 			//show class info update Dialog
-			showDialog("Loading", year+" "+month);
-			getHttpService().asyncLoadClassInfo(year, month, this);
+			askForLoadCourse(year, month);
 		}
 		return agendaEvents;
 	}
@@ -427,8 +559,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	@Override
 	public void onEventClicked(AgendaEvent event, RectF rect) 
 	{
-		if(classDetailInfoView == null)
-			classDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_class_detail_info, null);
+		View classDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_class_detail_info, null);
 
 		ClassEvent classEvent = worker.getClassEvent(currentUser.login, event.mId);
 		if(classEvent != null)
@@ -438,8 +569,8 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 				@Override
 				public void onClick(View v) 
 				{
-					// TODO Auto-generated method stub
-					
+					//getOpenMFM().showGcFragment(CourseEditFragment.class, false, null);
+					ToastUtils.show("Coming soon ...");
 				}
 			};
 
@@ -452,8 +583,7 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 			createDialogBuilderWithCancel(event.mName, null)
 			.setCustomView(classDetailInfoView)
 			.withButton1Text(getString(R.string.edit))
-			.setButton1Click(editBtnListener)
-			.show();
+			.setButton1Click(editBtnListener).show();;
 		}
 	}
 
@@ -461,5 +591,11 @@ public class AgendaViewFragment extends OpamFragment implements IntHttpService.a
 	public void onEventLongPressed(AgendaEvent event, RectF rect) 
 	{
 		
+	}
+	
+	@Override
+	protected int getInitDialogBackgroundColor()
+	{
+		return Color.parseColor("#33b5e5");
 	}
 }

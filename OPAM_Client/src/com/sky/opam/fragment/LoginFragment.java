@@ -17,7 +17,6 @@ import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
-import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
@@ -87,10 +86,21 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 				}
 			}
 		});
-		test();
+		
+		getGcActivity().getSupportActionBar().hide();
+		getGcActivity().setLeftMenuEnable(false);
+		
 		return rootView;
 	}
 	
+	@Override
+	public void onDestroy() 
+	{
+		super.onDestroy();
+		getGcActivity().getSupportActionBar().show();
+		getGcActivity().setLeftMenuEnable(true);
+	}
+
 	private void showAgenda()
 	{
 		getOpenMFM().setProfileAvatar(loginTextView.getText().toString());

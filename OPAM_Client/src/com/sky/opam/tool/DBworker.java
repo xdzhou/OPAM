@@ -11,7 +11,6 @@ import com.sky.opam.model.ClassEvent;
 import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 
-import android.R.integer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -122,9 +121,9 @@ public class DBworker extends SqliteWorker
     /******************************************************
 	 **************** ClassEvent Operation ****************
 	 ******************************************************/
-    public ClassEvent getClassEvent(String login, long dateNum)
+    public ClassEvent getClassEvent(String login, long numEve)
     {
-    	Object object = retrieveAData(ClassEvent.class, "login = '"+login+"' AND NumEve = "+dateNum);
+    	Object object = retrieveAData(ClassEvent.class, "login = '"+login+"' AND NumEve = "+numEve);
     	if(object != null && object instanceof ClassEvent)
     	{
     		return (ClassEvent) object;

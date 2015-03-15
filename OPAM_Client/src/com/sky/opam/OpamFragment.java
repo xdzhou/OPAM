@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -12,7 +13,7 @@ import com.loic.common.fragManage.GcFragment;
 import com.loic.common.fragManage.MultiFragmentManager;
 import com.sky.opam.service.IntHttpService;
 
-public abstract class OpamFragment extends GcFragment 
+public class OpamFragment extends GcFragment 
 {
 	private static final String TAG = OpamFragment.class.getSimpleName();
 	private IntHttpService intHttpService;
@@ -75,5 +76,8 @@ public abstract class OpamFragment extends GcFragment
 		}
 	}
 
-	protected abstract void onHttpServiceReady();
+	protected void onHttpServiceReady()
+	{
+		
+	}
 }

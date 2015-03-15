@@ -1,7 +1,5 @@
 package com.sky.opam.adapter;
 
-import java.util.HashMap;
-
 import com.loic.common.LibApplication;
 import com.loic.common.manager.LoadImgManager;
 import com.loic.common.manager.LoadImgManager.onDownloadImgReadyListener;
@@ -13,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +23,7 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 	private static final String TAG = EtudiantListAdapter.class.getSimpleName();
 	
 	private LoadImgManager loadImgManager;
-	private HashMap<String, ImageView> loadingImgList;
+	private int expectSize;
 	
 	public EtudiantListAdapter(Context context) 
 	{
@@ -41,11 +38,9 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 	
 	private void init()
 	{
-		loadingImgList = new HashMap<String, ImageView>();
-		loadImgManager = new LoadImgManager();
-		int expectSize = LibApplication.getAppContext().getResources().getDimensionPixelSize(R.dimen.etudiant_search_list_item_height);
-		loadImgManager.setExpectImgDimension(expectSize, expectSize);
-		loadImgManager.setListener(this);
+		loadImgManager = LoadImgManager.getInstance();
+		expectSize = LibApplication.getAppContext().getResources().getDimensionPixelSize(R.dimen.etudiant_search_list_item_height);
+		loadImgManager.registerListener(this);
 	}
 	
 	private static class ViewHolder
@@ -104,11 +99,9 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 		if(etudiant.login != null)
 		{
 			String imageUrl = Tool.getTrombiPhotoURL(etudiant.login, 80);
-			Bitmap bitmap = loadImgManager.getBitmapByUrl(imageUrl);
+			Bitmap bitmap = loadImgManager.getBitmapByUrl(imageUrl, expectSize, expectSize);
 			if(bitmap != null)
 				viewHolder.profil.setImageBitmap(bitmap);
-			else
-				loadingImgList.put(imageUrl, viewHolder.profil);
 		}
 		
 		return convertView;
@@ -117,10 +110,9 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 	@Override
 	public boolean onDownloadImgReady(String url, Bitmap bitmap) 
 	{
-		if(bitmap != null && loadingImgList.containsKey(url))
+		if(bitmap != null)
 		{
-			loadingImgList.get(url).setImageBitmap(bitmap);
-			loadingImgList.remove(url);
+			notifyDataSetChanged();
 		}
 		return true;
 	}

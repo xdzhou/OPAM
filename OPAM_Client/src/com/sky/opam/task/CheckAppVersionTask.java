@@ -22,14 +22,6 @@ import android.os.Message;
 
 public class CheckAppVersionTask extends AsyncTask<Void, Void, String>
 {
-	private Context context;
-	private Handler handler;
-	
-	public CheckAppVersionTask(Context context, Handler handler) 
-	{
-		this.context = context;
-		this.handler = handler;
-	}
 
 	@Override
 	protected String doInBackground(Void... params) 
@@ -37,10 +29,13 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>
 		try 
 		{
 			int lastVersionCode = getLastVersionCode();
-			if(lastVersionCode > Tool.getVersionCode(context)){
+			if(lastVersionCode > Tool.getVersionCode())
+			{
 				return getVersionInfo();
 			}
-		}catch (FailException e) {
+		}
+		catch (FailException e) 
+		{
 			return null;
 		}
 		return null;
@@ -55,7 +50,7 @@ public class CheckAppVersionTask extends AsyncTask<Void, Void, String>
         	Bundle b = new Bundle();// 存放数据
         	b.putString("versionInfo", result);
         	msg.setData(b);
-        	handler.sendMessage(msg);
+        	//handler.sendMessage(msg);
         }
     }
 	

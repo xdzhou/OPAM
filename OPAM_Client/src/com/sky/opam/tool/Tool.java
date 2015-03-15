@@ -1,14 +1,14 @@
 package com.sky.opam.tool;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.loic.common.LibApplication;
 import com.sky.opam.R;
 import com.sky.opam.model.VersionInfo;
 
-import android.app.Activity;
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,10 +21,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.view.Display;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.WindowManager;
 
 public class Tool 
 {
@@ -33,12 +31,54 @@ public class Tool
 		return "http://trombi.tem-tsp.eu/photo.php?uid="+login+"&h="+size+"&w="+size;
 	}
 	
-	public static void showInfo(Context context, String title, String msg) 
+	public static int[] getPreviousMonth(int year, int month)
 	{
-        new AlertDialog.Builder(context).setTitle(title).setMessage(msg)
-            .setPositiveButton(R.string.ok, null).show();
+		int[] retVal = new int[] {year, month};
+		if(month == Calendar.JANUARY)
+		{
+			retVal[0] = year - 1;
+			retVal[1] = Calendar.DECEMBER;
+		}
+		else 
+		{
+			retVal[1] = month - 1;
+		}
+		return retVal;
 	}
 	
+	public static int[] getNextMonth(int year, int month)
+	{
+		int[] retVal = new int[] {year, month};
+		if(month == Calendar.DECEMBER)
+		{
+			retVal[0] = year + 1;
+			retVal[1] = Calendar.JANUARY;
+		}
+		else 
+		{
+			retVal[1] = month + 1;
+		}
+		return retVal;
+	}
+	
+	public static int[] getCurrentYearMonth()
+	{
+		int[] retVal = new int[2];
+		Calendar calendar = Calendar.getInstance();
+		retVal[0] = calendar.get(Calendar.YEAR);
+		retVal[1] = calendar.get(Calendar.MONTH);
+		return retVal;
+	}
+	
+	public static int[] getYearMonthForDate(Date date)
+	{
+		int[] retVal = new int[2];
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		retVal[0] = calendar.get(Calendar.YEAR);
+		retVal[1] = calendar.get(Calendar.MONTH);
+		return retVal;
+	}
 	
 	/**
      * 把一个view转换为Bitmap，可用于屏幕截图
@@ -66,67 +106,7 @@ public class Tool
         return bitmap;
 	} 
 	
-	/**
-     * 得到当前的周数（一年中的第几周）
-     * 
-     */
-	public static int getNumWeek() 
-	{
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        int xq = c.get(Calendar.DAY_OF_WEEK);
-        if (xq == 1) 
-        {
-                c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        sdf.applyPattern("w");
-        return Integer.parseInt(sdf.format(c.getTime()));
-	}
-	
-	/**
-     * 得到日期（月/日）
-     * 
-     * @param numweek
-     *          得到当前的周数
-     * @param dayOfWeek
-     * 			星期几
-     */
-	public static String getDateViaNumWeek(int numweek, int dayOfWeek) 
-	{
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.WEEK_OF_YEAR, numweek);
-		cal.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-		cal.set(Calendar.WEEK_OF_YEAR, numweek);
-		int num = cal.get(Calendar.MONTH) + 1;
 
-		String date = (num < 10) ? "0" + num : "" + num;
-		date += "/";
-		num = cal.get(Calendar.DAY_OF_MONTH);
-		date += (num < 10) ? "0" + num : "" + num;
-		return date;
-	}
-	
-	/**
-     * 得到公元多少年
-     * 
-     */
-	public static int getYear() 
-	{
-		Calendar cal = Calendar.getInstance();
-		return cal.get(Calendar.YEAR);
-	}
-	
-	/**
-     * 星期几
-     * 
-     */
-	public static int getDayOfWeek() 
-	{
-		Calendar c = Calendar.getInstance();
-		int xq = c.get(Calendar.DAY_OF_WEEK);
-		return xq;
-	}
 	
 	/**
      * 把 dip 数值转换为 px（像素值）
@@ -142,42 +122,7 @@ public class Tool
 		return (int) (dipValue * scale + 0.5f);
 	}
 	
-	/**
-     * 得到手机屏幕的宽度
-     * 
-     * @param activity
-     *          环境，为activity
-     */
-	public static int getScreenWidth(Activity activity)
-	{
-		WindowManager manager = activity.getWindowManager();
-		Display display = manager.getDefaultDisplay();
-		return display.getWidth();
-	}
-	
-	/**
-     * 得到手机屏幕的高度
-     * 
-     * @param activity
-     *          环境，为activity
-     */
-	public static int getScreenHeight(Activity activity)
-	{
-		WindowManager manager = activity.getWindowManager();
-		Display display = manager.getDefaultDisplay();
-		return display.getHeight();
-	}
-	
-	/**
-     * 显示时间 hh:mm
-     * 
-     * @param hour
-     *          小时值
-     */
-	public static String getTime(int hour)
-	{
-		return (hour < 10) ? ("0" + hour + ":00"): (hour + ":00");
-	}
+
 	
 	/**
      * 得到当前应用的 版本名 Version Name
@@ -185,10 +130,11 @@ public class Tool
      * @param context
      *          环境，一般为activity
      */
-	public static String getVersionName(Context context)
+	public static String getVersionName()
 	{
 		String version_name = null;
 		try {
+			Context context = LibApplication.getAppContext();
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			version_name = pInfo.versionName;
 		} catch (NameNotFoundException e) {
@@ -197,16 +143,11 @@ public class Tool
 		return version_name;
 	}
 	
-	/**
-     * 得到当前应用的 版本号 Version Code
-     * 
-     * @param context
-     *          环境，一般为activity
-     */
-	public static int getVersionCode(Context context)
+	public static int getVersionCode()
 	{
 		int version_code = 0;
 		try {
+			Context context = LibApplication.getAppContext();
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			version_code = pInfo.versionCode;
 		} catch (NameNotFoundException e) {
@@ -214,7 +155,7 @@ public class Tool
 		}
 		return version_code;
 	}
-	
+
 	/**
      * 得到当前的语言
      * 
