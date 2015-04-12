@@ -6,7 +6,7 @@ import com.loic.common.sqliteTool.Column;
 import com.loic.common.sqliteTool.Model;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 
-@Model
+@Model(tableName = "ClassUpdateInfo")
 public class ClassUpdateInfo
 {
 	public int year;

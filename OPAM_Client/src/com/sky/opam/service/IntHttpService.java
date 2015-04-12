@@ -51,7 +51,6 @@ import com.sky.opam.model.User;
 import com.sky.opam.tool.AdditionalKeyStoresSSLSocketFactory;
 import com.sky.opam.tool.DBworker;
 
-import android.R.integer;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -168,15 +167,7 @@ public class IntHttpService extends Service
 	
 	/******************************************************
 	 **********************Task Runnable*******************
-	 ******************************************************/
-	private Runnable loginRunnable = new Runnable() 
-	{	
-		@Override
-		public void run() 
-		{
-		}
-	};
-	
+	 ******************************************************/	
 	private Runnable LoadClassRunnable = new Runnable() 
 	{	
 		@Override
@@ -187,28 +178,10 @@ public class IntHttpService extends Service
 			{
 				taskParams = loadClassParamsQueue.poll();
 			}
-			if(taskParams != null)
+			if(taskParams != null && taskParams.callbackRef.get() != null)
 			{
-				requestAgendaInfo(taskParams.searchDate, taskParams.callback);
+				requestAgendaInfo(taskParams.searchDate, taskParams.callbackRef);
 			}
-		}
-	};
-	
-	private Runnable SearchStudentRunnable = new Runnable() 
-	{	
-		@Override
-		public void run() 
-		{
-			
-		}
-	};
-	
-	private Runnable StopRunnable = new Runnable() 
-	{	
-		@Override
-		public void run() 
-		{
-			
 		}
 	};
 	
@@ -269,7 +242,9 @@ public class IntHttpService extends Service
 			dBworker.insertData(user);
 			
 			if(userName == null)
+			{
 				Log.e(TAG, "Can't find user name, error : "+errorEnumRef.errorEnum.getDescription());
+			}
 			
 			errorEnumRef.errorEnum = HttpServiceErrorEnum.OkError;
 			loadProfilImg(login);
@@ -281,7 +256,9 @@ public class IntHttpService extends Service
 		}
 		
 		if(callbackWeakReference != null && callbackWeakReference.get() != null)
+		{
 			callbackWeakReference.get().onAsyncLoginReponse(login, errorEnumRef.errorEnum);
+		}
 	}
 	
 	private String getUserName(HttpServiceErrorEnumReference errorEnumRef, HttpResponse response)
@@ -337,7 +314,7 @@ public class IntHttpService extends Service
     		File document = new File(imgPath);
     		if(!document.exists())
     		{
-    			InputStream in = new java.net.URL("http://trombi.it-sudparis.eu/photo.php?uid="+login+"&h=80&w=80").openStream();
+    			InputStream in = new java.net.URL("http://trombi.it-sudparis.eu/photo.php?uid=" + login + "&h=80&w=80").openStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 FileOutputStream fos = new FileOutputStream(document);  
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -385,7 +362,7 @@ public class IntHttpService extends Service
 		}
 	}
 	
-	private void requestAgendaInfo(Date date, asyncGetClassInfoReponse callback)
+	private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoReponse> callbackRef)
 	{
 		classLoadingDate = date;
 		HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
@@ -445,10 +422,14 @@ public class IntHttpService extends Service
 			
 			HttpPost request = createGetClassInfoRequest(response, date, errorEnumRef);
 			if(response != null)
+			{
 				response.getEntity().consumeContent();
+			}
 			//request SI get class info
 			if(request != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+			{
 				response = this.executeHttpRequest(request, errorEnumRef);
+			}
 
 			if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 			{
@@ -512,26 +493,32 @@ public class IntHttpService extends Service
 		}
 		
 		if(needSave)
+		{
 			worker.insertData(updateInfo);
+		}
 		else
+		{
 			worker.updateClassUpdateInfro(updateInfo);
+		}
 		
 		classLoadingDate = null;
 		
-		if(callback != null)
-			callback.onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
+		if(callbackRef != null && callbackRef.get() != null)
+		{
+			callbackRef.get().onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
+		}
 		else
+		{
 			Log.e(TAG, "NO callback for asyncGetClassInfo");
+		}
 	}
 	
 	private String getGroupID(String html)
 	{
 		Pattern pattern = Pattern.compile("IdGroupe = (\\d+)");
 		Matcher matcher = pattern.matcher(html);
-		if(matcher.find())
-			return matcher.group(1);
-		else
-			return null;
+		
+		return matcher.find() ? matcher.group(1) : null;
 	}
 	
 	private void getAppIDLienID(String html)
@@ -612,7 +599,9 @@ public class IntHttpService extends Service
 					{
 						Elements elements = divAllElement.getElementsByTag("table");
 						if(elements != null)
+						{
 							elements.remove();
+						}
 						elements = divAllElement.getElementsByTag("input");
 						for(Element ele : elements)
 						{
@@ -623,9 +612,13 @@ public class IntHttpService extends Service
 							value = name.equals("NumDat") ? df.format(searchDate) : value;
 							
 							if(name.equals("ValGra"))
+							{
 								agendaWebParams.ValGra = value;
+							}
 							else if (name.equals("NomCal"))
+							{
 								agendaWebParams.NomCal = value;
+							}
 							
 							//Log.i(TAG, name+" - "+value);
 							data.add(new BasicNameValuePair(name, value));
@@ -686,9 +679,13 @@ public class IntHttpService extends Service
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("user", name));
 				if(school != null && !school.isEmpty())
+				{
 					params.add(new BasicNameValuePair("ecole", school));
+				}
 				if(grade != null && !grade.isEmpty())
+				{
 					params.add(new BasicNameValuePair("annee", grade));
+				}
 				params.add(new BasicNameValuePair("submit", "Rechercher"));
 				
 				try 
@@ -709,7 +706,9 @@ public class IntHttpService extends Service
 							{
 								Student etudiant = createEtudiant(ele, SchoolEnum.TEM);
 								if(etudiant != null)
+								{
 									serachedEtudiants.add(etudiant);
+								}
 							}
 						}
 						Elements tspElements = etudiantsEle.getElementsByClass("TINT");
@@ -719,14 +718,16 @@ public class IntHttpService extends Service
 							{
 								Student etudiant = createEtudiant(ele, SchoolEnum.TSP);
 								if(etudiant != null)
+								{
 									serachedEtudiants.add(etudiant);
+								}
 							}
 						}
 					}
 					else 
 					{
 						errorEnum = HttpServiceErrorEnum.HttpBadStatusError;
-						errorEnum.setDescription("Http bad status : "+status);
+						errorEnum.setDescription("Http bad status : " + status);
 					}
 					post.abort();
 				} 
@@ -737,9 +738,13 @@ public class IntHttpService extends Service
 				}
 				
 				if(callbackWeakReference != null && callbackWeakReference.get() != null)
+				{
 					callbackWeakReference.get().onAsyncSearchEtudiantByNameReponse(errorEnum, serachedEtudiants);
+				}
 				else
+				{
 					Log.e(TAG, "NO callback for asyncSearchEtudiantByName");
+				}
 			}
 		}).start();
 	}
@@ -755,22 +760,30 @@ public class IntHttpService extends Service
 			{
 				String login = elements.get(0).attr("src");
 				if(login != null && login.length() > 0)
+				{
 					etudiant.login = login.substring(15, login.length() - 10);
+				}
 			}
 			elements = ele.getElementsByClass("ldapNom");
 			if(elements != null && elements.size() > 0)
+			{
 				etudiant.name = elements.get(0).text();
+			}
 			
 			elements = ele.getElementsByClass("ldapInfo");
 			Element infoEle = null;
 			if(elements != null && elements.size() > 0)
+			{
 				infoEle = elements.get(0);
+			}
 			
 			if(infoEle != null)
 			{
 				elements = infoEle.getElementsByTag("li");
 				if(elements != null && elements.size() > 0)
+				{
 					etudiant.grade = elements.get(0).text();
+				}
 				elements = infoEle.getElementsByTag("p");
 				if(elements != null && elements.size() > 0)
 				{
@@ -822,9 +835,13 @@ public class IntHttpService extends Service
 				{
 					String className = elements.get(0).getElementsByTag("b").get(0).text();
 					if(className.contains("Cours de Langue"))
+					{
 						classInfo.name = className;
+					}
 					else
+					{
 						classInfo.name = className.split("-")[0].trim();
+					}
 					
 					for(int i = 1; i < elements.size(); i++)
 					{
@@ -858,7 +875,9 @@ public class IntHttpService extends Service
 								classInfo.type = getContent(TDeles.get(1)).trim();
 								classInfo.type.replace(getSpecialSpace(), "");
 								if(classInfo.type.toUpperCase(Locale.FRANCE).contains("EXAMEN"))
+								{
 									classInfo.bgColor = Color.RED;
+								}
 							}
 							else if(m.find()) 
 							{
@@ -899,9 +918,13 @@ public class IntHttpService extends Service
 						while(match_salle.find())
 						{
 							if(match_salle.group(1).toLowerCase(Locale.FRANCE).contains("amphi"))
+							{
 								classInfo.room += ("Amphi "+match_salle.group(2).trim()+"__");
+							}
 							else
+							{
 								classInfo.room += (match_salle.group(2).trim()+"__");
+							}
 						}
 						
 						if(!classInfo.room.isEmpty())
@@ -972,15 +995,24 @@ public class IntHttpService extends Service
 				{
 					String newUrl = response.getFirstHeader("Location").getValue();
 					if(newUrl.startsWith("/"))
+					{
 						newUrl = request.getURI().getHost() + newUrl;
+					}
 					if(!newUrl.startsWith("http"))
+					{
 						newUrl = "http://" + newUrl;
+					}
 					
 					response.getEntity().consumeContent();
 					response = executeHttpRequest(new HttpGet(newUrl), errorEnumRef);
 				}
 				else if (status == 200 && CAS_HOST.contains(request.getURI().getHost())) //auto connect to CAS
 				{
+					if(request.getURI().toString().contains("jsessionid="))
+					{
+						Log.e(TAG, EntityUtils.toString(response.getEntity()));
+						return null;
+					}
 					HttpUriRequest casRequest = createCASHandleRequest(response, errorEnumRef);
 					if(casRequest != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 					{
@@ -1029,7 +1061,9 @@ public class IntHttpService extends Service
 					Log.i(TAG, "connect with login and password ...");
 					String actionUrl = formElement.attr("action");
 					if(actionUrl.startsWith("/"))
+					{
 						actionUrl = CAS_HOST + actionUrl;
+					}
 					
 					List<NameValuePair> data = new ArrayList<NameValuePair>();
 					Elements elements = doc.getElementsByTag("input");
@@ -1083,7 +1117,9 @@ public class IntHttpService extends Service
 	{
 		CookieStore cookieStore = (CookieStore) httpContext.getAttribute(ClientContext.COOKIE_STORE);
 		if(cookieStore != null)
+		{
 			cookieStore.clear();
+		}
 	}
 	
 	public static String getSpecialSpace()
@@ -1097,9 +1133,13 @@ public class IntHttpService extends Service
 	public static String getUserProfileFilePath(String login)
 	{
 		if(login != null)
+		{
 			return PROFILE_CACHE_FLOLDER + "/" + login +".jpg";
+		}
 		else
+		{
 			return null;
+		}
 	}
 	
 	public void prepareToQuit()
@@ -1128,12 +1168,12 @@ public class IntHttpService extends Service
 	private class LoadClassTaskParams
 	{
 		private Date searchDate;
-		private asyncGetClassInfoReponse callback;
+		private WeakReference<asyncGetClassInfoReponse> callbackRef;
 		
 		public LoadClassTaskParams(Date searchDate, asyncGetClassInfoReponse callback) 
 		{
 			this.searchDate = searchDate;
-			this.callback = callback;
+			this.callbackRef = new WeakReference<IntHttpService.asyncGetClassInfoReponse>(callback);
 		}
 	}
 	
@@ -1231,8 +1271,23 @@ public class IntHttpService extends Service
 	public void onDestroy() 
 	{
 		super.onDestroy();
-		if(client != null)
-			client.close();
-		workerThread.quit();
+		
+		synchronized (loadClassParamsQueue) 
+		{
+			loadClassParamsQueue.clear();
+		}
+		workerHandler.removeCallbacksAndMessages(null);
+		workerHandler.post(new Runnable() 
+		{
+			@Override
+			public void run() 
+			{
+				if(client != null)
+				{
+					client.close();
+				}
+				workerThread.quit();
+			}
+		});
 	}
 }

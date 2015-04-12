@@ -11,7 +11,7 @@ import com.loic.common.sqliteTool.Column;
 import com.loic.common.sqliteTool.ID;
 import com.loic.common.sqliteTool.Model;
 
-@Model
+@Model(tableName = "ClassEvent")
 public class ClassEvent implements Comparable<ClassEvent>
 {
 	public static final  DateFormat dtf = new SimpleDateFormat("yyyyMMddHH:mm", Locale.US);

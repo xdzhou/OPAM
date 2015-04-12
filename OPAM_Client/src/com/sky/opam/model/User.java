@@ -4,7 +4,7 @@ import com.loic.common.sqliteTool.Column;
 import com.loic.common.sqliteTool.ID;
 import com.loic.common.sqliteTool.Model;
 
-@Model
+@Model(tableName = "User")
 public class User
 {
 	@ID

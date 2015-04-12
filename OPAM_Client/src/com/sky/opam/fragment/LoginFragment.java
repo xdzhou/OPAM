@@ -200,4 +200,11 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 			Log.e(TAG, "onAgendaLoaded with error : "+errorEnum.toString());
 		}
 	}
+	
+	@Override
+	public boolean onBackPressed()
+	{
+		getActivity().finish();
+		return true;
+	}
 }

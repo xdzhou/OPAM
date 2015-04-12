@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 {
 	private static final String TAG = AgendaViewFragment.class.getSimpleName();
 	public static final String BUNDLE_LOGIN_KEY = "BUNDLE_LOGIN_KEY";
+	private static final String Share_Preference_Key = "AgendaViewFragment_Share_Preference_Key";
 	private static final String BUNDLE_Agenda_Year_KEY = "BUNDLE_Agenda_Year_KEY";
 	private static final String BUNDLE_Agenda_Month_KEY = "BUNDLE_Agenda_Month_KEY";
 	
@@ -71,10 +73,16 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	public void onSaveInstanceState(Bundle outState) 
 	{
 		super.onSaveInstanceState(outState);
-		outState.putString(BUNDLE_LOGIN_KEY, currentUser.login);
-		int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
-		outState.putInt(BUNDLE_Agenda_Year_KEY, yearMonth[0]);
-		outState.putInt(BUNDLE_Agenda_Month_KEY, yearMonth[1]);
+		if(currentUser != null)
+		{
+			outState.putString(BUNDLE_LOGIN_KEY, currentUser.login);
+		}
+		if(adapter != null)
+		{
+			int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
+			outState.putInt(BUNDLE_Agenda_Year_KEY, yearMonth[0]);
+			outState.putInt(BUNDLE_Agenda_Month_KEY, yearMonth[1]);
+		}
 	}
 
 	@Override
@@ -84,13 +92,22 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		worker = DBworker.getInstance();
 		String login = null;
 		if(getArguments() != null)
+		{
 			login = getArguments().getString(BUNDLE_LOGIN_KEY);
+		}
 		if(login == null && savedInstanceState != null)
+		{
 			login = savedInstanceState.getString(BUNDLE_LOGIN_KEY);
+		}
+		
 		if(login != null)
+		{
 			currentUser = worker.getUser(login);
+		}
 		else
+		{
 			currentUser = worker.getDefaultUser();
+		}
 		
 		classDetailTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
 		localDateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -103,22 +120,29 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	{
 		mViewPager = new AgendaViewPage(LibApplication.getAppContext());
 		
-		int year = 0, month = 0;
+		int year = -1, month = -1;
+		//get year month info from savedInstanceState
 		if(savedInstanceState != null)
 		{
 			year = savedInstanceState.getInt(BUNDLE_Agenda_Year_KEY, -1);
 			month = savedInstanceState.getInt(BUNDLE_Agenda_Month_KEY, -1);
-			if(year != -1 && month != -1)
-				adapter = new AgendaViewPageAdapter(year, month);
 		}
-		
-		if(adapter == null)
+		//get year month info from sharedPreference
+		if(year == -1 || month == -1)
+		{
+			SharedPreferences sp = LibApplication.getAppContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
+			year = sp.getInt(BUNDLE_Agenda_Year_KEY, -1);
+			month = sp.getInt(BUNDLE_Agenda_Month_KEY, -1);
+		}
+		//get current year month info
+		if(year == -1 || month == -1)
 		{
 			int[] yearMonth = Tool.getCurrentYearMonth();
 			year = yearMonth[0];
 			month = yearMonth[1];
-			adapter = new AgendaViewPageAdapter(year, month);
 		}
+		
+		adapter = new AgendaViewPageAdapter(year, month);
 		
 		mViewPager.setAdapter(adapter);
 		mViewPager.setCurrentItem(1);
@@ -131,9 +155,26 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	}
 
 	@Override
+	public void onDestroy() 
+	{
+		super.onDestroy();
+		saveSharePreference();
+	}
+
+	@Override
 	protected void onHttpServiceReady() 
 	{
 		
+	}
+	
+	private void saveSharePreference()
+	{
+		if(adapter != null)
+		{
+			SharedPreferences sp = LibApplication.getAppContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
+			int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
+			sp.edit().putInt(BUNDLE_Agenda_Year_KEY, yearMonth[0]).putInt(BUNDLE_Agenda_Month_KEY, yearMonth[1]).apply();
+		}
 	}
 	
 	private void refreshAgendaView(Date date, boolean forceLoad)
@@ -307,7 +348,9 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		((ImageView) monthDetailView.findViewById(R.id.profile_avatar)).setImageDrawable(getOpenMFM().getAvatarRoundDrawable());
 		((TextView) monthDetailView.findViewById(R.id.profile_name)).setText(currentUser.name);
 		if(isForNextMonth)
+		{
 			((TextView) monthDetailView.findViewById(R.id.month_detail_month_type)).setText(getString(R.string.OA2018));
+		}
 		
 		fillMonthDetailInfo(monthDetailView, year, month);
 
@@ -321,22 +364,30 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		
 		String text = "-";
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
+		{
 			text = Integer.toString(updateInfo.classNumber);
+		}
 		((TextView)monthDetailView.findViewById(R.id.month_detail_class_num)).setText(text);
 		
 		text = "-";
 		if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
+		{
 			text = localDateTimeFormat.format(updateInfo.lastSuccessUpdateDate);
+		}
 		((TextView)monthDetailView.findViewById(R.id.month_detail_successs_update)).setText(text);
 		
 		text = "-";
 		if(updateInfo != null && updateInfo.lastFailUpdateDate != null)
+		{
 			text = localDateTimeFormat.format(updateInfo.lastFailUpdateDate);
+		}
 		((TextView)monthDetailView.findViewById(R.id.month_detail_failed_update)).setText(text);
 		
 		text = "-";
 		if(updateInfo != null && updateInfo.errorEnum != null)
+		{
 			text = updateInfo.errorEnum.getDescription();
+		}
 		((TextView)monthDetailView.findViewById(R.id.month_detail_failed_reason)).setText(text);
 		
 		Button updateBtn = ((Button) monthDetailView.findViewById(R.id.month_detail_update));
@@ -350,13 +401,17 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 				public void onClick(View v) 
 				{
 					if(prepareLoadCourse(year, month))
+					{
 						v.setEnabled(false);
+					}
 				}
 			});
 			
 			chargeBtn.setEnabled(true);
 			if(updateInfo == null || updateInfo.lastSuccessUpdateDate == null)
+			{
 				chargeBtn.setEnabled(false);
+			}
 			else
 				chargeBtn.setOnClickListener(new View.OnClickListener() 
 				{
@@ -416,9 +471,13 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 					{
 						ClassUpdateInfo updateInfo = worker.getUpdateInfo(currentUser.login, year, monthOfYear);
 						if(updateInfo != null && updateInfo.lastSuccessUpdateDate != null)
+						{
 							refreshAgendaView(year, monthOfYear, false);
+						}
 						else
+						{
 							askForLoadCourse(year, monthOfYear);
+						}
 					}
 				}, year, month, day);
 	            datePickerDialog.setTitle(getString(R.string.OA2008));
@@ -486,7 +545,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 						adapter.tryUpdatePreNextMonthClassInfo(searchDate);
 						if(errorEnum == HttpServiceErrorEnum.OkError)
 						{
-							createDialogBuilderWithCancel(getString(R.string.OA0000), "The course of "+getYearMonthText(searchDate)+"("+classSize+" class) is successful dowloaded. Do you want to charge it?")
+							createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2020, getYearMonthText(searchDate), classSize))
 							.withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
 							{
 								@Override
@@ -499,7 +558,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 						}
 						else 
 						{
-							createDialogBuilderWithCancel(getString(R.string.OA0000), "Failed to load course for "+getYearMonthText(searchDate)+" : "+errorEnum.getDescription())
+							createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2021, getYearMonthText(searchDate), errorEnum.getDescription()))
 							.withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
 						}
 					}
@@ -513,7 +572,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	 ******************************************************/
 	private void askForLoadCourse(final int year, final int month)
 	{
-		createDialogBuilderWithCancel(getString(R.string.OA0000), "Can't find course for "+getYearMonthText(year, month)+". Do you want to download it?")
+		createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2022, getYearMonthText(year, month)))
 		.withButton1Text(getString(android.R.string.no)).withButton2Text(getString(android.R.string.yes)).setButton2Click(new View.OnClickListener() 
 		{
 			@Override
@@ -582,7 +641,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			
 			createDialogBuilderWithCancel(event.mName, null)
 			.setCustomView(classDetailInfoView)
-			.withButton1Text(getString(R.string.OA2016))
+			.withButton1Text(getString(R.string.OA2017))
 			.setButton1Click(editBtnListener).show();
 		}
 	}

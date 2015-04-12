@@ -61,9 +61,13 @@ public class OpamMFM extends MultiFragmentManager
 	public boolean onOpenElement(MenuElementItem menuElementItem, int position)
     {
 		if(menuElementItem.fragmentClass != null)
+		{
 			showGcFragment(menuElementItem.fragmentClass, true, null);
+		}
 		else
+		{
 			getActivity().finish();
+		}
 		return true;
     }
 

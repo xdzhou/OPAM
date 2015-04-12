@@ -38,6 +38,9 @@
     <string name="OA2017">Edit</string>
     <string name="OA2018">Next Month</string>
     <string name="OA2019">Error</string>
+    <string name="OA2020">The course of %1$s (%2$d courses) is successful downloaded. Do you want to load them?</string>
+    <string name="OA2021">Failed to download courses for %1$s : %2$s</string>
+    <string name="OA2022">Can\'t find course for %1$s. Do you want to download them?</string>
     
     <string name="OA3000">First name or last name</string>
     <string name="OA3001">search</string>

@@ -41,20 +41,18 @@ public class DBHelper extends SqliteHelper
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
-    {    	
-    	Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-    	while(c.moveToNext())
-    	{
-    	   String s = c.getString(0);
-    	   if(s.equals("android_metadata"))
-    	   {
-    	     continue;
-    	   }
-    	   else
-    	   {
-    		   db.execSQL("DROP table if exists "+s+";");
-    	   }
-    	 }
+    {   
+    	//old version
+    	db.execSQL("DROP table if exists user;");
+    	db.execSQL("DROP table if exists cours;");
+    	db.execSQL("DROP table if exists syncevent;");
+    	//newer version
+    	db.execSQL("DROP table if exists USER;");
+    	db.execSQL("DROP table if exists CLASSINFO;");
+    	db.execSQL("DROP table if exists CLASSTYPE;");
+    	db.execSQL("DROP table if exists CONFIG;");
+    	db.execSQL("DROP table if exists ROOM;");
+    	
         onCreate(db);         
     }
 

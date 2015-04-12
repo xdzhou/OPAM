@@ -53,8 +53,8 @@ public class SettingFragment extends OpamFragment
         
 		rangeSeekBar = new RangeSeekBar<Integer>(0, 24, getActivity());
         rangeSeekBar.setNotifyWhileDragging(true);
-        rangeSeekBar.setSelectedMinValue(user.agendaStartHour);
-		rangeSeekBar.setSelectedMaxValue(user.agendaEndHour);
+        rangeSeekBar.setSelectedMinValue(7);
+		rangeSeekBar.setSelectedMaxValue(21);
 		LinearLayout root = (LinearLayout)rootView.findViewById(R.id.root_layout);
 		root.addView(rangeSeekBar, 1);
         rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() 
@@ -66,6 +66,7 @@ public class SettingFragment extends OpamFragment
 				endTimeTV.setText(getTime(maxValue));
 			}		
 		});
+        rangeSeekBar.setEnabled(false);
         
         autoSyncTB = (ToggleButton) rootView.findViewById(R.id.autoSyncTB);
         autoSyncTB.setChecked(false);

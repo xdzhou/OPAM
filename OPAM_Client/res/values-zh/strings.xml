@@ -36,6 +36,9 @@
     <string name="OA2017">编辑</string>
     <string name="OA2018">下个月</string>
     <string name="OA2019">错误</string>
+    <string name="OA2020">%1$s的课程 (%2$d门课) 已经成功下载完成. 需要载入它们吗?</string>
+    <string name="OA2021">%1$s的课程下载失败: %2$s</string>
+    <string name="OA2022">本地没有找到%1$s的课程. 需要下载它们吗?</string>
     
     <string name="OA3000">名字或姓氏</string>
     <string name="OA3001">检索</string>
