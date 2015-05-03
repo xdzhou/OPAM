@@ -61,11 +61,18 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class IntHttpService extends Service 
 {
 	private static final String TAG = IntHttpService.class.getSimpleName();
+	
+	public static final String CoursLoadedBroadCaset = "IntHttpService_CoursLoadedBroadCaset";
+	public static final String CoursLoaded_Date_Info = "IntHttpService_CoursLoaded_Date_Info";
+	public static final String CoursLoaded_Error_Enum_Index_Info = "IntHttpService_CoursLoaded_Error_Enum_Index_Info";
+	public static final String CoursLoaded_Cours_Size_Info = "IntHttpService_CoursLoaded_Cours_Size_Info";
+	
 	private static final String CAS_HOST = "https://cas.tem-tsp.eu/";  //CAS : host 157.159.10.172
 	private static final String SI_HOST = "http://si-etudiants.tem-tsp.eu/";  //SI_Student : host 157.159.10.180
 	public static final String ENCRPT_KEY = "opam";
@@ -205,7 +212,7 @@ public class IntHttpService extends Service
 		}).start();
 	}
 	
-	private void requestLogout()
+	private void requestLogout(Boolean clearLogin)
 	{
 		boolean isLogin = false;
 		synchronized (loginPasswordLock)
@@ -218,12 +225,16 @@ public class IntHttpService extends Service
 			executeHttpRequest(new HttpGet("https://ecampus.tem-tsp.eu/uPortal/Logout"), new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError));
 		}
 		reset();
-		setLoginPassword(null, null);
+		
+		if(clearLogin)
+		{
+			setLoginPassword(null, null);
+		}
 	}
 	
 	private void requestLogin(String login, String password, WeakReference<asyncLoginReponse> callbackWeakReference)
 	{
-		requestLogout();
+		requestLogout(true);
 		setLoginPassword(login, password);
 		HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
 		HttpResponse response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
@@ -236,6 +247,7 @@ public class IntHttpService extends Service
 		if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 		{
 			String userName = getUserName(errorEnumRef, response);
+			Log.d(TAG, "userName : "+userName);
 			User user = new User(login, Chiffrement.encrypt(password, ENCRPT_KEY), userName);
 			
 			DBworker dBworker = DBworker.getInstance();
@@ -252,8 +264,11 @@ public class IntHttpService extends Service
 		
 		if(errorEnumRef.errorEnum != HttpServiceErrorEnum.OkError)
 		{
-			requestLogout();
+			setLoginPassword(null, null);
 		}
+		requestLogout(false);
+		
+		Log.d(TAG, "request login finished for "+login+" ErrorEnum : "+errorEnumRef.errorEnum);
 		
 		if(callbackWeakReference != null && callbackWeakReference.get() != null)
 		{
@@ -503,14 +518,14 @@ public class IntHttpService extends Service
 		
 		classLoadingDate = null;
 		
-		if(callbackRef != null && callbackRef.get() != null)
-		{
-			callbackRef.get().onAsyncGetClassInfoReponse(errorEnumRef.errorEnum, date, classInfos);
-		}
-		else
-		{
-			Log.e(TAG, "NO callback for asyncGetClassInfo");
-		}
+		Log.d(TAG, "Cours Loaded for " + date + " ErrorEnum : "+errorEnumRef.errorEnum.getDescription());
+		
+		//try to broadcast cet info
+		Intent i = new Intent(CoursLoadedBroadCaset);
+		i.putExtra(CoursLoaded_Date_Info, date.getTime());
+		i.putExtra(CoursLoaded_Cours_Size_Info, classInfos == null ? 0 : classInfos.size());
+		i.putExtra(CoursLoaded_Error_Enum_Index_Info, errorEnumRef.errorEnum.ordinal());
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
 	}
 	
 	private String getGroupID(String html)
@@ -1008,11 +1023,6 @@ public class IntHttpService extends Service
 				}
 				else if (status == 200 && CAS_HOST.contains(request.getURI().getHost())) //auto connect to CAS
 				{
-					if(request.getURI().toString().contains("jsessionid="))
-					{
-						Log.e(TAG, EntityUtils.toString(response.getEntity()));
-						return null;
-					}
 					HttpUriRequest casRequest = createCASHandleRequest(response, errorEnumRef);
 					if(casRequest != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
 					{
@@ -1162,10 +1172,11 @@ public class IntHttpService extends Service
 			this.password = password;
 		}
 	}
+	
 	/******************************************************
 	 **********************Inner Class*********************
 	 ******************************************************/
-	private class LoadClassTaskParams
+	private static class LoadClassTaskParams
 	{
 		private Date searchDate;
 		private WeakReference<asyncGetClassInfoReponse> callbackRef;
@@ -1177,7 +1188,7 @@ public class IntHttpService extends Service
 		}
 	}
 	
-	private class AgendaWebParams
+	private static class AgendaWebParams
 	{
 		private String groupID;
 		private String appId;
@@ -1205,7 +1216,7 @@ public class IntHttpService extends Service
 	/******************************************************
 	 ********************HttpService Enum******************
 	 ******************************************************/
-	private class HttpServiceErrorEnumReference
+	private static class HttpServiceErrorEnumReference
 	{
 		private HttpServiceErrorEnum errorEnum;
 

@@ -32,7 +32,7 @@ public class OpamMFM extends MultiFragmentManager
 		User defaultUser = dBworker.getDefaultUser();
 		if(defaultUser != null && defaultUser.isAutoConnect)
 		{
-			setProfileAvatar(defaultUser.login);
+			//setProfileAvatar(defaultUser.login);
 			Bundle data = new Bundle();
 			data.putString(AgendaViewFragment.BUNDLE_LOGIN_KEY, defaultUser.login);
 			showGcFragment(AgendaViewFragment.class, true, data);

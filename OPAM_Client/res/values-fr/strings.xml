@@ -39,6 +39,9 @@
     <string name="OA2020">Les course de %1$s ( %2$d course) sont téléchargés avec succès. Voulez-vous les charger?</string>
     <string name="OA2021">Impossible de télécharger des courses pour %1$s : %2$s</string>
     <string name="OA2022">Pas de course de %1$s trouvés en locale, Voulez-vous les télécharger?</string>
+    <string name="OA2023">Cours d\'aujourd\'hui</string>
+    <string name="OA2024">Chercher Cours</string>
+    <string name="OA2025">Mois en cours</string>
     
     <string name="OA3000">Prénom ou nom</string>
     <string name="OA3001">Recherche</string>

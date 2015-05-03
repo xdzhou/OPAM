@@ -112,7 +112,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 	{
     	new AlertDialog.Builder(getActivity())
         .setTitle("Password Error")
-        .setMessage("Password incorrect. If you have modified your password online these days, Please click retry!")
+        .setMessage("Password incorrect. If you have modified your password online (E-Campus) these days, Please click retry!")
         .setPositiveButton(R.string.OA1008, new DialogInterface.OnClickListener() 
         {
             public void onClick(DialogInterface dialog, int which) 
@@ -182,7 +182,10 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
 				@Override
 				public void run() 
 				{
-					showAgenda();
+					if(isAdded() && getActivity() != null)
+					{
+						showAgenda();
+					}
 				}
 			});
 		}

@@ -86,8 +86,6 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 	protected void onHttpServiceReady() 
 	{
 	}
-	
-	
 
 	@Override
 	public void onStop() 

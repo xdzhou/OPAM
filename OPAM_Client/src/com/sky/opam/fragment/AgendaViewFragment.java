@@ -10,11 +10,15 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -58,6 +62,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	private User currentUser;
 	private AgendaViewPageAdapter adapter;
 	private DBworker worker;
+	private BroadcastReceiver coursLoadedReceiver;
 	
 	private ViewPager mViewPager;
 	
@@ -100,14 +105,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			login = savedInstanceState.getString(BUNDLE_LOGIN_KEY);
 		}
 		
-		if(login != null)
-		{
-			currentUser = worker.getUser(login);
-		}
-		else
-		{
-			currentUser = worker.getDefaultUser();
-		}
+		currentUser = login != null ? worker.getUser(login) : worker.getDefaultUser();
 		
 		classDetailTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
 		localDateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -437,6 +435,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		}
 		else 
 		{
+			ToastUtils.show("Loading ...");
 			getHttpService().asyncLoadClassInfo(year, month, searchCourseCallback);
 			success = true;
 		}
@@ -448,13 +447,62 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 		createDialogBuilderWithCancel(title, msg).withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
 	}
 	
+	@Override
+	protected void onCoursLoaded (Intent intent)
+	{
+		if(intent != null)
+		{
+			int enumIndex = intent.getIntExtra(IntHttpService.CoursLoaded_Error_Enum_Index_Info, -1);
+			long time = intent.getLongExtra(IntHttpService.CoursLoaded_Date_Info, -1);
+			int classSize = intent.getIntExtra(IntHttpService.CoursLoaded_Cours_Size_Info, -1);
+			
+			if(enumIndex != -1 && time != -1 && classSize != -1)
+			{
+				onCoursLoaded(HttpServiceErrorEnum.values()[enumIndex], new Date(time), classSize);
+			}
+		}
+	}
+	
+	private void onCoursLoaded(final HttpServiceErrorEnum errorEnum, final Date searchDate, final int classSize)
+	{
+		if(isAdded() && ! isHidden() && searchDate != null && errorEnum != null && getActivity() != null)
+		{
+			getActivity().runOnUiThread(new Runnable() 
+			{
+				@Override
+				public void run() 
+				{
+					adapter.tryUpdatePreNextMonthClassInfo(searchDate);
+					if(errorEnum == HttpServiceErrorEnum.OkError)
+					{
+						createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2020, getYearMonthText(searchDate), classSize))
+						.withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
+						{
+							@Override
+							public void onClick(View v) 
+							{
+								hideDialog();
+								refreshAgendaView(searchDate, true);
+							}
+						}).show();
+					}
+					else 
+					{
+						createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2021, getYearMonthText(searchDate), errorEnum.getDescription()))
+						.withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
+					}
+				}
+			});
+		}
+	}
+	
 	/******************************************************
 	 ********************** option menu *******************
 	 ******************************************************/
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		MenuItem searchMI = menu.add("search").setIcon(android.R.drawable.ic_menu_search).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItem searchMI = menu.add(R.string.OA2024).setIcon(android.R.drawable.ic_menu_search).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		searchMI.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() 
 		{
 			@Override
@@ -486,7 +534,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			}
 		});
 		
-		MenuItem todayMI = menu.add("today").setIcon(android.R.drawable.ic_menu_today).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItem todayMI = menu.add(R.string.OA2023).setIcon(android.R.drawable.ic_menu_today).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		todayMI.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() 
 		{
 			@Override
@@ -497,7 +545,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			}
 		});
 		
-		MenuItem monthInfoMI = menu.add("info").setIcon(android.R.drawable.ic_menu_info_details).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItem monthInfoMI = menu.add(R.string.OA2007).setIcon(android.R.drawable.ic_menu_info_details).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		monthInfoMI.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() 
 		{
 			@Override
@@ -507,6 +555,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 				
 				int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
 				fillMonthDetailInfo(monthDetailInfoView, yearMonth[0], yearMonth[1]);
+				((TextView)monthDetailInfoView.findViewById(R.id.month_detail_month_type)).setText(R.string.OA2025);
 				
 				createDialogBuilderWithCancel(getString(R.string.OA2007), null)
 				.setCustomView(monthDetailInfoView).show();
@@ -532,38 +581,9 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 	private asyncGetClassInfoReponse searchCourseCallback = new asyncGetClassInfoReponse() 
 	{
 		@Override
-		public void onAsyncGetClassInfoReponse(final HttpServiceErrorEnum errorEnum,final Date searchDate, List<ClassEvent> results) 
+		public void onAsyncGetClassInfoReponse(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results) 
 		{
-			if(getActivity() != null)
-			{
-				final int classSize = results == null ? 0 : results.size();
-				getActivity().runOnUiThread(new Runnable() 
-				{
-					@Override
-					public void run() 
-					{
-						adapter.tryUpdatePreNextMonthClassInfo(searchDate);
-						if(errorEnum == HttpServiceErrorEnum.OkError)
-						{
-							createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2020, getYearMonthText(searchDate), classSize))
-							.withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
-							{
-								@Override
-								public void onClick(View v) 
-								{
-									hideDialog();
-									refreshAgendaView(searchDate, true);
-								}
-							}).show();
-						}
-						else 
-						{
-							createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2021, getYearMonthText(searchDate), errorEnum.getDescription()))
-							.withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
-						}
-					}
-				});
-			}
+			onCoursLoaded(errorEnum, searchDate, results == null ? 0 : results.size());
 		}
 	};
 	

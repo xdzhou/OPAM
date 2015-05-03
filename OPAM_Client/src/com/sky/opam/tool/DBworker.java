@@ -19,12 +19,13 @@ public class DBworker extends SqliteWorker
 {
 	private static final String TAG = DBworker.class.getSimpleName();
 	private static DBworker singleton;
-    private Object lock = new Object();
 
     public static synchronized DBworker getInstance()
     {
     	if(singleton == null)
+    	{
     		singleton = new DBworker(LibApplication.getAppContext());
+    	}
     	
     	return singleton;
     }

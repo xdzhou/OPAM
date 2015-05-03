@@ -7,7 +7,6 @@ import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class DBHelper extends SqliteHelper 
@@ -25,17 +24,17 @@ public class DBHelper extends SqliteHelper
     {
     	db.execSQL("DROP table if exists ClassEvent;");
     	String sql = SqliteManager.generateTableSql(ClassEvent.class);
-    	System.out.println(sql);
+    	//System.out.println(sql);
     	db.execSQL(sql);
     	
     	db.execSQL("DROP table if exists ClassUpdateInfo;");
     	sql = SqliteManager.generateTableSql(ClassUpdateInfo.class);
-    	System.out.println(sql);
+    	//System.out.println(sql);
     	db.execSQL(sql);
     	
     	db.execSQL("DROP table if exists User;");
     	sql = SqliteManager.generateTableSql(User.class);
-    	System.out.println(sql);
+    	//System.out.println(sql);
     	db.execSQL(sql);
     }
 
@@ -46,6 +45,7 @@ public class DBHelper extends SqliteHelper
     	db.execSQL("DROP table if exists user;");
     	db.execSQL("DROP table if exists cours;");
     	db.execSQL("DROP table if exists syncevent;");
+    	
     	//newer version
     	db.execSQL("DROP table if exists USER;");
     	db.execSQL("DROP table if exists CLASSINFO;");
