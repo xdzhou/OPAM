@@ -91,7 +91,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 	public void onStop() 
 	{
 		super.onStop();
-		LoadImgManager.getInstance().unregisterListener(listAdapter);
+		LoadImgManager.getInstance().removeListener(listAdapter);
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package com.sky.opam.adapter;
 
 import com.loic.common.LibApplication;
 import com.loic.common.manager.LoadImgManager;
-import com.loic.common.manager.LoadImgManager.onDownloadImgReadyListener;
+import com.loic.common.manager.LoadImgManager.onLoadImgReadyListener;
 import com.sky.opam.R;
 import com.sky.opam.model.Student;
 import com.sky.opam.tool.Tool;
@@ -18,7 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDownloadImgReadyListener
+public class EtudiantListAdapter extends ArrayAdapter<Student> implements onLoadImgReadyListener
 {
 	private static final String TAG = EtudiantListAdapter.class.getSimpleName();
 	
@@ -40,7 +40,7 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 	{
 		loadImgManager = LoadImgManager.getInstance();
 		expectSize = LibApplication.getAppContext().getResources().getDimensionPixelSize(R.dimen.etudiant_search_list_item_height);
-		loadImgManager.registerListener(this);
+		loadImgManager.addListener(this);
 	}
 	
 	private static class ViewHolder
@@ -99,7 +99,7 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onDown
 		if(etudiant.login != null)
 		{
 			String imageUrl = Tool.getTrombiPhotoURL(etudiant.login, 80);
-			Bitmap bitmap = loadImgManager.getBitmapByUrl(imageUrl, expectSize, expectSize);
+			Bitmap bitmap = loadImgManager.loadBitmapFor(imageUrl, expectSize, expectSize);
 			if(bitmap != null)
 				viewHolder.profil.setImageBitmap(bitmap);
 		}
