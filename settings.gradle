@@ -1,0 +1,5 @@
+include ':LibUtil'
+project(':LibUtil').projectDir = file("../AndroidCommonLib/LibUtil")
+
+include ':LibGraphic'
+project(':LibGraphic').projectDir = file("../AndroidCommonLib/LibGraphic")

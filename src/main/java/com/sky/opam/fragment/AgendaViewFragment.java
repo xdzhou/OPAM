@@ -558,7 +558,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 				((TextView)monthDetailInfoView.findViewById(R.id.month_detail_month_type)).setText(R.string.OA2025);
 				
 				createDialogBuilderWithCancel(getString(R.string.OA2007), null)
-				.setCustomView(monthDetailInfoView).show();
+				.setCustomView(monthDetailInfoView, null).show();
 				return false;
 			}
 		});
@@ -660,7 +660,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 			((TextView)classDetailInfoView.findViewById(R.id.classTeacher)).setText(classEvent.teacher == null ? "" : classEvent.teacher.replace("__", "\n"));
 			
 			createDialogBuilderWithCancel(event.mName, null)
-			.setCustomView(classDetailInfoView)
+			.setCustomView(classDetailInfoView, null)
 			.withButton1Text(getString(R.string.OA2017))
 			.setButton1Click(editBtnListener).show();
 		}
