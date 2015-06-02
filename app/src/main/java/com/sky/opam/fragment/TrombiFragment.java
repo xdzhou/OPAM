@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.loic.common.manager.LoadImgManager;
+import com.loic.common.manager.ManagerUtilsFactory;
 import com.loic.common.utils.NetWorkUtils;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
@@ -91,7 +92,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
 	public void onStop() 
 	{
 		super.onStop();
-		LoadImgManager.getInstance().removeListener(listAdapter);
+		((LoadImgManager) ManagerUtilsFactory.getUtilsManager(ManagerUtilsFactory.ManagerTypeEnum.Load_Image_Manager)).removeListener(listAdapter);
 	}
 
 	@Override

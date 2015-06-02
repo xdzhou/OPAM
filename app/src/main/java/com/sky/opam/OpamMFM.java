@@ -12,6 +12,7 @@ import com.loic.common.LibApplication;
 import com.loic.common.fragManage.MultiFragmentManager;
 import com.loic.common.fragManage.MenuElementItem;
 import com.loic.common.manager.LoadImgManager;
+import com.loic.common.manager.ManagerUtilsFactory;
 import com.sky.opam.fragment.AgendaViewFragment;
 import com.sky.opam.fragment.LoginFragment;
 import com.sky.opam.model.User;
@@ -78,7 +79,8 @@ public class OpamMFM extends MultiFragmentManager
 		Intent intent = new Intent(LibApplication.getAppContext(), IntHttpService.class);
 		boolean success = LibApplication.getAppContext().stopService(intent);
 		Log.d(TAG, "stop INT http service ... "+success);
-		LoadImgManager.getInstance().dispose();
+		LoadImgManager loadImgManager = (LoadImgManager) ManagerUtilsFactory.getUtilsManager(ManagerUtilsFactory.ManagerTypeEnum.Load_Image_Manager);
+		loadImgManager.dispose();
 	}
 	
 	public void setProfileAvatar(String login)

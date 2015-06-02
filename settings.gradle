@@ -1,3 +1,7 @@
+include ':app'
+
+include ':testPlugin'
+
 include ':LibUtil'
 project(':LibUtil').projectDir = file("../AndroidCommonLib/LibUtil")
 
