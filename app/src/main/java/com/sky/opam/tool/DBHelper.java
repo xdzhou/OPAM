@@ -16,50 +16,50 @@ public class DBHelper extends SqliteHelper
 
     public DBHelper(Context context)
     {
-    	super(context, BDNAME, null, VERSION);
+        super(context, BDNAME, null, VERSION);
     }
     
     @Override
     public void onCreate(SQLiteDatabase db) 
     {
-    	db.execSQL("DROP table if exists ClassEvent;");
-    	String sql = SqliteManager.generateTableSql(ClassEvent.class);
-    	//System.out.println(sql);
-    	db.execSQL(sql);
-    	
-    	db.execSQL("DROP table if exists ClassUpdateInfo;");
-    	sql = SqliteManager.generateTableSql(ClassUpdateInfo.class);
-    	//System.out.println(sql);
-    	db.execSQL(sql);
-    	
-    	db.execSQL("DROP table if exists User;");
-    	sql = SqliteManager.generateTableSql(User.class);
-    	//System.out.println(sql);
-    	db.execSQL(sql);
+        db.execSQL("DROP table if exists ClassEvent;");
+        String sql = SqliteManager.generateTableSql(ClassEvent.class);
+        //System.out.println(sql);
+        db.execSQL(sql);
+        
+        db.execSQL("DROP table if exists ClassUpdateInfo;");
+        sql = SqliteManager.generateTableSql(ClassUpdateInfo.class);
+        //System.out.println(sql);
+        db.execSQL(sql);
+        
+        db.execSQL("DROP table if exists User;");
+        sql = SqliteManager.generateTableSql(User.class);
+        //System.out.println(sql);
+        db.execSQL(sql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
     {   
-    	//old version
-    	db.execSQL("DROP table if exists user;");
-    	db.execSQL("DROP table if exists cours;");
-    	db.execSQL("DROP table if exists syncevent;");
-    	
-    	//newer version
-    	db.execSQL("DROP table if exists USER;");
-    	db.execSQL("DROP table if exists CLASSINFO;");
-    	db.execSQL("DROP table if exists CLASSTYPE;");
-    	db.execSQL("DROP table if exists CONFIG;");
-    	db.execSQL("DROP table if exists ROOM;");
-    	
+        //old version
+        db.execSQL("DROP table if exists user;");
+        db.execSQL("DROP table if exists cours;");
+        db.execSQL("DROP table if exists syncevent;");
+        
+        //newer version
+        db.execSQL("DROP table if exists USER;");
+        db.execSQL("DROP table if exists CLASSINFO;");
+        db.execSQL("DROP table if exists CLASSTYPE;");
+        db.execSQL("DROP table if exists CONFIG;");
+        db.execSQL("DROP table if exists ROOM;");
+        
         onCreate(db);         
     }
 
-	@Override
-	protected String getModelPackage() 
-	{
-		return "com.sky.opam.model";
-	}
+    @Override
+    protected String getModelPackage() 
+    {
+        return "com.sky.opam.model";
+    }
 
 }

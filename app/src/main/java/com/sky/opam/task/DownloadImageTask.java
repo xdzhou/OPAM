@@ -12,8 +12,8 @@ import android.util.Log;
 
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap>
 {
-	private Context context;
-	private String login;
+    private Context context;
+    private String login;
 
     public DownloadImageTask(Context context, String login) 
     {
@@ -28,15 +28,15 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap>
         Bitmap mIcon11 = null;
         try 
         {
-        	String imgPath = context.getFilesDir() + "/" + login +".jpg";
-    		File document = new File(imgPath);
-    		if(!document.exists())
-    		{
-    			InputStream in = new java.net.URL(urldisplay).openStream();
+            String imgPath = context.getFilesDir() + "/" + login +".jpg";
+            File document = new File(imgPath);
+            if(!document.exists())
+            {
+                InputStream in = new java.net.URL(urldisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
                 FileOutputStream fos = new FileOutputStream(document);  
                 mIcon11.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-    		}
+            }
             
         } 
         catch (Exception e) 
