@@ -7,6 +7,8 @@
     <string name="OA0002">Setting</string>
     <string name="OA0003">Exit</string>
     <string name="OA0004">Network is not available</string>
+    <string name="OA0005">Login</string>
+    <string name="OA0006">Logout</string>
     
     <string name="OA1000">Welcome to OPAM</string>
     <string name="OA1001">OPAM</string>

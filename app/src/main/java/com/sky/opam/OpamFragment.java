@@ -19,7 +19,6 @@ import com.loic.common.fragManage.GcFragment;
 import com.loic.common.fragManage.MultiFragmentManager;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.service.IntHttpService;
-import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.tool.Tool;
 
 public class OpamFragment extends GcFragment 

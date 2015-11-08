@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.MeasureSpec;
 
@@ -20,7 +21,14 @@ public class Tool
 {
     public static String getTrombiPhotoURL(String login, int size)
     {
-        return "http://trombi.tem-tsp.eu/photo.php?uid="+login+"&h="+size+"&w="+size;
+        if(! TextUtils.isEmpty(login))
+        {
+            return "http://trombi.tem-tsp.eu/photo.php?uid="+login+"&h="+size+"&w="+size;
+        }
+        else
+        {
+            return null;
+        }
     }
     
     public static int[] getPreviousMonth(int year, int month)

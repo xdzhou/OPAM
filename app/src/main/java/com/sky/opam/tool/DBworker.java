@@ -24,9 +24,14 @@ public class DBworker extends SqliteWorker
     {
         if(singleton == null)
         {
-            singleton = new DBworker(LibApplication.getAppContext());
+            synchronized (DBworker.class)
+            {
+                if(singleton == null)
+                {
+                    singleton = new DBworker(LibApplication.getAppContext());
+                }
+            }
         }
-        
         return singleton;
     }
     
@@ -190,10 +195,6 @@ public class DBworker extends SqliteWorker
             deleteData(ClassEvent.class, "login = '"+login+"' AND startTime > "+startestTime+" AND endTime < "+endestTime);
         }
     }
-    
-    
-    
-    
     
     public void setClassSynced(long classId, long eventId)
     {

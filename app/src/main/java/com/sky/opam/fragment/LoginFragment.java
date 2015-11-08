@@ -1,9 +1,9 @@
 package com.sky.opam.fragment;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,16 +11,19 @@ import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 
 import com.loic.common.Chiffrement;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
+import com.sky.opam.OpamMFM;
 import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.service.IntHttpService.asyncLoginReponse;
 import com.sky.opam.tool.DBworker;
+import com.sky.opam.tool.SharePreferenceUtils;
 
 public class LoginFragment extends OpamFragment implements asyncLoginReponse
 {
@@ -29,6 +32,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
     private AutoCompleteTextView loginTextView;
     private EditText passwordEditText;
     private Button enterButton;
+    private Switch rememberMeSwitch;
     private ProgressDialog progressDialog;
     private DBworker worker;
     
@@ -47,37 +51,53 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
         passwordEditText = (EditText) rootView.findViewById(R.id.txtMDP);
         enterButton = (Button) rootView.findViewById(R.id.btnVAD);
 
-        User defaultUser = worker.getDefaultUser();
-        if(defaultUser != null)
-            loginTextView.setText(defaultUser.login);
+        rememberMeSwitch = (Switch) rootView.findViewById(R.id.switch_remember_me);
+        if(SharePreferenceUtils.isRememberMe())
+        {
+            rememberMeSwitch.setChecked(true);
+            User defaultUser = worker.getDefaultUser();
+            if(defaultUser != null)
+            {
+                loginTextView.setText(defaultUser.login);
+                passwordEditText.setText(Chiffrement.decrypt(defaultUser.password, IntHttpService.ENCRPT_KEY));
+            }
+        }
+        else
+        {
+            rememberMeSwitch.setChecked(false);
+        }
         
         enterButton.getBackground().setAlpha(150);
-        enterButton.setOnClickListener(new View.OnClickListener() 
+        enterButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v) 
+            public void onClick(View v)
             {
                 String login = loginTextView.getText().toString();
                 String password = passwordEditText.getText().toString();
-                if(login.length() == 0)
+                if (login.length() == 0)
                 {
                     ToastUtils.show(getString(R.string.OA1004));
                 }
-                else if(password.length() == 0)
+                else if (password.length() == 0)
                 {
                     ToastUtils.show(getString(R.string.OA1005));
                 }
                 else
                 {
                     User currentUser = worker.getUser(login);
-                    if(currentUser != null)
+                    if (currentUser != null)
                     {
-                        if(currentUser.password.equals(Chiffrement.encrypt(password, IntHttpService.ENCRPT_KEY)))
+                        if (currentUser.password.equals(Chiffrement.encrypt(password, IntHttpService.ENCRPT_KEY)))
+                        {
                             showAgenda();
+                        }
                         else
+                        {
                             passwordResetAlart();
+                        }
                     }
-                    else if(getHttpService() != null)
+                    else if (getHttpService() != null)
                     {
                         showProgressDialog();
                         getHttpService().asyncLogin(login, password, LoginFragment.this);
@@ -87,31 +107,40 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
         });
         
         getGcActivity().getSupportActionBar().hide();
-        getGcActivity().setLeftMenuEnable(false);
         
         return rootView;
     }
-    
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        SharePreferenceUtils.setRememberMeState(rememberMeSwitch.isChecked());
+    }
+
     @Override
     public void onDestroy() 
     {
         super.onDestroy();
         getGcActivity().getSupportActionBar().show();
-        getGcActivity().setLeftMenuEnable(true);
     }
 
     private void showAgenda()
     {
-        getOpenMFM().setProfileAvatar(loginTextView.getText().toString());
-        Bundle data = new Bundle();
-        data.putString(AgendaViewFragment.BUNDLE_LOGIN_KEY, loginTextView.getText().toString());
-        getMultiFragmentManager().showGcFragment(AgendaViewFragment.class, true, data);
+        SharePreferenceUtils.setLoginState(true);
+        OpamMFM mfm = getOpenMFM();
+        if(mfm != null && mfm.isAdded())
+        {
+            Bundle data = new Bundle();
+            data.putString(AgendaViewFragment.BUNDLE_LOGIN_KEY, loginTextView.getText().toString());
+            mfm.showGcFragment(AgendaViewFragment.class, true, data);
+        }
     }
     
     private void passwordResetAlart()
     {
-        new AlertDialog.Builder(getActivity())
-        .setTitle("Password Error")
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Password Error")
         .setMessage("Password incorrect. If you have modified your password online (E-Campus) these days, Please click retry!")
         .setPositiveButton(R.string.OA1008, new DialogInterface.OnClickListener() 
         {
@@ -127,8 +156,8 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
                 dialog.dismiss();
             }
          })
-        .setIcon(android.R.drawable.ic_dialog_alert)
-        .show();
+        .setIcon(android.R.drawable.ic_dialog_alert);
+        showDialog(builder);
     }
     
     private void showProgressDialog()
@@ -161,7 +190,9 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
     private void closeProgressDialog()
     {
         if(progressDialog != null)
+        {
             progressDialog.dismiss();
+        }
     }
 
     @Override
@@ -182,7 +213,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
                 @Override
                 public void run() 
                 {
-                    if(isAdded() && getActivity() != null)
+                    if(isAdded())
                     {
                         showAgenda();
                     }
@@ -202,12 +233,5 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
             
             Log.e(TAG, "onAgendaLoaded with error : "+errorEnum.toString());
         }
-    }
-    
-    @Override
-    public boolean onBackPressed()
-    {
-        getActivity().finish();
-        return true;
     }
 }

@@ -12,6 +12,7 @@ import java.util.Locale;
 import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,7 +35,6 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.loic.common.LibApplication;
 import com.loic.common.graphic.AgendaView;
 import com.loic.common.graphic.AgendaView.AgendaEvent;
@@ -444,7 +445,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     
     private void showErrorDialog(String title, String msg)
     {
-        createDialogBuilderWithCancel(title, msg).withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
+        //createDialogBuilderWithCancel(title, msg).withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
+        showDialog(title, msg, null);
     }
     
     @Override
@@ -472,9 +474,11 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
                 @Override
                 public void run() 
                 {
+                    /*
                     adapter.tryUpdatePreNextMonthClassInfo(searchDate);
                     if(errorEnum == HttpServiceErrorEnum.OkError)
                     {
+
                         createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2020, getYearMonthText(searchDate), classSize))
                         .withButton2Text(getString(android.R.string.ok)).setButton2Click(new View.OnClickListener() 
                         {
@@ -491,6 +495,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
                         createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2021, getYearMonthText(searchDate), errorEnum.getDescription()))
                         .withDialogColor("#FFE74C3C").withEffect(Effectstype.RotateBottom).show();
                     }
+                    */
                 }
             });
         }
@@ -556,9 +561,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
                 int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
                 fillMonthDetailInfo(monthDetailInfoView, yearMonth[0], yearMonth[1]);
                 ((TextView)monthDetailInfoView.findViewById(R.id.month_detail_month_type)).setText(R.string.OA2025);
-                
-                createDialogBuilderWithCancel(getString(R.string.OA2007), null)
-                .setCustomView(monthDetailInfoView, null).show();
+
+                showDialog(R.string.OA2007, null, monthDetailInfoView);
                 return false;
             }
         });
@@ -592,16 +596,20 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
      ******************************************************/
     private void askForLoadCourse(final int year, final int month)
     {
-        createDialogBuilderWithCancel(getString(R.string.OA0000), getString(R.string.OA2022, getYearMonthText(year, month)))
-        .withButton1Text(getString(android.R.string.no)).withButton2Text(getString(android.R.string.yes)).setButton2Click(new View.OnClickListener() 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.OA0000)
+        .setMessage(getString(R.string.OA2022, getYearMonthText(year, month)))
+        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
         {
-            @Override
-            public void onClick(View v) 
+            public void onClick(DialogInterface dialog, int which)
             {
                 hideDialog();
                 prepareLoadCourse(year, month);
             }
-        }).show();
+         })
+        .setNegativeButton(android.R.string.no, cancelDialogListener)
+        .setIcon(android.R.drawable.ic_dialog_alert);
+        showDialog(builder);
     }
     
     @Override
@@ -658,11 +666,13 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
             ((TextView)classDetailInfoView.findViewById(R.id.classGroup)).setText(classEvent.groupe == null ? "" : classEvent.groupe.replace("__", "\n"));
             ((TextView)classDetailInfoView.findViewById(R.id.classRoom)).setText(classEvent.room == null ? "" : classEvent.room.replace("__", "\n"));
             ((TextView)classDetailInfoView.findViewById(R.id.classTeacher)).setText(classEvent.teacher == null ? "" : classEvent.teacher.replace("__", "\n"));
-            
+            /*
             createDialogBuilderWithCancel(event.mName, null)
             .setCustomView(classDetailInfoView, null)
             .withButton1Text(getString(R.string.OA2017))
             .setButton1Click(editBtnListener).show();
+            */
+            showDialog(event.mName, null, classDetailInfoView);
         }
     }
 
@@ -670,11 +680,5 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     public void onEventLongPressed(AgendaEvent event, RectF rect) 
     {
         
-    }
-    
-    @Override
-    protected int getInitDialogBackgroundColor()
-    {
-        return Color.parseColor("#33b5e5");
     }
 }

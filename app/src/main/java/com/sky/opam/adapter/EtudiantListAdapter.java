@@ -1,16 +1,12 @@
 package com.sky.opam.adapter;
 
-import com.loic.common.LibApplication;
-import com.loic.common.manager.LoadImgManager;
-import com.loic.common.manager.LoadImgManager.onLoadImgReadyListener;
-import com.loic.common.manager.ManagerUtilsFactory;
 import com.sky.opam.R;
 import com.sky.opam.model.Student;
 import com.sky.opam.tool.Tool;
+import com.squareup.picasso.Picasso;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +15,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class EtudiantListAdapter extends ArrayAdapter<Student> implements onLoadImgReadyListener
+public class EtudiantListAdapter extends ArrayAdapter<Student>
 {
     private static final String TAG = EtudiantListAdapter.class.getSimpleName();
-    
-    private LoadImgManager loadImgManager;
-    private int expectSize;
     
     public EtudiantListAdapter(Context context) 
     {
@@ -34,14 +27,6 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onLoad
     public EtudiantListAdapter(Context context, int textViewResourceId) 
     {
         super(context, textViewResourceId);
-        init();
-    }
-    
-    private void init()
-    {
-        loadImgManager = (LoadImgManager) ManagerUtilsFactory.getUtilsManager(ManagerUtilsFactory.ManagerTypeEnum.Load_Image_Manager);
-        expectSize = LibApplication.getAppContext().getResources().getDimensionPixelSize(R.dimen.etudiant_search_list_item_height);
-        loadImgManager.addListener(this);
     }
     
     private static class ViewHolder
@@ -68,7 +53,8 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onLoad
             viewHolder.gradeTextView = (TextView) convertView.findViewById(R.id.etudiant_grade);
             viewHolder.emailTextView = (TextView) convertView.findViewById(R.id.etudiant_email);
             convertView.setTag(viewHolder);
-        } else
+        }
+        else
         {
             viewHolder = (ViewHolder) convertView.getTag();
         }
@@ -99,21 +85,9 @@ public class EtudiantListAdapter extends ArrayAdapter<Student> implements onLoad
         if(etudiant.login != null)
         {
             String imageUrl = Tool.getTrombiPhotoURL(etudiant.login, 80);
-            Bitmap bitmap = loadImgManager.loadBitmapFor(imageUrl, expectSize, expectSize);
-            if(bitmap != null)
-                viewHolder.profil.setImageBitmap(bitmap);
+            Picasso.with(getContext()).load(imageUrl).into(viewHolder.profil);
         }
-        
-        return convertView;
-    }
 
-    @Override
-    public boolean onDownloadImgReady(String url, Bitmap bitmap) 
-    {
-        if(bitmap != null)
-        {
-            notifyDataSetChanged();
-        }
-        return true;
+        return convertView;
     }
 }

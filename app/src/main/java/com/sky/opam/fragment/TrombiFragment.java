@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.loic.common.manager.LoadImgManager;
 import com.loic.common.manager.ManagerUtilsFactory;
 import com.loic.common.utils.NetWorkUtils;
 import com.loic.common.utils.ToastUtils;
@@ -92,7 +91,6 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
     public void onStop() 
     {
         super.onStop();
-        ((LoadImgManager) ManagerUtilsFactory.getUtilsManager(ManagerUtilsFactory.ManagerTypeEnum.Load_Image_Manager)).removeListener(listAdapter);
     }
 
     @Override
@@ -115,16 +113,9 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
                 }
             });
         }
-        else if(errorEnum != errorEnum.OkError && getActivity() != null)
+        else if(errorEnum != errorEnum.OkError)
         {
-            getActivity().runOnUiThread(new Runnable() 
-            {
-                @Override
-                public void run() 
-                {
-                    createDialogBuilderWithCancel("Trombi", "Error : "+errorEnum.getDescription()).show();
-                }
-            });
+            showDialog("Trombi", "Error : "+errorEnum.getDescription(), null);
         }
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <!-- "agenda" submenu -->
+    <item android:id="@+id/menu_agenda"
+          android:title="Agenda">
+        <menu>
+            <item android:id="@+id/menu_agenda_login"
+                  android:icon="@android:drawable/ic_menu_agenda"
+                  android:title="@string/OA0005" />
+            <item android:id="@+id/menu_agenda_calendar"
+                  android:icon="@android:drawable/ic_menu_agenda"
+                  android:title="@string/OA0000" />
+            <item android:id="@+id/menu_agenda_logout"
+                  android:icon="@android:drawable/ic_menu_agenda"
+                  android:title="@string/OA0006" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/menu_trombi"
+          android:icon="@android:drawable/ic_menu_set_as"
+          android:title="@string/OA0001" />
+
+    <item android:id="@+id/menu_setting"
+          android:icon="@android:drawable/ic_menu_set_as"
+          android:title="@string/OA0002" />
+
+    <item android:id="@+id/menu_Contact"
+          android:icon="@android:drawable/sym_contact_card"
+          android:title="@android:string/unknownName" />
+
+    <item android:id="@+id/menu_about"
+          android:icon="@android:drawable/presence_audio_busy"
+          android:title="@android:string/unknownName" />
+</menu>

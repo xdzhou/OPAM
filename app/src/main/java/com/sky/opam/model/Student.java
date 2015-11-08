@@ -21,7 +21,7 @@ public class Student implements Parcelable
         this.login = in.readString();
         this.name = in.readString();
         this.email = in.readString();
-        this.school = SchoolEnum.getEnumByIndex(in.readInt());
+        this.school = SchoolEnum.values()[in.readInt()];
         this.grade = in.readString();
     }
     
@@ -48,28 +48,6 @@ public class Student implements Parcelable
         {
             return abbreviation;
         }
-        
-        public int getIndex()
-        {
-            int index = -1;
-            for(int i = 0; i < values().length; i++)
-            {
-                if(this.equals(values()[i]))
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        }
-        
-        public static SchoolEnum getEnumByIndex(int index)
-        {
-            if(index >=0 && index < values().length)
-                return values()[index];
-            else
-                return null;
-        }
     }
 
     @Override
@@ -84,7 +62,7 @@ public class Student implements Parcelable
         dest.writeString(login);
         dest.writeString(name);
         dest.writeString(email);
-        dest.writeInt(school.getIndex());
+        dest.writeInt(school.ordinal());
         dest.writeString(grade);
     }
     

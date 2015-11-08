@@ -7,17 +7,18 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.loic.common.LibApplication;
+import com.loic.common.fragManage.GcActivity;
 import com.loic.common.fragManage.MultiFragmentManager;
-import com.loic.common.fragManage.MenuElementItem;
-import com.loic.common.manager.LoadImgManager;
-import com.loic.common.manager.ManagerUtilsFactory;
 import com.sky.opam.fragment.AgendaViewFragment;
 import com.sky.opam.fragment.LoginFragment;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.tool.DBworker;
+import com.sky.opam.tool.SharePreferenceUtils;
 
 public class OpamMFM extends MultiFragmentManager 
 {
@@ -31,43 +32,43 @@ public class OpamMFM extends MultiFragmentManager
         super.onCreate(savedInstanceState);
         DBworker dBworker = DBworker.getInstance();
         User defaultUser = dBworker.getDefaultUser();
-        if(defaultUser != null && defaultUser.isAutoConnect)
+        if(defaultUser != null && SharePreferenceUtils.isUserLogined())
         {
-            //setProfileAvatar(defaultUser.login);
             Bundle data = new Bundle();
             data.putString(AgendaViewFragment.BUNDLE_LOGIN_KEY, defaultUser.login);
             showGcFragment(AgendaViewFragment.class, true, data);
-            //showGcFragment(LoginFragment.class, true, null);
-        } else
+        }
+        else
         {
-            //showGcFragment(AgendaViewFragment.class, true, null);
             showGcFragment(LoginFragment.class, true, null);
         }
     }
 
-    @Override
-    public boolean onBackPressed()
+    public boolean onMainMenuSelected(MenuItem menuItem)
     {
-        boolean consumed = super.onBackPressed();
-        if(!consumed && fragmentClassInShowing != null && !fragmentClassInShowing.isAssignableFrom(AgendaViewFragment.class))
+        Class<? extends OpamFragment> fragToSHowClass = null;
+        switch (menuItem.getItemId())
         {
-            this.showGcFragment(AgendaViewFragment.class, true, null);
-            consumed = true;
+            case R.id.menu_agenda_login:
+                fragToSHowClass = LoginFragment.class;
+                break;
+            case R.id.menu_agenda_logout:
+                fragToSHowClass = LoginFragment.class;
+                SharePreferenceUtils.setLoginState(false);
+                break;
+            case R.id.menu_agenda_calendar:
+                fragToSHowClass = AgendaViewFragment.class;
+                break;
         }
-        return consumed;
-    }
-
-    @Override
-    public boolean onOpenElement(MenuElementItem menuElementItem, int position)
-    {
-        if(menuElementItem.fragmentClass != null)
+        if(fragToSHowClass != null)
         {
-            showGcFragment(menuElementItem.fragmentClass, true, null);
-        } else
-        {
-            getActivity().finish();
+            showGcFragment(fragToSHowClass, true, null);
+            return true;
         }
-        return true;
+        else
+        {
+            return false;
+        }
     }
 
     @Override
@@ -76,9 +77,7 @@ public class OpamMFM extends MultiFragmentManager
         super.onDestroy();
         Intent intent = new Intent(LibApplication.getAppContext(), IntHttpService.class);
         boolean success = LibApplication.getAppContext().stopService(intent);
-        Log.d(TAG, "stop INT http service ... "+success);
-        LoadImgManager loadImgManager = (LoadImgManager) ManagerUtilsFactory.getUtilsManager(ManagerUtilsFactory.ManagerTypeEnum.Load_Image_Manager);
-        loadImgManager.dispose();
+        Log.d(TAG, "stop INT http service ... " + success);
     }
 
     public void setProfileAvatar(String login)
