@@ -38,6 +38,10 @@ public class SettingFragment extends OpamFragment
     {
         super.onCreate(savedInstanceState);
         user = DBworker.getInstance().getDefaultUser();
+        if(user == null)
+        {
+
+        }
     }
 
     @Override

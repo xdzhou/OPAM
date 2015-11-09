@@ -51,6 +51,8 @@ import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.service.IntHttpService.asyncGetClassInfoReponse;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.Tool;
+import com.sky.opam.view.AgendaViewPage;
+import com.squareup.picasso.Picasso;
 
 public class AgendaViewFragment extends OpamFragment implements AgendaViewEventTouchListener
 {
@@ -230,24 +232,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     /******************************************************
      ******************* pageView adapter *****************
      ******************************************************/
-    private class AgendaViewPage extends ViewPager
-    {
-        public AgendaViewPage(Context context)
-        {
-            super(context);
-        }
-        
-        @Override
-        protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) 
-        {
-            if(v instanceof AgendaView)
-            {
-                return ((AgendaView) v).canScrollHorizontal(-dx);
-            }
-            return super.canScroll(v, checkV, dx, x, y);
-        }
-    }
-    
+
     private class AgendaViewPageAdapter extends PagerAdapter
     {
         private View preMonthView;
@@ -344,7 +329,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     private View createMonthDetailPageView(int year, int month, boolean isForNextMonth)
     {
         View monthDetailView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_month_page_view_layout, null);
-        ((ImageView) monthDetailView.findViewById(R.id.profile_avatar)).setImageDrawable(getOpenMFM().getAvatarRoundDrawable());
+        Picasso.with(LibApplication.getAppContext()).load(Tool.getTrombiPhotoURL(currentUser.login, 80)).into((ImageView) monthDetailView.findViewById(R.id.profile_avatar));
         ((TextView) monthDetailView.findViewById(R.id.profile_name)).setText(currentUser.name);
         if(isForNextMonth)
         {
@@ -352,7 +337,6 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
         }
         
         fillMonthDetailInfo(monthDetailView, year, month);
-
         return monthDetailView;
     }
     

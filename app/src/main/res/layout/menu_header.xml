@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
-                android:background="@drawable/background_login_div_bg"
+                android:background="#4d9dba"
                 android:paddingLeft="20dp"
                 android:paddingBottom="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="180dp">
     <ImageView
-        android:id="@+id/photo"
+        android:id="@+id/user_avatar"
         android:src="@drawable/important_bg"
-        android:layout_above="@+id/desc"
+        android:layout_above="@+id/user_name"
         android:layout_marginBottom="20dp"
         android:layout_width="80dp"
         android:layout_height="80dp" />
+
     <TextView
-        android:id="@+id/desc"
+        android:id="@+id/user_name"
         android:layout_alignParentBottom="true"
-        android:text="欢迎关注个人博客 明桑Android"
+        android:text="To Login"
         android:textStyle="bold"
-        android:textColor="#ffffff"
         android:textSize="20sp"
         android:layout_marginBottom="2dp"
         android:layout_width="wrap_content"
