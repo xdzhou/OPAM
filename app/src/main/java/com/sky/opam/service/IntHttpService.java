@@ -40,6 +40,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.loic.common.AsyncProcessor;
 import com.loic.common.Chiffrement;
 import com.loic.common.LibApplication;
 import com.sky.opam.R;
@@ -62,6 +63,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class IntHttpService extends Service 
@@ -80,7 +82,7 @@ public class IntHttpService extends Service
 
     static
     {
-        PROFILE_CACHE_FLOLDER = LibApplication.getAppContext().getFilesDir().getAbsolutePath();
+        PROFILE_CACHE_FLOLDER = LibApplication.getContext().getFilesDir().getAbsolutePath();
     }
     
     private final IBinder mBinder = new LocalBinder();
@@ -95,7 +97,7 @@ public class IntHttpService extends Service
     
     private HandlerThread workerThread;
     private Handler workerHandler;
-    private LinkedList<LoadClassTaskParams> loadClassParamsQueue;
+    private final LinkedList<LoadClassTaskParams> loadClassParamsQueue = new LinkedList<IntHttpService.LoadClassTaskParams>();
     private Date classLoadingDate;
     
     private Object loginPasswordLock = new Object();
@@ -114,7 +116,6 @@ public class IntHttpService extends Service
         super.onCreate();
         
         initHttpClient();
-        loadClassParamsQueue = new LinkedList<IntHttpService.LoadClassTaskParams>();
         workerThread = new HandlerThread("IntHttpService-workerThread");
         workerThread.start();
         workerHandler = new Handler(workerThread.getLooper());
@@ -155,7 +156,7 @@ public class IntHttpService extends Service
         {
             final KeyStore ks = KeyStore.getInstance("BKS");
             // the bks file we generated above
-            final InputStream in = LibApplication.getAppContext().getResources().openRawResource(R.raw.mystore);  
+            final InputStream in = LibApplication.getContext().getResources().openRawResource(R.raw.mystore);
             try 
             {
                 ks.load(in, "opam123".toCharArray());
@@ -199,9 +200,9 @@ public class IntHttpService extends Service
      * @param password 
      * @param callback
      */
-    public void asyncLogin(final String login, final String password, asyncLoginReponse callback)
+    public void asyncLogin(final String login, final String password, asyncLoginListener callback)
     {
-        final WeakReference<asyncLoginReponse> callbackWeakReference = new WeakReference<asyncLoginReponse>(callback);
+        final WeakReference<asyncLoginListener> callbackWeakReference = new WeakReference<asyncLoginListener>(callback);
         new Thread(new Runnable() 
         {
             @Override
@@ -232,7 +233,7 @@ public class IntHttpService extends Service
         }
     }
     
-    private void requestLogin(String login, String password, WeakReference<asyncLoginReponse> callbackWeakReference)
+    private void requestLogin(String login, String password, WeakReference<asyncLoginListener> callbackWeakReference)
     {
         requestLogout(true);
         setLoginPassword(login, password);
@@ -272,7 +273,7 @@ public class IntHttpService extends Service
         
         if(callbackWeakReference != null && callbackWeakReference.get() != null)
         {
-            callbackWeakReference.get().onAsyncLoginReponse(login, errorEnumRef.errorEnum);
+            callbackWeakReference.get().onAsyncLogin(login, errorEnumRef.errorEnum);
         }
     }
     
@@ -350,7 +351,7 @@ public class IntHttpService extends Service
      * @param date the date selected
      * @param callback 
      */
-    public void asyncLoadClassInfo(int year, int month, asyncGetClassInfoReponse callback)
+    public void asyncLoadClassInfo(int year, int month, asyncGetClassInfoListener callback)
     {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
@@ -358,7 +359,7 @@ public class IntHttpService extends Service
         asyncLoadClassInfo(calendar.getTime(), callback);
     }
     
-    public void asyncLoadClassInfo(Date date, asyncGetClassInfoReponse callback)
+    public void asyncLoadClassInfo(Date date, asyncGetClassInfoListener callback)
     {
         if(date != null && callback != null && login != null && password != null)
         {
@@ -377,7 +378,7 @@ public class IntHttpService extends Service
         }
     }
     
-    private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoReponse> callbackRef)
+    private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoListener> callbackRef)
     {
         classLoadingDate = date;
         HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
@@ -671,118 +672,128 @@ public class IntHttpService extends Service
         return httpPost;
     }
     
-    /*
+    /**
      * search students by name
      * 
      * @param name the student's name to search (first name or last name)
      * @param callback request finished callback
      * 
      */
-    
-    public void asyncSearchEtudiantByName(final String name, final String school, final String grade, asyncSearchEtudiantByNameReponse callback)
+    private static final String AsyncSearchStudentByNameToken = "AsyncSearchStudentByNameToken";
+
+    public void asyncSearchStudentByName(final String name, final String school, final String grade, asyncSearchStudentByNameListener callback)
     {
-        final WeakReference<asyncSearchEtudiantByNameReponse> callbackWeakReference = new WeakReference<asyncSearchEtudiantByNameReponse>(callback);
-        
-        new Thread(new Runnable() 
+        if(! TextUtils.isEmpty(name) && callback != null)
         {
-            @Override
-            public void run() 
+            final WeakReference<asyncSearchStudentByNameListener> callbackWeakReference = new WeakReference<asyncSearchStudentByNameListener>(callback);
+
+            Runnable r = new Runnable()
             {
-                List<Student> serachedEtudiants = null;
-                HttpServiceErrorEnum errorEnum = HttpServiceErrorEnum.OkError;
-                HttpPost post = new HttpPost("http://trombi.tem-tsp.eu/etudiants.php");
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("user", name));
-                if(school != null && !school.isEmpty())
+                @Override
+                public void run()
                 {
-                    params.add(new BasicNameValuePair("ecole", school));
-                }
-                if(grade != null && !grade.isEmpty())
-                {
-                    params.add(new BasicNameValuePair("annee", grade));
-                }
-                params.add(new BasicNameValuePair("submit", "Rechercher"));
-                
-                try 
-                {
-                    post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-                    HttpResponse response = client.execute(post);
-                    int status = response.getStatusLine().getStatusCode();
-                    if(status == 200)
+                    List<Student> serachedEtudiants = null;
+                    HttpServiceErrorEnum errorEnum = HttpServiceErrorEnum.OkError;
+                    HttpPost post = new HttpPost("http://trombi.tem-tsp.eu/etudiants.php");
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("user", name));
+                    if(! TextUtils.isEmpty(school))
                     {
-                        serachedEtudiants = new ArrayList<Student>();
-                        String rspHtml = EntityUtils.toString(response.getEntity());
-                        Document doc = Jsoup.parse(rspHtml);
-                        Element etudiantsEle = doc.getElementById("etudiants");
-                        Elements temElements = etudiantsEle.getElementsByClass("INTM");
-                        if(temElements != null && !temElements.isEmpty())
+                        params.add(new BasicNameValuePair("ecole", school));
+                    }
+                    if(! TextUtils.isEmpty(grade))
+                    {
+                        params.add(new BasicNameValuePair("annee", grade));
+                    }
+                    params.add(new BasicNameValuePair("submit", "Rechercher"));
+
+                    try
+                    {
+                        post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+                        HttpResponse response = client.execute(post);
+                        int status = response.getStatusLine().getStatusCode();
+                        if(status == 200)
                         {
-                            for(Element ele : temElements)
+                            serachedEtudiants = new ArrayList<Student>();
+                            String rspHtml = EntityUtils.toString(response.getEntity());
+                            Document doc = Jsoup.parse(rspHtml);
+                            Element etudiantsEle = doc.getElementById("etudiants");
+                            Elements temElements = etudiantsEle.getElementsByClass("INTM");
+                            if(temElements != null && !temElements.isEmpty())
                             {
-                                Student etudiant = createEtudiant(ele, SchoolEnum.TEM);
-                                if(etudiant != null)
+                                for(Element ele : temElements)
                                 {
-                                    serachedEtudiants.add(etudiant);
+                                    Student etudiant = createStudent(ele, SchoolEnum.TEM);
+                                    if(etudiant != null)
+                                    {
+                                        serachedEtudiants.add(etudiant);
+                                    }
+                                }
+                            }
+                            Elements tspElements = etudiantsEle.getElementsByClass("TINT");
+                            if(tspElements != null && !tspElements.isEmpty())
+                            {
+                                for(Element ele : tspElements)
+                                {
+                                    Student etudiant = createStudent(ele, SchoolEnum.TSP);
+                                    if(etudiant != null)
+                                    {
+                                        serachedEtudiants.add(etudiant);
+                                    }
                                 }
                             }
                         }
-                        Elements tspElements = etudiantsEle.getElementsByClass("TINT");
-                        if(tspElements != null && !tspElements.isEmpty())
+                        else
                         {
-                            for(Element ele : tspElements)
-                            {
-                                Student etudiant = createEtudiant(ele, SchoolEnum.TSP);
-                                if(etudiant != null)
-                                {
-                                    serachedEtudiants.add(etudiant);
-                                }
-                            }
+                            errorEnum = HttpServiceErrorEnum.HttpBadStatusError;
+                            errorEnum.setDescription("Http bad status : " + status);
                         }
                     }
-                    else 
+                    catch (Exception e)
                     {
-                        errorEnum = HttpServiceErrorEnum.HttpBadStatusError;
-                        errorEnum.setDescription("Http bad status : " + status);
+                        errorEnum = HttpServiceErrorEnum.ExceptionError;
+                        errorEnum.setDescription(e.getMessage());
                     }
-                    post.abort();
-                } 
-                catch (Exception e) 
-                {
-                    errorEnum = HttpServiceErrorEnum.ExceptionError;
-                    errorEnum.setDescription(e.getMessage());
+
+                    if(callbackWeakReference.get() != null)
+                    {
+                        callbackWeakReference.get().onAsyncSearchStudentByName(errorEnum, serachedEtudiants);
+                    }
+                    else
+                    {
+                        Log.e(TAG, "NO callback for asyncSearchStudentByName");
+                    }
                 }
-                
-                if(callbackWeakReference != null && callbackWeakReference.get() != null)
-                {
-                    callbackWeakReference.get().onAsyncSearchEtudiantByNameReponse(errorEnum, serachedEtudiants);
-                }
-                else
-                {
-                    Log.e(TAG, "NO callback for asyncSearchEtudiantByName");
-                }
-            }
-        }).start();
+            };
+
+            AsyncProcessor.getInstance().pushRequest(r, AsyncSearchStudentByNameToken);
+        }
+    }
+
+    public void cancelAsyncSearchStudentByNameRequest()
+    {
+         AsyncProcessor.getInstance().cancelRequest(AsyncSearchStudentByNameToken);
     }
     
-    public Student createEtudiant(Element ele, SchoolEnum schoolEnum)
+    public Student createStudent(Element ele, SchoolEnum schoolEnum)
     {
-        Student etudiant = null;
+        Student student = null;
         if(ele != null)
         {
-            etudiant = new Student(schoolEnum);
+            student = new Student(schoolEnum);
             Elements elements = ele.getElementsByTag("img");
             if(elements != null && elements.size() > 0)
             {
                 String login = elements.get(0).attr("src");
                 if(login != null && login.length() > 0)
                 {
-                    etudiant.login = login.substring(15, login.length() - 10);
+                    student.login = login.substring(15, login.length() - 10);
                 }
             }
             elements = ele.getElementsByClass("ldapNom");
             if(elements != null && elements.size() > 0)
             {
-                etudiant.name = elements.get(0).text();
+                student.name = elements.get(0).text();
             }
             
             elements = ele.getElementsByClass("ldapInfo");
@@ -797,17 +808,17 @@ public class IntHttpService extends Service
                 elements = infoEle.getElementsByTag("li");
                 if(elements != null && elements.size() > 0)
                 {
-                    etudiant.grade = elements.get(0).text();
+                    student.grade = elements.get(0).text();
                 }
                 elements = infoEle.getElementsByTag("p");
                 if(elements != null && elements.size() > 0)
                 {
                     String email = elements.get(0).text().substring(8);
-                    etudiant.email = email.replace("[AT]", "@");
+                    student.email = email.replace("[AT]", "@");
                 }
             }
         }
-        return etudiant;
+        return student;
     }
     
     /******************************************************
@@ -1179,12 +1190,12 @@ public class IntHttpService extends Service
     private static class LoadClassTaskParams
     {
         private Date searchDate;
-        private WeakReference<asyncGetClassInfoReponse> callbackRef;
+        private WeakReference<asyncGetClassInfoListener> callbackRef;
         
-        public LoadClassTaskParams(Date searchDate, asyncGetClassInfoReponse callback) 
+        public LoadClassTaskParams(Date searchDate, asyncGetClassInfoListener callback)
         {
             this.searchDate = searchDate;
-            this.callbackRef = new WeakReference<IntHttpService.asyncGetClassInfoReponse>(callback);
+            this.callbackRef = new WeakReference<asyncGetClassInfoListener>(callback);
         }
     }
     
@@ -1226,7 +1237,7 @@ public class IntHttpService extends Service
         }
     }
     
-    public static enum HttpServiceErrorEnum
+    public enum HttpServiceErrorEnum
     {
         OkError(R.string.OA2009),
         UnknowError(R.string.OA2010),
@@ -1248,9 +1259,13 @@ public class IntHttpService extends Service
         public String getDescription() 
         {
             if(customedDescription != null)
+            {
                 return customedDescription;
+            }
             else
-                return LibApplication.getAppContext().getString(descriptionResID);
+            {
+                return LibApplication.getContext().getString(descriptionResID);
+            }
         }
         
         public void setDescription(String description) 
@@ -1263,19 +1278,19 @@ public class IntHttpService extends Service
      *********************Async Listener*******************
      ******************************************************/
     
-    public static interface asyncSearchEtudiantByNameReponse
+    public interface asyncSearchStudentByNameListener
     {
-        public void onAsyncSearchEtudiantByNameReponse(HttpServiceErrorEnum errorEnum, List<Student> results);
+        public void onAsyncSearchStudentByName(HttpServiceErrorEnum errorEnum, List<Student> results);
     }
     
-    public static interface asyncLoginReponse
+    public interface asyncLoginListener
     {
-        public void onAsyncLoginReponse(String login, HttpServiceErrorEnum errorEnum);
+        public void onAsyncLogin(String login, HttpServiceErrorEnum errorEnum);
     }
     
-    public static interface asyncGetClassInfoReponse
+    public interface asyncGetClassInfoListener
     {
-        public void onAsyncGetClassInfoReponse(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results);
+        public void onAsyncGetClassInfo(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results);
     }
     
     @Override

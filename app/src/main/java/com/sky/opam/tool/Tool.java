@@ -132,7 +132,7 @@ public class Tool
     {
         String version_name = null;
         try {
-            Context context = LibApplication.getAppContext();
+            Context context = LibApplication.getContext();
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version_name = pInfo.versionName;
         } catch (NameNotFoundException e) {
@@ -145,7 +145,7 @@ public class Tool
     {
         int version_code = 0;
         try {
-            Context context = LibApplication.getAppContext();
+            Context context = LibApplication.getContext();
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version_code = pInfo.versionCode;
         } catch (NameNotFoundException e) {

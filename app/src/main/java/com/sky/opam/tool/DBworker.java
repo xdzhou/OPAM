@@ -28,7 +28,7 @@ public class DBworker extends SqliteWorker
             {
                 if(singleton == null)
                 {
-                    singleton = new DBworker(LibApplication.getAppContext());
+                    singleton = new DBworker(LibApplication.getContext());
                 }
             }
         }

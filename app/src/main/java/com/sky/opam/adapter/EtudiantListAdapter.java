@@ -42,7 +42,7 @@ public class EtudiantListAdapter extends ArrayAdapter<Student>
     public View getView(int position, View convertView, ViewGroup parent) 
     {
         ViewHolder viewHolder = null;
-        Student etudiant = getItem(position);
+        Student stu = getItem(position);
         if(convertView == null)
         {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.etudiant_list_item_view, parent, false);
@@ -59,13 +59,13 @@ public class EtudiantListAdapter extends ArrayAdapter<Student>
             viewHolder = (ViewHolder) convertView.getTag();
         }
         
-        viewHolder.nameTextView.setText(etudiant.name);
-        viewHolder.schoolTextView.setText(etudiant.school.getAbbreviation());
-        viewHolder.gradeTextView.setText(etudiant.grade);
-        if(etudiant.email != null)
+        viewHolder.nameTextView.setText(stu.name);
+        viewHolder.schoolTextView.setText(stu.school.getAbbreviation());
+        viewHolder.gradeTextView.setText(stu.grade);
+        if(stu.email != null)
         {
             viewHolder.emailTextView.setPaintFlags(viewHolder.emailTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-            viewHolder.emailTextView.setText(etudiant.email);
+            viewHolder.emailTextView.setText(stu.email);
             viewHolder.emailTextView.setOnClickListener(new View.OnClickListener() 
             {
                 @Override
@@ -82,9 +82,9 @@ public class EtudiantListAdapter extends ArrayAdapter<Student>
         }
         viewHolder.profil.setImageBitmap(null);
         
-        if(etudiant.login != null)
+        if(stu.login != null)
         {
-            String imageUrl = Tool.getTrombiPhotoURL(etudiant.login, 80);
+            String imageUrl = Tool.getTrombiPhotoURL(stu.login, 80);
             Picasso.with(getContext()).load(imageUrl).into(viewHolder.profil);
         }
 

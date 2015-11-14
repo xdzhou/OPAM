@@ -13,21 +13,21 @@ public class SharePreferenceUtils
 
     public static boolean isUserLogined()
     {
-        return LibApplication.getAppContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).getBoolean(Login_State, false);
+        return LibApplication.getContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).getBoolean(Login_State, false);
     }
 
     public static void setLoginState(boolean isLogined)
     {
-        LibApplication.getAppContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(Login_State, isLogined).commit();
+        LibApplication.getContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(Login_State, isLogined).commit();
     }
 
     public static boolean isRememberMe()
     {
-        return LibApplication.getAppContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).getBoolean(Remenber_Me_State, true);
+        return LibApplication.getContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).getBoolean(Remenber_Me_State, true);
     }
 
     public static void setRememberMeState(boolean isRemember)
     {
-        LibApplication.getAppContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(Remenber_Me_State, isRemember).commit();
+        LibApplication.getContext().getSharedPreferences(LOGIN_STATE_PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(Remenber_Me_State, isRemember).commit();
     }
 }

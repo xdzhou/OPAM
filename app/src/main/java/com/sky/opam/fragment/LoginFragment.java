@@ -22,11 +22,11 @@ import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
-import com.sky.opam.service.IntHttpService.asyncLoginReponse;
+import com.sky.opam.service.IntHttpService.asyncLoginListener;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.SharePreferenceUtils;
 
-public class LoginFragment extends OpamFragment implements asyncLoginReponse
+public class LoginFragment extends OpamFragment implements asyncLoginListener
 {
     private static final String TAG = LoginFragment.class.getSimpleName();
     
@@ -202,7 +202,7 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
     }
 
     @Override
-    public void onAsyncLoginReponse(String login, final HttpServiceErrorEnum errorEnum) 
+    public void onAsyncLogin(String login, final HttpServiceErrorEnum errorEnum)
     {
         closeProgressDialog();
         if(errorEnum == HttpServiceErrorEnum.OkError && isAdded())

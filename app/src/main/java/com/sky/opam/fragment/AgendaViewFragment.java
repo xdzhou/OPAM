@@ -14,12 +14,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -48,7 +45,7 @@ import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
-import com.sky.opam.service.IntHttpService.asyncGetClassInfoReponse;
+import com.sky.opam.service.IntHttpService.asyncGetClassInfoListener;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.Tool;
 import com.sky.opam.view.AgendaViewPage;
@@ -120,7 +117,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
     {
-        mViewPager = new AgendaViewPage(LibApplication.getAppContext());
+        mViewPager = new AgendaViewPage(LibApplication.getContext());
         
         int year = -1, month = -1;
         //get year month info from savedInstanceState
@@ -132,7 +129,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
         //get year month info from sharedPreference
         if(year == -1 || month == -1)
         {
-            SharedPreferences sp = LibApplication.getAppContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
+            SharedPreferences sp = LibApplication.getContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
             year = sp.getInt(BUNDLE_Agenda_Year_KEY, -1);
             month = sp.getInt(BUNDLE_Agenda_Month_KEY, -1);
         }
@@ -173,7 +170,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     {
         if(adapter != null)
         {
-            SharedPreferences sp = LibApplication.getAppContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
+            SharedPreferences sp = LibApplication.getContext().getSharedPreferences(Share_Preference_Key, Context.MODE_PRIVATE);
             int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
             sp.edit().putInt(BUNDLE_Agenda_Year_KEY, yearMonth[0]).putInt(BUNDLE_Agenda_Month_KEY, yearMonth[1]).apply();
         }
@@ -328,8 +325,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     
     private View createMonthDetailPageView(int year, int month, boolean isForNextMonth)
     {
-        View monthDetailView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_month_page_view_layout, null);
-        Picasso.with(LibApplication.getAppContext()).load(Tool.getTrombiPhotoURL(currentUser.login, 80)).into((ImageView) monthDetailView.findViewById(R.id.profile_avatar));
+        View monthDetailView = View.inflate(LibApplication.getContext(), R.layout.agenda_fragment_month_page_view_layout, null);
+        Picasso.with(LibApplication.getContext()).load(Tool.getTrombiPhotoURL(currentUser.login, 80)).into((ImageView) monthDetailView.findViewById(R.id.profile_avatar));
         ((TextView) monthDetailView.findViewById(R.id.profile_name)).setText(currentUser.name);
         if(isForNextMonth)
         {
@@ -540,7 +537,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
             @Override
             public boolean onMenuItemClick(MenuItem item) 
             {
-                View monthDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_month_detail_info, null);
+                View monthDetailInfoView = View.inflate(LibApplication.getContext(), R.layout.agenda_fragment_month_detail_info, null);
                 
                 int[] yearMonth = adapter.agendaView.getAgendaYearMonth();
                 fillMonthDetailInfo(monthDetailInfoView, yearMonth[0], yearMonth[1]);
@@ -566,10 +563,10 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
         return year + " " + dfs.getMonths()[month];
     }
     
-    private asyncGetClassInfoReponse searchCourseCallback = new asyncGetClassInfoReponse() 
+    private asyncGetClassInfoListener searchCourseCallback = new asyncGetClassInfoListener()
     {
         @Override
-        public void onAsyncGetClassInfoReponse(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results) 
+        public void onAsyncGetClassInfo(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results)
         {
             onCoursLoaded(errorEnum, searchDate, results == null ? 0 : results.size());
         }
@@ -630,7 +627,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     @Override
     public void onEventClicked(AgendaEvent event, RectF rect) 
     {
-        View classDetailInfoView = View.inflate(LibApplication.getAppContext(), R.layout.agenda_fragment_class_detail_info, null);
+        View classDetailInfoView = View.inflate(LibApplication.getContext(), R.layout.agenda_fragment_class_detail_info, null);
 
         ClassEvent classEvent = worker.getClassEvent(currentUser.login, event.mId);
         if(classEvent != null)

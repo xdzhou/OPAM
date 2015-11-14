@@ -3,6 +3,7 @@ package com.sky.opam.fragment;
 import java.util.List;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.loic.common.manager.ManagerUtilsFactory;
+import com.loic.common.utils.AndroidUtils;
 import com.loic.common.utils.NetWorkUtils;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.R;
 import com.sky.opam.adapter.EtudiantListAdapter;
 import com.sky.opam.model.Student;
+import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
-import com.sky.opam.service.IntHttpService.asyncSearchEtudiantByNameReponse;
+import com.sky.opam.service.IntHttpService.asyncSearchStudentByNameListener;
 
-public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantByNameReponse
+public class TrombiFragment extends OpamFragment implements asyncSearchStudentByNameListener
 {
     private static final String TAG = TrombiFragment.class.getSimpleName();
     
@@ -56,6 +58,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
             @Override
             public void onClick(View v) 
             {
+                AndroidUtils.closeSoftKeyboard(getActivity());
                 String searchText = searchEditText.getText().toString();
                 if(searchText.length() == 0)
                 {
@@ -67,11 +70,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
                 }
                 else if(getHttpService() != null)
                 {
-                    getHttpService().asyncSearchEtudiantByName(searchText, schoolParam[schoolSpinner.getSelectedItemPosition()], gradeParam[gradeSpinner.getSelectedItemPosition()], TrombiFragment.this);
-                }
-                else 
-                {
-                    ToastUtils.show("httpService is null, retry later");
+                    getHttpService().asyncSearchStudentByName(searchText, schoolParam[schoolSpinner.getSelectedItemPosition()], gradeParam[gradeSpinner.getSelectedItemPosition()], TrombiFragment.this);
                 }
             }
         });
@@ -83,27 +82,27 @@ public class TrombiFragment extends OpamFragment implements asyncSearchEtudiantB
     }
 
     @Override
-    protected void onHttpServiceReady() 
-    {
-    }
-
-    @Override
     public void onStop() 
     {
+        IntHttpService service = getHttpService();
+        if(service != null)
+        {
+            service.cancelAsyncSearchStudentByNameRequest();
+        }
         super.onStop();
     }
 
     @Override
-    public void onAsyncSearchEtudiantByNameReponse(final HttpServiceErrorEnum errorEnum, final List<Student> results) 
+    public void onAsyncSearchStudentByName(final HttpServiceErrorEnum errorEnum, final List<Student> results)
     {
-        if(errorEnum == errorEnum.OkError && results != null && getActivity() != null)
+        if(errorEnum == errorEnum.OkError && results != null && isAdded())
         {
             getActivity().runOnUiThread(new Runnable() 
             {
                 @Override
                 public void run() 
                 {
-                    ToastUtils.show(getString(R.string.OA3002)+" : " + results.size());
+                    Snackbar.make(getView(), getString(R.string.OA3002) + " : " + results.size(), Snackbar.LENGTH_SHORT).show();
                     if(listAdapter != null)
                     {
                         listAdapter.clear();

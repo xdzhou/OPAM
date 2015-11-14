@@ -48,9 +48,9 @@ public class OpamFragment extends GcFragment
     public void onResume() 
     {
         super.onResume();
-        Intent intent = new Intent(LibApplication.getAppContext(), IntHttpService.class);
-        LibApplication.getAppContext().startService(intent);
-        boolean flag = LibApplication.getAppContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(LibApplication.getContext(), IntHttpService.class);
+        LibApplication.getContext().startService(intent);
+        boolean flag = LibApplication.getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         
         Log.d(TAG, "bind INT http service ... "+flag);
     }
@@ -113,7 +113,7 @@ public class OpamFragment extends GcFragment
         super.onStop();
         if(serviceConnection != null)
         {
-            LibApplication.getAppContext().unbindService(serviceConnection);
+            LibApplication.getContext().unbindService(serviceConnection);
             Log.d(TAG, "unbind INT http service ...");
         }
         unregisterBroadCast();

@@ -130,13 +130,13 @@ public class SettingFragment extends OpamFragment
     
     private boolean isAutoNotifi()
     {
-        SharedPreferences sharedPref = LibApplication.getAppContext().getSharedPreferences(SettingFragment.class.getName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = LibApplication.getContext().getSharedPreferences(SettingFragment.class.getName(), Context.MODE_PRIVATE);
         return sharedPref.getBoolean("isAutoNotifi", true);
     }
     
     private void setAutoNotifi(boolean autoNotifi)
     {
-        SharedPreferences sharedPref = LibApplication.getAppContext().getSharedPreferences(SettingFragment.class.getName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = LibApplication.getContext().getSharedPreferences(SettingFragment.class.getName(), Context.MODE_PRIVATE);
         sharedPref.edit().putBoolean("isAutoNotifi", autoNotifi).apply();
     }
 }

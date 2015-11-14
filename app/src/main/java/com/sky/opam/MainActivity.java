@@ -47,8 +47,8 @@ public class MainActivity extends GcActivity implements SharedPreferences.OnShar
     protected void onDestroy()
     {
         super.onDestroy();
-        Intent intent = new Intent(LibApplication.getAppContext(), IntHttpService.class);
-        LibApplication.getAppContext().stopService(intent);
+        Intent intent = new Intent(LibApplication.getContext(), IntHttpService.class);
+        LibApplication.getContext().stopService(intent);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class MainActivity extends GcActivity implements SharedPreferences.OnShar
                 User loginUser = DBworker.getInstance().getDefaultUser();
                 if(loginUser != null)
                 {
-                    Picasso.with(LibApplication.getAppContext()).load(Tool.getTrombiPhotoURL(loginUser.login, 80)).into(mUserAvatar);
+                    Picasso.with(LibApplication.getContext()).load(Tool.getTrombiPhotoURL(loginUser.login, 80)).into(mUserAvatar);
                     mUserName.setText(loginUser.name);
                 }
             }
