@@ -5,7 +5,7 @@
     <application 
         android:name="com.loic.common.LibApplication"
         android:icon="@drawable/logo"
-        android:theme="@style/Theme.AppCompat.Light"
+        android:theme="@style/AppTheme"
         android:label="@string/OA1001">
         
         <activity 

@@ -58,6 +58,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
 {
     private static final String TAG = AgendaViewFragment.class.getSimpleName();
     public static final String BUNDLE_LOGIN_KEY = "BUNDLE_LOGIN_KEY";
+
     private static final String Share_Preference_Key = "AgendaViewFragment_Share_Preference_Key";
     private static final String BUNDLE_Agenda_Year_KEY = "BUNDLE_Agenda_Year_KEY";
     private static final String BUNDLE_Agenda_Month_KEY = "BUNDLE_Agenda_Month_KEY";
@@ -278,9 +279,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
                 agendaView = new AgendaView(container.getContext());
                 agendaView.setStartHour(currentUser.agendaStartHour);
                 agendaView.setEndHour(currentUser.agendaEndHour);
-                agendaView.initCalendar(year, month, false);
                 agendaView.setEventTouchListener(AgendaViewFragment.this);
-                agendaView.askForEvents();
+                agendaView.refreshAgendaWithNewDate(year, month, false);
                 pageView = agendaView;
                 break;
             case 2:

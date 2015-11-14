@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 
 import com.loic.common.Chiffrement;
+import com.loic.common.utils.AndroidUtils;
 import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.OpamMFM;
@@ -73,15 +74,16 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
             @Override
             public void onClick(View v)
             {
+                AndroidUtils.closeSoftKeyboard(getActivity());
                 String login = loginTextView.getText().toString();
                 String password = passwordEditText.getText().toString();
                 if (login.length() == 0)
                 {
-                    ToastUtils.show(getString(R.string.OA1004));
+                    loginTextView.setError(getString(R.string.OA1004));
                 }
                 else if (password.length() == 0)
                 {
-                    ToastUtils.show(getString(R.string.OA1005));
+                    passwordEditText.setError(getString(R.string.OA1005));
                 }
                 else
                 {
@@ -91,13 +93,11 @@ public class LoginFragment extends OpamFragment implements asyncLoginReponse
                         if (currentUser.password.equals(Chiffrement.encrypt(password, IntHttpService.ENCRPT_KEY)))
                         {
                             showAgenda();
-                        }
-                        else
+                        } else
                         {
                             passwordResetAlart();
                         }
-                    }
-                    else if (getHttpService() != null)
+                    } else if (getHttpService() != null)
                     {
                         showProgressDialog();
                         getHttpService().asyncLogin(login, password, LoginFragment.this);
