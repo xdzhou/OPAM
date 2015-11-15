@@ -4,6 +4,9 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,9 +77,14 @@ public class TrombiFragment extends OpamFragment implements asyncSearchStudentBy
                 }
             }
         });
-        ListView resultListView = (ListView) rootView.findViewById(R.id.search_resulte);
-        listAdapter = new EtudiantListAdapter(getActivity());
-        resultListView.setAdapter(listAdapter);
+        RecyclerView resultRecycleView = (RecyclerView) rootView.findViewById(R.id.search_resulte);
+        resultRecycleView.setHasFixedSize(true);
+        // use a linear layout manager
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        resultRecycleView.setLayoutManager(mLayoutManager);
+
+        listAdapter = new EtudiantListAdapter();
+        resultRecycleView.setAdapter(listAdapter);
         
         return rootView;
     }
@@ -105,9 +113,7 @@ public class TrombiFragment extends OpamFragment implements asyncSearchStudentBy
                     Snackbar.make(getView(), getString(R.string.OA3002) + " : " + results.size(), Snackbar.LENGTH_SHORT).show();
                     if(listAdapter != null)
                     {
-                        listAdapter.clear();
-                        listAdapter.addAll(results);
-                        listAdapter.notifyDataSetChanged();
+                        listAdapter.updateData(results);
                     }
                 }
             });

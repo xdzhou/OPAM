@@ -66,6 +66,8 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     private BroadcastReceiver coursLoadedReceiver;
     
     private ViewPager mViewPager;
+
+    private Menu mMenu;
     
     //private View classDetailInfoView;
     //private View monthDetailInfoView;
@@ -158,6 +160,10 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     {
         super.onDestroy();
         saveSharePreference();
+        if(mMenu != null)
+        {
+            mMenu.clear();
+        }
     }
 
     @Override
@@ -488,6 +494,7 @@ public class AgendaViewFragment extends OpamFragment implements AgendaViewEventT
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
+        mMenu = menu;
         MenuItem searchMI = menu.add(R.string.OA2024).setIcon(android.R.drawable.ic_menu_search).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
         searchMI.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() 
         {

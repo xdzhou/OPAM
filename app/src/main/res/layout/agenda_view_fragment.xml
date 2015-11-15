@@ -5,11 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.sky.opam.view.AgendaViewPage
-        android:id="@+id/agenda_view_pager"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/agenda_view_month_info"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:text="azrzsdgegerrrr"/>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:animateLayoutChanges="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Space
+                android:id="@+id/agenda_view_holder"
+                android:layout_width="match_parent"
+                android:layout_height="100px" />
+
+            <com.sky.opam.view.AgendaViewPage
+                android:id="@+id/agenda_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:background="#ffffff"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -23,4 +23,5 @@ dependencies {
     compile project(':LibGraphic')
     compile 'org.jsoup:jsoup:1.8.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
 }

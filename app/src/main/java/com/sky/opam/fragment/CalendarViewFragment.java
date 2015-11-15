@@ -13,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -42,6 +45,8 @@ public class CalendarViewFragment extends OpamFragment implements AgendaView.Age
     private static final String TAG = CalendarViewFragment.class.getSimpleName();
 
     private AgendaViewPage mViewPager;
+    private View monthInfoView = null;
+    private View holderView = null;
     private DBworker worker = DBworker.getInstance();
     private User currentUser;
     private DateFormatSymbols dfs = new DateFormatSymbols(Locale.getDefault());
@@ -67,8 +72,34 @@ public class CalendarViewFragment extends OpamFragment implements AgendaView.Age
         mViewPager.addOnPageChangeListener(adapter);
         mViewPager.setCurrentItem(AgendaViewPageAdapter.CENTER_POSITION, false);
 
+        monthInfoView = rootView.findViewById(R.id.agenda_view_month_info);
+        holderView = rootView.findViewById(R.id.agenda_view_holder);
+
+        setHasOptionsMenu(true);
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        MenuItem searchMI = menu.add(R.string.OA2024).setIcon(android.R.drawable.ic_menu_search).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        searchMI.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                if(holderView.getVisibility() == View.VISIBLE)
+                {
+                    holderView.setVisibility(View.GONE);
+                }
+                else
+                {
+                    holderView.setVisibility(View.VISIBLE);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
