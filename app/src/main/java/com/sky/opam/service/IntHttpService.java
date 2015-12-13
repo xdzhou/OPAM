@@ -42,7 +42,9 @@ import org.jsoup.select.Elements;
 
 import com.loic.common.AsyncProcessor;
 import com.loic.common.Chiffrement;
+import com.loic.common.FailException;
 import com.loic.common.LibApplication;
+import com.loic.common.Triple;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
 import com.sky.opam.model.ClassUpdateInfo;
@@ -62,7 +64,9 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -355,8 +359,8 @@ public class IntHttpService extends Service
     /**
      * get the list of class information for a month
      * 
-     * @param date the date selected
-     * @param callback 
+     * @param year the date selected
+     * @param month the date selected
      */
     public void asyncLoadClassInfo(int year, int month, asyncGetClassInfoListener callback)
     {
@@ -683,103 +687,110 @@ public class IntHttpService extends Service
      * search students by name
      * 
      * @param name the student's name to search (first name or last name)
-     * @param callback request finished callback
+     * @param school TSP or TEM
+     * @param grade first / second ... year
      * 
      */
-    private static final String AsyncSearchStudentByNameToken = "AsyncSearchStudentByNameToken";
-
-    public void asyncSearchStudentByName(final String name, final String school, final String grade, asyncSearchStudentByNameListener callback)
+    public Observable<List<Student>> requestSearchStudents(@NonNull final String name, @Nullable final String school, @Nullable final String grade)
     {
-        if(! TextUtils.isEmpty(name) && callback != null)
+        return Observable.create(new Observable.OnSubscribe<String>()
         {
-            final WeakReference<asyncSearchStudentByNameListener> callbackWeakReference = new WeakReference<asyncSearchStudentByNameListener>(callback);
-
-            Runnable r = new Runnable()
+            @Override
+            public void call(Subscriber<? super String> subscriber)
             {
-                @Override
-                public void run()
+                subscriber.onStart();
+
+                Log.v(TAG, "onStart : "+ (Looper.getMainLooper() == Looper.myLooper()));
+
+                if (TextUtils.isEmpty(name))
                 {
-                    List<Student> serachedEtudiants = null;
-                    HttpServiceErrorEnum errorEnum = HttpServiceErrorEnum.OkError;
-                    HttpPost post = new HttpPost("http://trombi.tem-tsp.eu/etudiants.php");
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("user", name));
-                    if(! TextUtils.isEmpty(school))
-                    {
-                        params.add(new BasicNameValuePair("ecole", school));
-                    }
-                    if(! TextUtils.isEmpty(grade))
-                    {
-                        params.add(new BasicNameValuePair("annee", grade));
-                    }
-                    params.add(new BasicNameValuePair("submit", "Rechercher"));
+                    subscriber.onError(new IllegalArgumentException("Name can't be null"));
+                }
+                else
+                {
+                    subscriber.onNext(name);
+                    subscriber.onNext(school);
+                    subscriber.onNext(grade);
+                    subscriber.onCompleted();
+                }
+            }
+        }).toList().observeOn(Schedulers.io())
+        .flatMap(new Func1<List<String>, Observable<String>>()
+        {
+            @Override
+            public Observable<String> call(List<String> list)
+            {
+                Log.v(TAG, "generate Html : "+ (Looper.getMainLooper() == Looper.myLooper()));
+                HttpPost post = new HttpPost("http://trombi.tem-tsp.eu/etudiants.php");
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("user", list.get(0)));
+                if (!TextUtils.isEmpty(list.get(1)))
+                {
+                    params.add(new BasicNameValuePair("ecole", list.get(1)));
+                }
+                if (!TextUtils.isEmpty(list.get(2)))
+                {
+                    params.add(new BasicNameValuePair("annee", list.get(2)));
+                }
+                params.add(new BasicNameValuePair("submit", "Rechercher"));
 
-                    try
+                try
+                {
+                    post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+                    HttpResponse response = client.execute(post);
+                    int status = response.getStatusLine().getStatusCode();
+                    if (status == 200)
                     {
-                        post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-                        HttpResponse response = client.execute(post);
-                        int status = response.getStatusLine().getStatusCode();
-                        if(status == 200)
-                        {
-                            serachedEtudiants = new ArrayList<Student>();
-                            String rspHtml = EntityUtils.toString(response.getEntity());
-                            Document doc = Jsoup.parse(rspHtml);
-                            Element etudiantsEle = doc.getElementById("etudiants");
-                            Elements temElements = etudiantsEle.getElementsByClass("INTM");
-                            if(temElements != null && !temElements.isEmpty())
-                            {
-                                for(Element ele : temElements)
-                                {
-                                    Student etudiant = createStudent(ele, SchoolEnum.TEM);
-                                    if(etudiant != null)
-                                    {
-                                        serachedEtudiants.add(etudiant);
-                                    }
-                                }
-                            }
-                            Elements tspElements = etudiantsEle.getElementsByClass("TINT");
-                            if(tspElements != null && !tspElements.isEmpty())
-                            {
-                                for(Element ele : tspElements)
-                                {
-                                    Student etudiant = createStudent(ele, SchoolEnum.TSP);
-                                    if(etudiant != null)
-                                    {
-                                        serachedEtudiants.add(etudiant);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorEnum = HttpServiceErrorEnum.HttpBadStatusError;
-                            errorEnum.setDescription("Http bad status : " + status);
-                        }
-                    }
-                    catch (Exception e)
+                        String rspHtml = EntityUtils.toString(response.getEntity());
+                        return Observable.just(rspHtml);
+                    } else
                     {
-                        errorEnum = HttpServiceErrorEnum.ExceptionError;
-                        errorEnum.setDescription(e.getMessage());
+                        return Observable.error(new FailException("Http bad status : " + status));
                     }
+                } catch (IOException e)
+                {
+                    return Observable.error(new FailException("IOException : " + e.getMessage()));
+                }
+            }
+        })
+        .flatMap(new Func1<String, Observable<List<Student>>>()
+        {
+            @Override
+            public Observable<List<Student>> call(String rspHtml)
+            {
+                Log.v(TAG, "generate students : " + (Looper.getMainLooper() == Looper.myLooper()));
+                List<Student> students = new ArrayList<Student>();
 
-                    if(callbackWeakReference.get() != null)
+                Document doc = Jsoup.parse(rspHtml);
+                Element etudiantsEle = doc.getElementById("etudiants");
+                Elements temElements = etudiantsEle.getElementsByClass("INTM");
+                if (temElements != null && !temElements.isEmpty())
+                {
+                    for (Element ele : temElements)
                     {
-                        callbackWeakReference.get().onAsyncSearchStudentByName(errorEnum, serachedEtudiants);
-                    }
-                    else
-                    {
-                        Log.e(TAG, "NO callback for asyncSearchStudentByName");
+                        Student s = createStudent(ele, SchoolEnum.TEM);
+                        if (s != null)
+                        {
+                            students.add(s);
+                        }
                     }
                 }
-            };
+                Elements tspElements = etudiantsEle.getElementsByClass("TINT");
+                if (tspElements != null && !tspElements.isEmpty())
+                {
+                    for (Element ele : tspElements)
+                    {
+                        Student s = createStudent(ele, SchoolEnum.TSP);
+                        if (s != null)
+                        {
+                            students.add(s);
+                        }
+                    }
+                }
 
-            AsyncProcessor.getInstance().pushRequest(r, AsyncSearchStudentByNameToken);
-        }
-    }
-
-    public void cancelAsyncSearchStudentByNameRequest()
-    {
-         AsyncProcessor.getInstance().cancelRequest(AsyncSearchStudentByNameToken);
+                return Observable.just(students);
+            }
+        }).subscribeOn(AndroidSchedulers.mainThread());
     }
     
     public Student createStudent(Element ele, SchoolEnum schoolEnum)
@@ -1231,6 +1242,7 @@ public class IntHttpService extends Service
             ValGra = NomCal = null;
         }
     }
+
     /******************************************************
      ********************HttpService Enum******************
      ******************************************************/
@@ -1289,16 +1301,6 @@ public class IntHttpService extends Service
     /******************************************************
      *********************Async Listener*******************
      ******************************************************/
-    
-    public interface asyncSearchStudentByNameListener
-    {
-        public void onAsyncSearchStudentByName(HttpServiceErrorEnum errorEnum, List<Student> results);
-    }
-    
-    public interface asyncLoginListener
-    {
-        public void onAsyncLogin(String login, HttpServiceErrorEnum errorEnum);
-    }
     
     public interface asyncGetClassInfoListener
     {
