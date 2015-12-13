@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,12 @@ import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
 import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
-import com.sky.opam.service.IntHttpService.asyncLoginListener;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.SharePreferenceUtils;
 
-public class LoginFragment extends OpamFragment implements asyncLoginListener
+import rx.Subscriber;
+
+public class LoginFragment extends OpamFragment
 {
     private static final String TAG = LoginFragment.class.getSimpleName();
     
@@ -77,11 +79,11 @@ public class LoginFragment extends OpamFragment implements asyncLoginListener
                 AndroidUtils.closeSoftKeyboard(getActivity());
                 String login = loginTextView.getText().toString();
                 String password = passwordEditText.getText().toString();
-                if (login.length() == 0)
+                if (TextUtils.isEmpty(login))
                 {
                     loginTextView.setError(getString(R.string.OA1004));
                 }
-                else if (password.length() == 0)
+                else if (TextUtils.isEmpty(password))
                 {
                     passwordEditText.setError(getString(R.string.OA1005));
                 }
@@ -93,20 +95,21 @@ public class LoginFragment extends OpamFragment implements asyncLoginListener
                         if (currentUser.password.equals(Chiffrement.encrypt(password, IntHttpService.ENCRPT_KEY)))
                         {
                             showAgenda();
-                        } else
+                        }
+                        else
                         {
                             passwordResetAlart();
                         }
-                    } else if (getHttpService() != null)
+                    }
+                    else
                     {
-                        showProgressDialog();
-                        getHttpService().asyncLogin(login, password, LoginFragment.this);
+                        requestLogin(login, password);
                     }
                 }
             }
         });
         
-        getGcActivity().getSupportActionBar().hide();
+        getGcActivity().setActionBarVisible(false);
         
         return rootView;
     }
@@ -122,7 +125,55 @@ public class LoginFragment extends OpamFragment implements asyncLoginListener
     public void onDestroy() 
     {
         super.onDestroy();
-        getGcActivity().getSupportActionBar().show();
+        getGcActivity().setActionBarVisible(true);
+    }
+
+    private void requestLogin(final String login, String password)
+    {
+        final IntHttpService httpService = getHttpService();
+        if(httpService == null)
+        {
+            Log.e(TAG, "requestLogin : IntHttpService is null ...");
+            return;
+        }
+        httpService.requestLogin(login, password).subscribe(new Subscriber<HttpServiceErrorEnum>()
+        {
+            @Override
+            public void onStart()
+            {
+                showProgressDialog();
+            }
+
+            @Override
+            public void onCompleted()
+            {
+                closeProgressDialog();
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+                closeProgressDialog();
+            }
+
+            @Override
+            public void onNext(HttpServiceErrorEnum errorEnum)
+            {
+                if (errorEnum == HttpServiceErrorEnum.OkError)
+                {
+                    worker.setDefaultUser(login);
+                    if (isAdded())
+                    {
+                        showAgenda();
+                    }
+                }
+                else
+                {
+                    ToastUtils.show(errorEnum.getDescription());
+                    Log.e(TAG, "onAgendaLoaded with error : " + errorEnum.toString());
+                }
+            }
+        });
     }
 
     private void showAgenda()
@@ -199,39 +250,5 @@ public class LoginFragment extends OpamFragment implements asyncLoginListener
     protected void onHttpServiceReady() 
     {
         Log.d(TAG, "onCasServiceReady...");
-    }
-
-    @Override
-    public void onAsyncLogin(String login, final HttpServiceErrorEnum errorEnum)
-    {
-        closeProgressDialog();
-        if(errorEnum == HttpServiceErrorEnum.OkError && isAdded())
-        {
-            worker.setDefaultUser(login);
-            getActivity().runOnUiThread(new Runnable() 
-            {
-                @Override
-                public void run() 
-                {
-                    if(isAdded())
-                    {
-                        showAgenda();
-                    }
-                }
-            });
-        }
-        else 
-        {
-            getActivity().runOnUiThread(new Runnable() 
-            {
-                @Override
-                public void run() 
-                {
-                    ToastUtils.show(errorEnum.getDescription());
-                }
-            });
-            
-            Log.e(TAG, "onAgendaLoaded with error : "+errorEnum.toString());
-        }
     }
 }

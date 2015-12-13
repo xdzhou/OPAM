@@ -195,35 +195,5 @@ public class DBworker extends SqliteWorker
             deleteData(ClassEvent.class, "login = '"+login+"' AND startTime > "+startestTime+" AND endTime < "+endestTime);
         }
     }
-    
-    public void setClassSynced(long classId, long eventId)
-    {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("update CLASSINFO set eventId=? where id = ?",
-                new Object[] { eventId, classId });
-        db.close();
-    }
-    
-    //指示App配置 自动登录  自动提示升级信息
-    public void setAutoLogin(Context context, boolean b)
-    {
-        context.getSharedPreferences("share", 0).edit().putBoolean("autoLogin", b).commit();        
-    }
-    
-    public void setAutoUpdateNotify(Context context, boolean b)
-    {
-        context.getSharedPreferences("share", 0).edit().putBoolean("autoUpdateNotify", b).commit(); 
-    }
-    
-    public boolean getAutoLogin(Context context)
-    {
-        SharedPreferences pref = context.getSharedPreferences("share", 0); 
-        return pref.getBoolean("autoLogin", true);       
-    }
-    
-    public boolean getAutoUpdateNotify(Context context)
-    {
-        SharedPreferences pref = context.getSharedPreferences("share", 0); 
-        return pref.getBoolean("autoUpdateNotify", true);
-    }
+
 }

@@ -62,9 +62,17 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class IntHttpService extends Service 
 {
@@ -100,7 +108,7 @@ public class IntHttpService extends Service
     private final LinkedList<LoadClassTaskParams> loadClassParamsQueue = new LinkedList<IntHttpService.LoadClassTaskParams>();
     private Date classLoadingDate;
     
-    private Object loginPasswordLock = new Object();
+    private final Object loginPasswordLock = new Object();
     
     public class LocalBinder extends Binder 
     {
@@ -193,29 +201,72 @@ public class IntHttpService extends Service
         }
     };
     
-    /*
+    /**
      * login to INT server
      * 
      * @param login user name
-     * @param password 
-     * @param callback
+     * @param password user's password
      */
-    public void asyncLogin(final String login, final String password, asyncLoginListener callback)
+    public Observable<HttpServiceErrorEnum> requestLogin(final String login, final String password)
     {
-        final WeakReference<asyncLoginListener> callbackWeakReference = new WeakReference<asyncLoginListener>(callback);
-        new Thread(new Runnable() 
+        return Observable.create(new Observable.OnSubscribe<Pair<String, String>>()
         {
             @Override
-            public void run() 
+            public void call(Subscriber<? super Pair<String, String>> subscriber)
             {
-                requestLogin(login, password, callbackWeakReference);
+                subscriber.onStart();
+                subscriber.onNext(Pair.create(login, password));
+                subscriber.onCompleted();
             }
-        }).start();
+        })
+        .flatMap(new Func1<Pair<String, String>, Observable<HttpServiceErrorEnum>>()
+        {
+            @Override
+            public Observable<HttpServiceErrorEnum> call(Pair<String, String> stringStringPair)
+            {
+                requestLogout(true);
+                setLoginPassword(login, password);
+                HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
+                HttpResponse response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
+
+                if (response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                {
+                    response = executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Bandeau.aspx?"), errorEnumRef);
+                }
+
+                if (response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                {
+                    String userName = getUserName(errorEnumRef, response);
+                    Log.d(TAG, "userName : " + userName);
+                    User user = new User(login, Chiffrement.encrypt(password, ENCRPT_KEY), userName);
+
+                    DBworker dBworker = DBworker.getInstance();
+                    dBworker.insertData(user);
+
+                    if (userName == null)
+                    {
+                        Log.e(TAG, "Can't find user name, error : " + errorEnumRef.errorEnum.getDescription());
+                    }
+
+                    //clear errorEnum, even we have't got user name
+                    errorEnumRef.errorEnum = HttpServiceErrorEnum.OkError;
+                    loadProfilImg(login);
+                }
+
+                if (errorEnumRef.errorEnum != HttpServiceErrorEnum.OkError)
+                {
+                    //request login failed, clear user login info
+                    setLoginPassword(null, null);
+                }
+                requestLogout(false);
+                return Observable.just(errorEnumRef.errorEnum);
+            }
+        }).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread());
     }
     
     private void requestLogout(Boolean clearLogin)
     {
-        boolean isLogin = false;
+        boolean isLogin;
         synchronized (loginPasswordLock)
         {
             isLogin = (login != null) && (password != null);
@@ -223,7 +274,7 @@ public class IntHttpService extends Service
         
         if(isLogin)
         {
-            executeHttpRequest(new HttpGet("https://ecampus.tem-tsp.eu/uPortal/Logout"), new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError));
+            executeHttpRequest(new HttpGet("https://ecampus.tem-tsp.eu/uPortal/Logout"), new HttpServiceErrorEnumReference());
         }
         reset();
         
@@ -233,85 +284,41 @@ public class IntHttpService extends Service
         }
     }
     
-    private void requestLogin(String login, String password, WeakReference<asyncLoginListener> callbackWeakReference)
-    {
-        requestLogout(true);
-        setLoginPassword(login, password);
-        HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
-        HttpResponse response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
-        
-        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-        {
-            response = this.executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Bandeau.aspx?"), errorEnumRef);
-        }
-
-        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-        {
-            String userName = getUserName(errorEnumRef, response);
-            Log.d(TAG, "userName : "+userName);
-            User user = new User(login, Chiffrement.encrypt(password, ENCRPT_KEY), userName);
-            
-            DBworker dBworker = DBworker.getInstance();
-            dBworker.insertData(user);
-            
-            if(userName == null)
-            {
-                Log.e(TAG, "Can't find user name, error : "+errorEnumRef.errorEnum.getDescription());
-            }
-            
-            errorEnumRef.errorEnum = HttpServiceErrorEnum.OkError;
-            loadProfilImg(login);
-        }
-        
-        if(errorEnumRef.errorEnum != HttpServiceErrorEnum.OkError)
-        {
-            setLoginPassword(null, null);
-        }
-        requestLogout(false);
-        
-        Log.d(TAG, "request login finished for "+login+" ErrorEnum : "+errorEnumRef.errorEnum);
-        
-        if(callbackWeakReference != null && callbackWeakReference.get() != null)
-        {
-            callbackWeakReference.get().onAsyncLogin(login, errorEnumRef.errorEnum);
-        }
-    }
-    
-    private String getUserName(HttpServiceErrorEnumReference errorEnumRef, HttpResponse response)
+    private String getUserName(HttpServiceErrorEnumReference errorEnumRef, @NonNull HttpResponse response)
     {
         String userName = null;
-        if(errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError && response != null)
+        try
         {
-            try 
+            String rspHtml = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Document doc = Jsoup.parse(rspHtml);
+            Element element = doc.getElementById("Menu");
+            if(element != null)
             {
-                String rspHtml = EntityUtils.toString(response.getEntity());
-                response.getEntity().consumeContent();
-                Document doc = Jsoup.parse(rspHtml);
-                Element element = doc.getElementById("Menu");
-                if(element != null)
+                Elements spanEles = element.getElementsByTag("span");
+                if(spanEles != null)
                 {
-                    Log.i(TAG, element.text());
-                    
-                    Elements spanEles = element.getElementsByTag("span");
-                    if(spanEles != null)
+                    for(Element ele : spanEles)
                     {
-                        for(Element ele : spanEles)
+                        if(ele.text().contains("Bonjour"))
                         {
-                            if(ele.text().contains("Bonjour"))
-                            {
-                                userName = ele.text().replace("Bonjour", "");
-                                userName = userName.replace(getSpecialSpace(), "");
-                                break;
-                            }
+                            userName = ele.text().replace("Bonjour", "");
+                            userName = userName.replace(getSpecialSpace(), "");
+                            break;
                         }
                     }
                 }
-            } 
-            catch (Exception e) 
-            {
-                errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
-                errorEnumRef.errorEnum.setDescription(e.getMessage());
+
+                if(userName == null)
+                {
+                    Log.e(TAG, "Can't find userName, html : "+element.text());
+                }
             }
+        }
+        catch (IOException e)
+        {
+            errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
+            errorEnumRef.errorEnum.setDescription(e.getMessage());
         }
         
         if(userName == null)
@@ -345,7 +352,7 @@ public class IntHttpService extends Service
         }
     }
     
-    /*
+    /**
      * get the list of class information for a month
      * 
      * @param date the date selected
@@ -381,7 +388,7 @@ public class IntHttpService extends Service
     private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoListener> callbackRef)
     {
         classLoadingDate = date;
-        HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
+        HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference();
         List<ClassEvent> classInfos = null;
         try 
         {
@@ -470,7 +477,7 @@ public class IntHttpService extends Service
                 }
             }
         } 
-        catch (Exception e) 
+        catch (IOException e)
         {
             errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
             errorEnumRef.errorEnum.setDescription(e.toString());
@@ -999,24 +1006,24 @@ public class IntHttpService extends Service
     /******************************************************
      ********************Common function ******************
      ******************************************************/
-    private HttpResponse executeHttpRequest(HttpUriRequest request, HttpServiceErrorEnumReference errorEnumRef)
+    private HttpResponse executeHttpRequest(@NonNull HttpUriRequest request, HttpServiceErrorEnumReference errorEnumRef)
     {
         HttpResponse response = null;
         
-        if(request != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+        if(errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
         {
-            try 
+            try
             {
                 response = client.execute(request, httpContext);
-                
+
                 int status = response.getStatusLine().getStatusCode();
-                
-                Log.d(TAG, "execute "+request.getMethod()+" with status:"+status+" URL:" + request.getURI());
+
+                Log.d(TAG, "execute " + request.getMethod() + " with status:" + status + " URL:" + request.getURI());
                 if(request.getMethod().equalsIgnoreCase("POST"))
                 {
                     Log.d(TAG, EntityUtils.toString(((HttpPost)request).getEntity()));
                 }
-                
+
                 if(status == 302)
                 {
                     String newUrl = response.getFirstHeader("Location").getValue();
@@ -1028,7 +1035,7 @@ public class IntHttpService extends Service
                     {
                         newUrl = "http://" + newUrl;
                     }
-                    
+
                     response.getEntity().consumeContent();
                     response = executeHttpRequest(new HttpGet(newUrl), errorEnumRef);
                 }
@@ -1041,16 +1048,16 @@ public class IntHttpService extends Service
                         response = executeHttpRequest(casRequest, errorEnumRef);
                     }
                 }
-                else if(status != 302 && status != 200)
+                else if(status != 200)
                 {
                     errorEnumRef.errorEnum = HttpServiceErrorEnum.HttpBadStatusError;
                     errorEnumRef.errorEnum.setDescription("Http status : "+status+" - for URL : "+request.getURI());
                 }
-            } 
-            catch (IOException e) 
+            }
+            catch (IOException e)
             {
                 errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
-                errorEnumRef.errorEnum.setDescription(e.toString());
+                errorEnumRef.errorEnum.setDescription(e.getMessage());
                 e.printStackTrace();
                 response = null;
             }
@@ -1230,6 +1237,11 @@ public class IntHttpService extends Service
     private static class HttpServiceErrorEnumReference
     {
         private HttpServiceErrorEnum errorEnum;
+
+        public HttpServiceErrorEnumReference()
+        {
+            this(HttpServiceErrorEnum.OkError);
+        }
 
         public HttpServiceErrorEnumReference(HttpServiceErrorEnum errorEnum) 
         {
