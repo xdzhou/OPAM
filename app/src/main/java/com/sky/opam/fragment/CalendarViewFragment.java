@@ -27,6 +27,7 @@ import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
 import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
+import com.sky.opam.service.IntHttpService;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.Tool;
 import com.sky.opam.view.AgendaViewPage;
@@ -39,6 +40,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
 
 public class CalendarViewFragment extends OpamFragment implements AgendaView.AgendaViewEventTouchListener
 {
@@ -89,11 +94,10 @@ public class CalendarViewFragment extends OpamFragment implements AgendaView.Age
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                if(holderView.getVisibility() == View.VISIBLE)
+                if (holderView.getVisibility() == View.VISIBLE)
                 {
                     holderView.setVisibility(View.GONE);
-                }
-                else
+                } else
                 {
                     holderView.setVisibility(View.VISIBLE);
                 }
@@ -181,6 +185,38 @@ public class CalendarViewFragment extends OpamFragment implements AgendaView.Age
             success = true;
         }
         return success;
+    }
+
+    private void requestClassEvents(int year, int month)
+    {
+        IntHttpService httpService = getHttpService();
+        if(httpService == null)
+        {
+            Log.e(TAG, "requestClassEvents : httpService is null");
+        }
+        else
+        {
+            Observable<List<ClassEvent>> rxClassObservable = httpService.requestClassInfos(year, month);
+            Subscription s = worker.inserClassEvents(currentUser.login, year, month, rxClassObservable).subscribe(new Subscriber<List<ClassEvent>>()
+            {
+                @Override
+                public void onCompleted()
+                {
+                }
+
+                @Override
+                public void onError(Throwable e)
+                {
+                    Log.e(TAG, "requestClassEvents : error : "+e);
+                }
+
+                @Override
+                public void onNext(List<ClassEvent> classEvents)
+                {
+
+                }
+            });
+        }
     }
 
     private String getYearMonthText(int year, int month)

@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.security.KeyStore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -40,14 +38,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.loic.common.AsyncProcessor;
 import com.loic.common.Chiffrement;
 import com.loic.common.FailException;
 import com.loic.common.LibApplication;
-import com.loic.common.Triple;
 import com.sky.opam.R;
 import com.sky.opam.model.ClassEvent;
-import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.Student;
 import com.sky.opam.model.Student.SchoolEnum;
 import com.sky.opam.model.User;
@@ -61,8 +56,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.http.AndroidHttpClient;
 import android.os.Binder;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -102,15 +95,9 @@ public class IntHttpService extends Service
     private AndroidHttpClient client;
     
     private DateFormat df = new SimpleDateFormat("yyyyMMdd", Locale.US);
-    private DBworker worker;
     private String login;    // "he_huilo";
     private String password; // "pancakes";
     private AgendaWebParams agendaWebParams;
-    
-    private HandlerThread workerThread;
-    private Handler workerHandler;
-    private final LinkedList<LoadClassTaskParams> loadClassParamsQueue = new LinkedList<IntHttpService.LoadClassTaskParams>();
-    private Date classLoadingDate;
     
     private final Object loginPasswordLock = new Object();
     
@@ -128,9 +115,6 @@ public class IntHttpService extends Service
         super.onCreate();
         
         initHttpClient();
-        workerThread = new HandlerThread("IntHttpService-workerThread");
-        workerThread.start();
-        workerHandler = new Handler(workerThread.getLooper());
         
         worker = DBworker.getInstance();
         User defautUser = worker.getDefaultUser();
@@ -185,33 +169,13 @@ public class IntHttpService extends Service
         }
     }
     
-    /******************************************************
-     **********************Task Runnable*******************
-     ******************************************************/    
-    private Runnable LoadClassRunnable = new Runnable() 
-    {    
-        @Override
-        public void run() 
-        {
-            LoadClassTaskParams taskParams;
-            synchronized (loadClassParamsQueue) 
-            {
-                taskParams = loadClassParamsQueue.poll();
-            }
-            if(taskParams != null && taskParams.callbackRef.get() != null)
-            {
-                requestAgendaInfo(taskParams.searchDate, taskParams.callbackRef);
-            }
-        }
-    };
-    
     /**
      * login to INT server
      * 
      * @param login user name
      * @param password user's password
      */
-    public Observable<HttpServiceErrorEnum> requestLogin(final String login, final String password)
+    public Observable<User> requestLogin(final String login, final String password)
     {
         return Observable.create(new Observable.OnSubscribe<Pair<String, String>>()
         {
@@ -219,17 +183,25 @@ public class IntHttpService extends Service
             public void call(Subscriber<? super Pair<String, String>> subscriber)
             {
                 subscriber.onStart();
-                subscriber.onNext(Pair.create(login, password));
-                subscriber.onCompleted();
+                if(TextUtils.isEmpty(login) || TextUtils.isEmpty(password))
+                {
+                    subscriber.onError(new IllegalArgumentException("login or password invalid"));
+                }
+                else
+                {
+                    subscriber.onNext(Pair.create(login, password));
+                    subscriber.onCompleted();
+                }
             }
-        })
-        .flatMap(new Func1<Pair<String, String>, Observable<HttpServiceErrorEnum>>()
+        }).observeOn(Schedulers.io())
+        .flatMap(new Func1<Pair<String, String>, Observable<User>>()
         {
             @Override
-            public Observable<HttpServiceErrorEnum> call(Pair<String, String> stringStringPair)
+            public Observable<User> call(Pair<String, String> pair)
             {
+                User user = null;
                 requestLogout(true);
-                setLoginPassword(login, password);
+                setLoginPassword(pair.first, pair.second);
                 HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
                 HttpResponse response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
 
@@ -242,10 +214,7 @@ public class IntHttpService extends Service
                 {
                     String userName = getUserName(errorEnumRef, response);
                     Log.d(TAG, "userName : " + userName);
-                    User user = new User(login, Chiffrement.encrypt(password, ENCRPT_KEY), userName);
-
-                    DBworker dBworker = DBworker.getInstance();
-                    dBworker.insertData(user);
+                    user = new User(pair.first, Chiffrement.encrypt(password, ENCRPT_KEY), userName);
 
                     if (userName == null)
                     {
@@ -254,7 +223,7 @@ public class IntHttpService extends Service
 
                     //clear errorEnum, even we have't got user name
                     errorEnumRef.errorEnum = HttpServiceErrorEnum.OkError;
-                    loadProfilImg(login);
+                    loadProfileImg(pair.first);
                 }
 
                 if (errorEnumRef.errorEnum != HttpServiceErrorEnum.OkError)
@@ -263,9 +232,17 @@ public class IntHttpService extends Service
                     setLoginPassword(null, null);
                 }
                 requestLogout(false);
-                return Observable.just(errorEnumRef.errorEnum);
+
+                if (user == null)
+                {
+                    return Observable.error(new FailException(errorEnumRef.errorEnum.getDescription()));
+                }
+                else
+                {
+                    return Observable.just(user);
+                }
             }
-        }).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(AndroidSchedulers.mainThread());
     }
     
     private void requestLogout(Boolean clearLogin)
@@ -333,7 +310,7 @@ public class IntHttpService extends Service
         return userName;
     }
     
-    private void loadProfilImg(String login)
+    private void loadProfileImg(String login)
     {
         try 
         {
@@ -362,110 +339,117 @@ public class IntHttpService extends Service
      * @param year the date selected
      * @param month the date selected
      */
-    public void asyncLoadClassInfo(int year, int month, asyncGetClassInfoListener callback)
+    public Observable<List<ClassEvent>> requestClassInfos(final int year, final int month)
     {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        asyncLoadClassInfo(calendar.getTime(), callback);
-    }
-    
-    public void asyncLoadClassInfo(Date date, asyncGetClassInfoListener callback)
-    {
-        if(date != null && callback != null && login != null && password != null)
+        return Observable.create(new Observable.OnSubscribe<Date>()
         {
-            if(classLoadingDate != null && classLoadingDate.getYear() == date.getYear() && classLoadingDate.getMonth() == date.getMonth())
+            @Override
+            public void call(Subscriber<? super Date> subscriber)
             {
-                Log.i(TAG, "classes for this year / month is loading : "+(date.getYear()+1900)+"/"+date.getMonth());
+                subscriber.onStart();
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                subscriber.onNext(calendar.getTime());
+                subscriber.onCompleted();
             }
-            else 
-            {
-                synchronized (loadClassParamsQueue) 
-                {
-                    loadClassParamsQueue.push(new LoadClassTaskParams(date, callback));
-                }
-                workerHandler.post(LoadClassRunnable);
-            }
-        }
-    }
-    
-    private void requestAgendaInfo(Date date, WeakReference<asyncGetClassInfoListener> callbackRef)
-    {
-        classLoadingDate = date;
-        HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference();
-        List<ClassEvent> classInfos = null;
-        try 
+        })
+        .observeOn(Schedulers.io())
+        .flatMap(new Func1<Date, Observable<String>>()
         {
-            HttpResponse response = null;
-            
-            if(! agendaWebParams.isFormItemsReady())
+            @Override
+            public Observable<String> call(Date date)
             {
-                //request SI main page html and auto connect
-                response = this.executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
-                if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                HttpResponse response = null;
+                HttpServiceErrorEnumReference errorEnumRef = new HttpServiceErrorEnumReference();
+                try
                 {
-                    response.getEntity().consumeContent();
-                    //request SI bandeau page html
-                    response = this.executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Bandeau.aspx?"), errorEnumRef);
-                }
-                if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-                {
-                    agendaWebParams.groupID = getGroupID(EntityUtils.toString(response.getEntity()));
-                    response.getEntity().consumeContent();
-                    if(agendaWebParams.groupID != null)
+                    if(! agendaWebParams.isFormItemsReady())
                     {
-                        //request SI left menu page html
-                        response = this.executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Rubriques.aspx?groupe=" + agendaWebParams.groupID), errorEnumRef);
+                        //request SI main page html and auto connect
+                        response = executeHttpRequest(new HttpGet(SI_HOST), errorEnumRef);
+                        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                        {
+                            response.getEntity().consumeContent();
+                            //request SI bandeau page html
+                            response = executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Bandeau.aspx?"), errorEnumRef);
+                        }
+                        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                        {
+                            agendaWebParams.groupID = getGroupID(EntityUtils.toString(response.getEntity()));
+                            response.getEntity().consumeContent();
+                            if(agendaWebParams.groupID != null)
+                            {
+                                //request SI left menu page html
+                                response = executeHttpRequest(new HttpGet(SI_HOST + "/OpDotNet/Noyau/Rubriques.aspx?groupe=" + agendaWebParams.groupID), errorEnumRef);
+                            }
+                            else
+                            {
+                                errorEnumRef.errorEnum = HttpServiceErrorEnum.HtmlContentError;
+                                errorEnumRef.errorEnum.setDescription("Can't find groupId from html ...");
+                            }
+                        }
+                        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                        {
+                            getAppIDLienID(EntityUtils.toString(response.getEntity()));
+                            response.getEntity().consumeContent();
+                            if(agendaWebParams.appId != null && agendaWebParams.lienID != null)
+                            {
+                                //request SI Login/aspxtoasp page html
+                                response = executeHttpRequest(new HttpGet(SI_HOST + "OpDotnet/commun/Login/aspxtoasp.aspx?url=/Eplug/Agenda/Agenda.asp?IdApplication=" + agendaWebParams.appId + "&TypeAcces=Utilisateur&IdLien=" + agendaWebParams.lienID + "&groupe=" + agendaWebParams.groupID), errorEnumRef);
+                            }
+                            else
+                            {
+                                errorEnumRef.errorEnum = HttpServiceErrorEnum.HtmlContentError;
+                                errorEnumRef.errorEnum.setDescription("Can't find appID and lienID from html ...");
+                            }
+                        }
+                        if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                        {
+                            HttpPost request = createAspxtoaspRequest(response, errorEnumRef);
+                            response.getEntity().consumeContent();
+                            //request SI agenda page html
+                            response = executeHttpRequest(request, errorEnumRef);
+                        }
                     }
-                    else 
-                    {
-                        errorEnumRef.errorEnum = HttpServiceErrorEnum.HtmlContentError;
-                        errorEnumRef.errorEnum.setDescription("Can't find groupId from html ...");
-                    }
-                }
-                if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-                {
-                    getAppIDLienID(EntityUtils.toString(response.getEntity()));
-                    response.getEntity().consumeContent();
-                    if(agendaWebParams.appId != null && agendaWebParams.lienID != null)
-                    {
-                        //request SI Login/aspxtoasp page html
-                        response = this.executeHttpRequest(new HttpGet(SI_HOST + "OpDotnet/commun/Login/aspxtoasp.aspx?url=/Eplug/Agenda/Agenda.asp?IdApplication="+agendaWebParams.appId+"&TypeAcces=Utilisateur&IdLien="+agendaWebParams.lienID+"&groupe="+agendaWebParams.groupID), errorEnumRef);
-                    }
-                    else 
-                    {
-                        errorEnumRef.errorEnum = HttpServiceErrorEnum.HtmlContentError;
-                        errorEnumRef.errorEnum.setDescription("Can't find appID and lienID from html ...");
-                    }
-                }
-                if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-                {
-                    HttpPost request = createAspxtoaspRequest(response, errorEnumRef);
-                    response.getEntity().consumeContent();
-                    //request SI agenda page html
-                    response = this.executeHttpRequest(request, errorEnumRef);
-                }
-            }
-            
-            HttpPost request = createGetClassInfoRequest(response, date, errorEnumRef);
-            if(response != null)
-            {
-                response.getEntity().consumeContent();
-            }
-            //request SI get class info
-            if(request != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-            {
-                response = this.executeHttpRequest(request, errorEnumRef);
-            }
 
-            if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                    HttpPost request = createGetClassInfoRequest(response, date, errorEnumRef);
+                    if(response != null)
+                    {
+                        response.getEntity().consumeContent();
+                    }
+                    //request SI get class info
+                    if(request != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                    {
+                        response = executeHttpRequest(request, errorEnumRef);
+                    }
+
+                    if(response != null && errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
+                    {
+                        String rspHtml = EntityUtils.toString(response.getEntity());
+                        response.getEntity().consumeContent();
+                        return Observable.just(rspHtml);
+                    }
+                    else
+                    {
+                        return Observable.error(new FailException(errorEnumRef.errorEnum.getDescription()));
+                    }
+                }
+                catch (IOException e)
+                {
+                    return Observable.error(new FailException("IOException : "+e.getMessage()));
+                }
+            }
+        })
+        .flatMap(new Func1<String, Observable<List<ClassEvent>>>()
+        {
+            @Override
+            public Observable<List<ClassEvent>> call(String rspHtml)
             {
-                String rspHtml = EntityUtils.toString(response.getEntity());
-                response.getEntity().consumeContent();
                 Pattern pattern = Pattern.compile("onmouseover=\"DetEve\\(\'([0-9]+)\',\'([^']+)\',\'([0-9]+)\'\\)");
                 Matcher matcher = pattern.matcher(rspHtml);
-                classInfos = new ArrayList<ClassEvent>();
-                
+                List<ClassEvent> classInfos = new ArrayList<ClassEvent>();
+
                 while(matcher.find())
                 {
                     HttpServiceErrorEnumReference tempErrorEnumRef = new HttpServiceErrorEnumReference(HttpServiceErrorEnum.OkError);
@@ -479,65 +463,17 @@ public class IntHttpService extends Service
                         Log.e(TAG, "Load Class failed, error : " + tempErrorEnumRef.errorEnum.getDescription());
                     }
                 }
+
+                //try to broadcast cet info
+                Intent i = new Intent(CoursLoadedBroadCaset);
+                i.putExtra(CoursLoaded_Date_Info, date.getTime());
+                i.putExtra(CoursLoaded_Cours_Size_Info, classInfos == null ? 0 : classInfos.size());
+                i.putExtra(CoursLoaded_Error_Enum_Index_Info, errorEnumRef.errorEnum.ordinal());
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+
+                return Observable.just(classInfos);
             }
-        } 
-        catch (IOException e)
-        {
-            errorEnumRef.errorEnum = HttpServiceErrorEnum.ExceptionError;
-            errorEnumRef.errorEnum.setDescription(e.toString());
-        }
-        
-        DBworker worker = DBworker.getInstance();
-        ClassUpdateInfo updateInfo = worker.getUpdateInfo(login, date);
-        boolean needSave = false;
-        if(updateInfo == null)
-        {
-            updateInfo = new ClassUpdateInfo(login);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            updateInfo.year = calendar.get(Calendar.YEAR);
-            updateInfo.month = calendar.get(Calendar.MONTH);
-            needSave = true;
-        }
-        
-        if(errorEnumRef.errorEnum == HttpServiceErrorEnum.OkError)
-        {
-            worker.deleteClassEvents(login, date);
-            int totalTime = 0; //in second
-            for(ClassEvent classEvent : classInfos)
-            {
-                worker.insertData(classEvent);
-                totalTime += (classEvent.endTime.getTime() - classEvent.startTime.getTime()) / 1000;
-            }
-            updateInfo.lastSuccessUpdateDate = new Date();
-            updateInfo.classNumber = classInfos.size();
-            updateInfo.totalTime = totalTime;
-        }
-        else 
-        {
-            updateInfo.lastFailUpdateDate = new Date();
-            updateInfo.errorEnum = errorEnumRef.errorEnum;
-        }
-        
-        if(needSave)
-        {
-            worker.insertData(updateInfo);
-        }
-        else
-        {
-            worker.updateClassUpdateInfro(updateInfo);
-        }
-        
-        classLoadingDate = null;
-        
-        Log.d(TAG, "Cours Loaded for " + date + " ErrorEnum : "+errorEnumRef.errorEnum.getDescription());
-        
-        //try to broadcast cet info
-        Intent i = new Intent(CoursLoadedBroadCaset);
-        i.putExtra(CoursLoaded_Date_Info, date.getTime());
-        i.putExtra(CoursLoaded_Cours_Size_Info, classInfos == null ? 0 : classInfos.size());
-        i.putExtra(CoursLoaded_Error_Enum_Index_Info, errorEnumRef.errorEnum.ordinal());
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+        });
     }
     
     private String getGroupID(String html)
@@ -1148,24 +1084,23 @@ public class IntHttpService extends Service
     private void reset()
     {
         //reset all params
-        clearCookies();
-        agendaWebParams.clear();
-    }
-    
-    private void clearCookies()
-    {
         CookieStore cookieStore = (CookieStore) httpContext.getAttribute(ClientContext.COOKIE_STORE);
         if(cookieStore != null)
         {
             cookieStore.clear();
         }
+        agendaWebParams.clear();
     }
-    
-    public static String getSpecialSpace()
+
+    private void setLoginPassword(String login, String password)
     {
-        byte[] bytes = {-62, -96};
-        return new String(bytes);
+        synchronized (loginPasswordLock)
+        {
+            this.login = login;
+            this.password = password;
+        }
     }
+
     /******************************************************
      ********************Public function ******************
      ******************************************************/
@@ -1180,43 +1115,31 @@ public class IntHttpService extends Service
             return null;
         }
     }
-    
-    public void prepareToQuit()
+
+    public static String getSpecialSpace()
     {
-        workerHandler.post(new Runnable() 
-        {
-            @Override
-            public void run() 
-            {
-                IntHttpService.this.stopSelf();
-            }
-        });
+        byte[] bytes = {-62, -96};
+        return new String(bytes);
     }
-    
-    private void setLoginPassword(String login, String password)
+
+    public boolean isConnected()
     {
-        synchronized (loginPasswordLock) 
+        boolean isLogin;
+        synchronized (loginPasswordLock)
         {
-            this.login = login;
-            this.password = password;
+            isLogin = login != null && password != null;
         }
+        return isLogin;
+    }
+
+    public @Nullable String getLogin()
+    {
+        return login;
     }
     
     /******************************************************
      **********************Inner Class*********************
      ******************************************************/
-    private static class LoadClassTaskParams
-    {
-        private Date searchDate;
-        private WeakReference<asyncGetClassInfoListener> callbackRef;
-        
-        public LoadClassTaskParams(Date searchDate, asyncGetClassInfoListener callback)
-        {
-            this.searchDate = searchDate;
-            this.callbackRef = new WeakReference<asyncGetClassInfoListener>(callback);
-        }
-    }
-    
     private static class AgendaWebParams
     {
         private String groupID;
@@ -1298,36 +1221,14 @@ public class IntHttpService extends Service
         }
     }
     
-    /******************************************************
-     *********************Async Listener*******************
-     ******************************************************/
-    
-    public interface asyncGetClassInfoListener
-    {
-        public void onAsyncGetClassInfo(HttpServiceErrorEnum errorEnum, Date searchDate, List<ClassEvent> results);
-    }
-    
     @Override
     public void onDestroy() 
     {
         super.onDestroy();
-        
-        synchronized (loadClassParamsQueue) 
+
+        if(client != null)
         {
-            loadClassParamsQueue.clear();
+            client.close();
         }
-        workerHandler.removeCallbacksAndMessages(null);
-        workerHandler.post(new Runnable() 
-        {
-            @Override
-            public void run() 
-            {
-                if(client != null)
-                {
-                    client.close();
-                }
-                workerThread.quit();
-            }
-        });
     }
 }

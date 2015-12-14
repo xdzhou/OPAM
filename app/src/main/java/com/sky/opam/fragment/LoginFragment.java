@@ -16,13 +16,11 @@ import android.widget.Switch;
 
 import com.loic.common.Chiffrement;
 import com.loic.common.utils.AndroidUtils;
-import com.loic.common.utils.ToastUtils;
 import com.sky.opam.OpamFragment;
 import com.sky.opam.OpamMFM;
 import com.sky.opam.R;
 import com.sky.opam.model.User;
 import com.sky.opam.service.IntHttpService;
-import com.sky.opam.service.IntHttpService.HttpServiceErrorEnum;
 import com.sky.opam.tool.DBworker;
 import com.sky.opam.tool.SharePreferenceUtils;
 
@@ -34,7 +32,6 @@ public class LoginFragment extends OpamFragment
     
     private AutoCompleteTextView loginTextView;
     private EditText passwordEditText;
-    private Button enterButton;
     private Switch rememberMeSwitch;
     private ProgressDialog progressDialog;
     private DBworker worker;
@@ -52,7 +49,7 @@ public class LoginFragment extends OpamFragment
         View rootView =  inflater.inflate(R.layout.login_fragment, container, false);
         loginTextView = (AutoCompleteTextView) rootView.findViewById(R.id.txtID);
         passwordEditText = (EditText) rootView.findViewById(R.id.txtMDP);
-        enterButton = (Button) rootView.findViewById(R.id.btnVAD);
+        Button enterButton = (Button) rootView.findViewById(R.id.btnVAD);
 
         rememberMeSwitch = (Switch) rootView.findViewById(R.id.switch_remember_me);
         if(SharePreferenceUtils.isRememberMe())
@@ -69,7 +66,7 @@ public class LoginFragment extends OpamFragment
         {
             rememberMeSwitch.setChecked(false);
         }
-        
+
         enterButton.getBackground().setAlpha(150);
         enterButton.setOnClickListener(new View.OnClickListener()
         {
@@ -98,7 +95,7 @@ public class LoginFragment extends OpamFragment
                         }
                         else
                         {
-                            passwordResetAlart();
+                            passwordResetAlert();
                         }
                     }
                     else
@@ -136,7 +133,7 @@ public class LoginFragment extends OpamFragment
             Log.e(TAG, "requestLogin : IntHttpService is null ...");
             return;
         }
-        httpService.requestLogin(login, password).subscribe(new Subscriber<HttpServiceErrorEnum>()
+        httpService.requestLogin(login, password).subscribe(new Subscriber<User>()
         {
             @Override
             public void onStart()
@@ -154,23 +151,17 @@ public class LoginFragment extends OpamFragment
             public void onError(Throwable e)
             {
                 closeProgressDialog();
+                Log.e(TAG, "requestLogin error : "+e);
             }
 
             @Override
-            public void onNext(HttpServiceErrorEnum errorEnum)
+            public void onNext(User user)
             {
-                if (errorEnum == HttpServiceErrorEnum.OkError)
+                worker.insertData(user);
+                worker.setDefaultUser(login);
+                if (isAdded())
                 {
-                    worker.setDefaultUser(login);
-                    if (isAdded())
-                    {
-                        showAgenda();
-                    }
-                }
-                else
-                {
-                    ToastUtils.show(errorEnum.getDescription());
-                    Log.e(TAG, "onAgendaLoaded with error : " + errorEnum.toString());
+                    showAgenda();
                 }
             }
         });
@@ -188,7 +179,7 @@ public class LoginFragment extends OpamFragment
         }
     }
     
-    private void passwordResetAlart()
+    private void passwordResetAlert()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Password Error")

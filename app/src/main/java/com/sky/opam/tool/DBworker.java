@@ -10,10 +10,16 @@ import com.loic.common.sqliteTool.SqliteWorker;
 import com.sky.opam.model.ClassEvent;
 import com.sky.opam.model.ClassUpdateInfo;
 import com.sky.opam.model.User;
+import com.sky.opam.service.IntHttpService;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import rx.Observable;
+import rx.functions.Action1;
 
 public class DBworker extends SqliteWorker
 {
@@ -77,7 +83,7 @@ public class DBworker extends SqliteWorker
     
     public User getUser(String login)
     {
-        Object object = retrieveAData(User.class, "login = '"+login+"'");
+        Object object = retrieveAData(User.class, "login = '" + login + "'");
         if(object != null && object instanceof User)
         {
             return (User) object;
@@ -88,13 +94,59 @@ public class DBworker extends SqliteWorker
     public void delUser(String login)
     {
         if(login != null && !login.isEmpty())
-            deleteData(User.class, "login = '"+login+"'");
+        {
+            deleteData(User.class, "login = '" + login + "'");
+        }
     }
     
     
     /******************************************************
      ************** ClassUpdateInfo Operation *************
      ******************************************************/
+    public Observable<List<ClassEvent>> inserClassEvents(final @NonNull String login, final int year, final int month, @NonNull Observable<List<ClassEvent>> rxClassEvents)
+    {
+        return rxClassEvents.doOnNext(new Action1<List<ClassEvent>>()
+        {
+            @Override
+            public void call(List<ClassEvent> classEvents)
+            {
+                ClassUpdateInfo updateInfo = getUpdateInfo(login, year, month);
+
+                boolean needSave = false;
+                if(updateInfo == null)
+                {
+                    updateInfo = new ClassUpdateInfo(login);
+                    updateInfo.year = year;
+                    updateInfo.month = month;
+                    needSave = true;
+                }
+
+                deleteClassEvents(login, year, month);
+                int totalTime = 0; //in second
+                for(ClassEvent classEvent : classEvents)
+                {
+                    insertData(classEvent);
+                    totalTime += (classEvent.endTime.getTime() - classEvent.startTime.getTime()) / 1000;
+                }
+                updateInfo.lastSuccessUpdateDate = new Date();
+                updateInfo.classNumber = classEvents.size();
+                updateInfo.totalTime = totalTime;
+                updateInfo.errorEnum = IntHttpService.HttpServiceErrorEnum.OkError;
+
+                if(needSave)
+                {
+                    insertData(updateInfo);
+                    Log.d(TAG, "insert updateInfo : "+updateInfo);
+                }
+                else
+                {
+                    updateClassUpdateInfro(updateInfo);
+                    Log.d(TAG, "update updateInfo : "+updateInfo);
+                }
+            }
+        });
+    }
+
     public ClassUpdateInfo getUpdateInfo(String login, Date date)
     {
         int[] values = getYearMonth(date);    
@@ -111,7 +163,9 @@ public class DBworker extends SqliteWorker
         {
             Object object = retrieveAData(ClassUpdateInfo.class, "login = '"+login+"' AND year = "+year+" AND month = "+month);
             if(object != null && object instanceof ClassUpdateInfo)
+            {
                 return (ClassUpdateInfo) object;
+            }
         }
         return null;
     }
